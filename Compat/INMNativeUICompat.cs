@@ -8,6 +8,53 @@ using System;
 
 namespace BennysMotorworksRevamped.Compat
 {
+    public sealed class UIMenuItemCollection : List<UIMenuItem>
+    {
+        private readonly UIMenu _owner;
+
+        internal UIMenuItemCollection(UIMenu owner)
+        {
+            _owner = owner;
+        }
+
+        public new void Add(UIMenuItem item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            item.NativeItem.Tag = item;
+            base.Add(item);
+            _owner.NativeMenu.Add(item.NativeItem);
+        }
+
+        public new void Clear()
+        {
+            base.Clear();
+            _owner.NativeMenu.Clear();
+        }
+
+        public new bool Remove(UIMenuItem item)
+        {
+            if (!base.Contains(item))
+            {
+                return false;
+            }
+
+            bool removed = base.Remove(item);
+            _owner.NativeMenu.Remove(item.NativeItem);
+            return removed;
+        }
+
+        public new void RemoveAt(int index)
+        {
+            UIMenuItem item = base[index];
+            base.RemoveAt(index);
+            _owner.NativeMenu.Remove(item.NativeItem);
+        }
+    }
+
     public class MenuPool
     {
         private readonly ObjectPool _pool = new ObjectPool();
@@ -55,7 +102,7 @@ namespace BennysMotorworksRevamped.Compat
         public UIMenu(string title, string subtitle)
         {
             NativeMenu = new NativeMenu(title ?? string.Empty, subtitle ?? string.Empty);
-            MenuItems = new List<UIMenuItem>();
+            MenuItems = new UIMenuItemCollection(this);
             RegisteredMenus.Add(this);
 
             NativeMenu.Closed += (sender, args) =>
@@ -121,7 +168,7 @@ namespace BennysMotorworksRevamped.Compat
         }
 
         public NativeMenu NativeMenu { get; }
-        public List<UIMenuItem> MenuItems { get; }
+        public UIMenuItemCollection MenuItems { get; }
         public bool MouseEdgeEnabled { get; set; }
         public UIMenu ParentMenu { get; internal set; }
         private bool SuppressParentRestoreOnce { get; set; }
@@ -215,14 +262,7 @@ namespace BennysMotorworksRevamped.Compat
 
         public void AddItem(UIMenuItem item)
         {
-            if (item == null)
-            {
-                return;
-            }
-
-            item.NativeItem.Tag = item;
             MenuItems.Add(item);
-            NativeMenu.Add(item.NativeItem);
         }
 
         public void BindMenuToItem(UIMenu submenu, UIMenuItem item)
@@ -284,11 +324,14 @@ namespace BennysMotorworksRevamped.Compat
 
     public class UIMenuItem
     {
+        private static readonly BadgeSet EquippedBadge = new BadgeSet("commonmenu", "shop_garage_icon_a", "shop_garage_icon_b");
+        private static readonly BadgeSet PurchasedBadge = new BadgeSet("commonmenu", "shop_tick_icon", "shop_tick_icon");
         private string _rightLabel = string.Empty;
 
         public enum BadgeStyle
         {
             None,
+            Tick,
             Car,
         }
 
@@ -299,7 +342,7 @@ namespace BennysMotorworksRevamped.Compat
 
         public UIMenuItem(string text, string description)
         {
-            NativeItem = new NativeItem(text ?? string.Empty, description ?? string.Empty);
+            NativeItem = new NativeItem(NormalizeItemText(text), description ?? string.Empty);
             NativeItem.Tag = this;
         }
 
@@ -310,7 +353,7 @@ namespace BennysMotorworksRevamped.Compat
         public string Text
         {
             get => NativeItem.Title;
-            set => NativeItem.Title = value ?? string.Empty;
+            set => NativeItem.Title = NormalizeItemText(value);
         }
 
         public string Description
@@ -335,9 +378,22 @@ namespace BennysMotorworksRevamped.Compat
 
         private void RefreshRightText()
         {
-            if (RightBadge == BadgeStyle.Car)
+            switch (RightBadge)
             {
-                NativeItem.AltTitle = "Purchased";
+                case BadgeStyle.Tick:
+                    NativeItem.RightBadgeSet = PurchasedBadge;
+                    break;
+                case BadgeStyle.Car:
+                    NativeItem.RightBadgeSet = EquippedBadge;
+                    break;
+                default:
+                    NativeItem.RightBadgeSet = null;
+                    break;
+            }
+
+            if (RightBadge != BadgeStyle.None)
+            {
+                NativeItem.AltTitle = string.Empty;
             }
             else if (!string.IsNullOrEmpty(_rightLabel))
             {
@@ -347,6 +403,11 @@ namespace BennysMotorworksRevamped.Compat
             {
                 NativeItem.AltTitle = Submenu != null ? ">" : string.Empty;
             }
+        }
+
+        private static string NormalizeItemText(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? "Unnamed Item" : value;
         }
     }
 
