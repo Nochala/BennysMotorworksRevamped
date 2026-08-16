@@ -46,10 +46,46 @@ namespace BennysMotorworksRevamped
 
         public static List<Model> lowriders = new()
         {
-            "banshee", "Buccaneer", "chino", "diablous", "comet2", "faction", "faction2", "fcr", "italigtb", "minivan",
+            "banshee", "buccaneer", "chino", "diablous", "comet2", "faction", "faction2", "fcr", "italigtb", "minivan",
             "moonbeam", "nero", "primo", "sabregt", "slamvan", "specter", "sultan", "tornado", "tornado2", "tornado3",
             "virgo3", "voodoo2", "elegy2", "technical", "insurgent", "youga2", "yosemite", "peyote", "manana", "glendale",
             "gauntlet3",
+        };
+
+        private static readonly Dictionary<Model, Tuple<Model, int>> lowriderUpgrades = new()
+        {
+            { new Model("banshee"), Tuple.Create(new Model("banshee2"), 565000) },
+            { new Model("buccaneer"), Tuple.Create(new Model("buccaneer2"), 390000) },
+            { new Model("chino"), Tuple.Create(new Model("chino2"), 180000) },
+            { new Model("diablous"), Tuple.Create(new Model("diablous2"), 245000) },
+            { new Model("comet2"), Tuple.Create(new Model("comet3"), 645000) },
+            { new Model("faction"), Tuple.Create(new Model("faction2"), 335000) },
+            { new Model("faction2"), Tuple.Create(new Model("faction3"), 695000) },
+            { new Model("fcr"), Tuple.Create(new Model("fcr2"), 196000) },
+            { new Model("italigtb"), Tuple.Create(new Model("italigtb2"), 495000) },
+            { new Model("minivan"), Tuple.Create(new Model("minivan2"), 330000) },
+            { new Model("moonbeam"), Tuple.Create(new Model("moonbeam2"), 370000) },
+            { new Model("nero"), Tuple.Create(new Model("nero2"), 605000) },
+            { new Model("primo"), Tuple.Create(new Model("primo2"), 400000) },
+            { new Model("sabregt"), Tuple.Create(new Model("sabregt2"), 490000) },
+            { new Model("slamvan"), Tuple.Create(new Model("slamvan3"), 415000) },
+            { new Model("slamvan2"), Tuple.Create(new Model("slamvan3"), 415000) },
+            { new Model("specter"), Tuple.Create(new Model("specter2"), 252000) },
+            { new Model("sultan"), Tuple.Create(new Model("sultanrs"), 795000) },
+            { new Model("tornado"), Tuple.Create(new Model("tornado5"), 375000) },
+            { new Model("tornado2"), Tuple.Create(new Model("tornado5"), 375000) },
+            { new Model("tornado3"), Tuple.Create(new Model("tornado5"), 375000) },
+            { new Model("virgo3"), Tuple.Create(new Model("virgo2"), 240000) },
+            { new Model("voodoo2"), Tuple.Create(new Model("voodoo"), 420000) },
+            { new Model("elegy2"), Tuple.Create(new Model("elegy"), 904000) },
+            { new Model("technical"), Tuple.Create(new Model("technical3"), 142500) },
+            { new Model("insurgent"), Tuple.Create(new Model("insurgent3"), 202500) },
+            { new Model("youga2"), Tuple.Create(new Model("youga3"), 1288000) },
+            { new Model("yosemite"), Tuple.Create(new Model("yosemite3"), 700000) },
+            { new Model("peyote"), Tuple.Create(new Model("peyote3"), 620000) },
+            { new Model("manana"), Tuple.Create(new Model("manana2"), 925000) },
+            { new Model("glendale"), Tuple.Create(new Model("glendale2"), 520000) },
+            { new Model("gauntlet3"), Tuple.Create(new Model("gauntlet5"), 815000) },
         };
 
         public static List<Model> arenawar = new()
@@ -59,7 +95,7 @@ namespace BennysMotorworksRevamped
 
         public static List<Model> bennysvehicle = new()
         {
-            "banshee2", "buccaneer2", "chino2", "diabolus2", "comet3", "faction2", "faction3", "fcr2", "italigtb2", "minivan2",
+            "banshee2", "buccaneer2", "chino2", "diablous2", "comet3", "faction2", "faction3", "fcr2", "italigtb2", "minivan2",
             "moonbeam2", "nero2", "primo2", "sabregt2", "specter2", "sultanrs", "tornado5", "virgo2", "voodoo", "elegy",
             "technical3", "insurgent3", "youga3", "yosemite3", "peyote3", "manana2", "glendale2", "gauntlet5",
         };
@@ -424,40 +460,27 @@ namespace BennysMotorworksRevamped
 
         public static Model LowriderUpgrade(Model model)
         {
-            string name = model.ToString().ToLowerInvariant();
-            return name switch
+            if (lowriderUpgrades.TryGetValue(model, out Tuple<Model, int> upgrade))
             {
-                "banshee" => new Model("banshee2"),
-                "buccaneer" => new Model("buccaneer2"),
-                "chino" => new Model("chino2"),
-                "diablous" => new Model("diablous2"),
-                "comet2" => new Model("comet3"),
-                "faction" => new Model("faction2"),
-                "faction2" => new Model("faction3"),
-                "fcr" => new Model("fcr2"),
-                "italigtb" => new Model("italigtb2"),
-                "minivan" => new Model("minivan2"),
-                "moonbeam" => new Model("moonbeam2"),
-                "nero" => new Model("nero2"),
-                "primo" => new Model("primo2"),
-                "sabregt" => new Model("sabregt2"),
-                "slamvan" or "slamvan2" => new Model("slamvan3"),
-                "specter" => new Model("specter2"),
-                "sultan" => new Model("sultanrs"),
-                "tornado" or "tornado2" or "tornado3" => new Model("tornado5"),
-                "virgo3" => new Model("virgo2"),
-                "voodoo2" => new Model("voodoo"),
-                "elegy2" => new Model("elegy"),
-                "technical" => new Model("technical3"),
-                "insurgent" => new Model("insurgent3"),
-                "youga2" => new Model("youga3"),
-                "yosemite" => new Model("yosemite3"),
-                "peyote" => new Model("peyote3"),
-                "manana" => new Model("manana2"),
-                "glendale" => new Model("glendale2"),
-                "gauntlet3" => new Model("gauntlet5"),
-                _ => model,
-            };
+                return upgrade.Item1;
+            }
+
+            return model;
+        }
+
+        public static bool TryGetLowriderBaseModel(Model upgradedModel, out Model baseModel)
+        {
+            foreach (Model candidate in lowriders)
+            {
+                if (LowriderUpgrade(candidate) == upgradedModel)
+                {
+                    baseModel = candidate;
+                    return true;
+                }
+            }
+
+            baseModel = upgradedModel;
+            return false;
         }
 
         public enum ScreenEffect
@@ -1833,40 +1856,12 @@ namespace BennysMotorworksRevamped
 
         public static int GetUpgradePrice(this Model vehicleModel)
         {
-            string modelName = vehicleModel.ToString().ToLowerInvariant();
-            return modelName switch
+            if (lowriderUpgrades.TryGetValue(vehicleModel, out Tuple<Model, int> upgrade))
             {
-                "banshee" => 565000,
-                "buccaneer" => 390000,
-                "chino" => 180000,
-                "diablous" => 245000,
-                "comet2" => 645000,
-                "faction" => 335000,
-                "faction2" => 695000,
-                "fcr" => 196000,
-                "italigtb" => 495000,
-                "minivan" => 330000,
-                "moonbeam" => 370000,
-                "nero" => 605000,
-                "primo" => 400000,
-                "sabregt" => 490000,
-                "slamvan" or "slamvan2" => 394250,
-                "specter" => 252000,
-                "sultan" => 795000,
-                "tornado" or "tornado2" or "tornado3" => 375000,
-                "virgo3" => 240000,
-                "voodoo2" => 420000,
-                "elegy2" => 904000,
-                "technical" => 142500,
-                "insurgent" => 202500,
-                "youga2" => 1288000,
-                "yosemite" => 700000,
-                "peyote" => 620000,
-                "manana" => 925000,
-                "glendale" => 520000,
-                "gauntlet3" => 815000,
-                _ => 0,
-            };
+                return upgrade.Item2;
+            }
+
+            return 0;
         }
 
         public static void PlaySpeech(string speechName)

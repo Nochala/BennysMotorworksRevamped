@@ -39,7 +39,7 @@ namespace BennysMotorworksRevamped
 
         public static UIMenu QuitMenu, MainMenu, gmBodywork, gmBodyworkArena, gmEngine, gmInterior, gmPlate, gmLights, gmRespray, gmWheels, gmBumper, gmWheelType, gmNeonKits, gmWeapon;
         public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTires, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryChromeColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mSecondaryColor, mSecondaryClassicColor, mSecondaryChromeColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
-        public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
+        public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
         public static UIMenuItem giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giTires, giNeonKits, giPrimaryCol, giSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
         public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank;
         public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank;
@@ -62,6 +62,50 @@ namespace BennysMotorworksRevamped
 
 
         #region Refresh Menus
+        private static int GetIndexedModPrice(int index, int priceStep)
+        {
+            // Stock uses index -1. It should cost the base tier whenever it is
+            // not currently equipped instead of appearing as a blank row.
+            return priceStep * Math.Max(1, index + 1);
+        }
+
+        private static readonly int[] SuspensionPrices = { 500, 1000, 2000, 3400, 4400, 4600 };
+        private static readonly int[] EnginePrices = { 1000, 9000, 12500, 18000, 33500 };
+        private static readonly int[] ArmorPrices = { 1000, 7500, 12000, 20000, 35000, 50000 };
+        private static readonly int[] BrakePrices = { 1000, 20000, 27000, 35000 };
+        private static readonly int[] TransmissionPrices = { 1000, 29500, 32500, 40000 };
+
+        private static int GetPerformanceModPrice(VehicleMod modType, int index)
+        {
+            int[] prices;
+
+            switch (modType)
+            {
+                case VehicleMod.Suspension:
+                    prices = SuspensionPrices;
+                    break;
+                case VehicleMod.Engine:
+                    prices = EnginePrices;
+                    break;
+                case VehicleMod.Armor:
+                    prices = ArmorPrices;
+                    break;
+                case VehicleMod.Brakes:
+                    prices = BrakePrices;
+                    break;
+                case VehicleMod.Transmission:
+                    prices = TransmissionPrices;
+                    break;
+                default:
+                    return GetIndexedModPrice(index, 2000);
+            }
+
+            int priceIndex = index + 1;
+            return priceIndex >= 0 && priceIndex < prices.Length
+                ? prices[priceIndex]
+                : GetIndexedModPrice(index, 2000);
+        }
+
         public static void RefreshMenus()
         {
             if (arenavehicle.Contains(veh.Model))
@@ -351,6 +395,13 @@ namespace BennysMotorworksRevamped
                         }
                         MainMenu.AddItem(iUpgrade);
                     }
+                    if (TryGetLowriderBaseModel(veh.Model, out Model motorcycleBaseModel))
+                    {
+                        iRemoveUpgrade = new UIMenuItem("Remove Upgrade", "Restore the original vehicle model.");
+                        iRemoveUpgrade.SetRightLabel("$0");
+                        iRemoveUpgrade.Tag = motorcycleBaseModel;
+                        MainMenu.AddItem(iRemoveUpgrade);
+                    }
                     if (veh.DisplayName.IsUpgradeModExist())
                     {
                         Tuple<string, int> upgrade2 = veh.DisplayName.GetUpgradeModVehicleInfo();
@@ -361,12 +412,6 @@ namespace BennysMotorworksRevamped
                             __with1.Tag = upgrade2.Item2;
                         }
                         MainMenu.AddItem(iUpgradeMod);
-                    }
-                    if (arenawar.Contains(veh.Model))
-                    {
-                        iUpgradeAW = new UIMenuItem(LocalizedModGroupName(GroupName.Upgrade2), Game.GetLocalizedString("collision_87oubis"));
-                        MainMenu.AddItem(iUpgradeAW);
-                        MainMenu.BindMenuToItem(mUpgradeAW, iUpgradeAW);
                     }
 
                     if (arenavehicle.Contains(veh.Model))
@@ -530,6 +575,13 @@ namespace BennysMotorworksRevamped
                         }
                         MainMenu.AddItem(iUpgrade);
                     }
+                    if (TryGetLowriderBaseModel(veh.Model, out Model baseModel))
+                    {
+                        iRemoveUpgrade = new UIMenuItem("Remove Upgrade", "Restore the original vehicle model.");
+                        iRemoveUpgrade.SetRightLabel("$0");
+                        iRemoveUpgrade.Tag = baseModel;
+                        MainMenu.AddItem(iRemoveUpgrade);
+                    }
                     if (veh.DisplayName.IsUpgradeModExist())
                     {
                         Tuple<string, int> upgrade2 = veh.DisplayName.GetUpgradeModVehicleInfo();
@@ -540,12 +592,6 @@ namespace BennysMotorworksRevamped
                             __with1.Tag = upgrade2.Item2;
                         }
                         MainMenu.AddItem(iUpgradeMod);
-                    }
-                    if (arenawar.Contains(veh.Model))
-                    {
-                        iUpgradeAW = new UIMenuItem(LocalizedModGroupName(GroupName.Upgrade2), Game.GetLocalizedString("collision_87oubis"));
-                        MainMenu.AddItem(iUpgradeAW);
-                        MainMenu.BindMenuToItem(mUpgradeAW, iUpgradeAW);
                     }
 
 
@@ -1149,7 +1195,7 @@ namespace BennysMotorworksRevamped
                     }
                     else
                     {
-                        int price = i == -1 ? 0 : 200 * (i + 1);
+                        int price = GetIndexedModPrice(i, 200);
                         if (price > 0)
                         {
                             item.SetRightLabel($"${price}");
@@ -1177,8 +1223,13 @@ namespace BennysMotorworksRevamped
                 if (!veh.IsToggleModOn(vehmod))
                 {
                     item.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                    item.Tag = new ModClass(0, 0);
                 }
-                item.Tag = new ModClass(0, 0);
+                else
+                {
+                    item.SetRightLabel("$1000");
+                    item.Tag = new ModClass(0, 1000);
+                }
                 menu.AddItem(item);
 
                 item = new UIMenuItem(LocalizedModTypeName(vehmod));
@@ -1219,7 +1270,9 @@ namespace BennysMotorworksRevamped
                 }
                 else
                 {
-                    stockItem.Tag = new ToggleModClass(false, 255, 0);
+                    const int stockPrice = 500;
+                    stockItem.SetRightLabel($"${stockPrice}");
+                    stockItem.Tag = new ToggleModClass(false, 255, stockPrice);
                 }
 
                 menu.AddItem(stockItem);
@@ -1393,7 +1446,7 @@ namespace BennysMotorworksRevamped
                     }
                     else
                     {
-                        int price = i == -1 ? 0 : 2000 * (i + 1);
+                        int price = GetPerformanceModPrice(vehmod, i);
                         if (price > 0)
                         {
                             item.SetRightLabel($"${price}");
@@ -1443,7 +1496,7 @@ namespace BennysMotorworksRevamped
                     iNitro = nitroItem;
                 }
 
-                AddNitroItem("CMOD_ARM_0", 0, 0);
+                AddNitroItem("CMOD_ARM_0", 0, 10000);
                 AddNitroItem("CMOD_BOS_1", 1, 10000);
                 AddNitroItem("CMOD_BOS_2", 2, 20000);
                 AddNitroItem("CMOD_BOS_3", 3, 30000);
@@ -1877,16 +1930,9 @@ namespace BennysMotorworksRevamped
                     }
                     else
                     {
-                        if (i != -1)
-                        {
-                            int price = 200 * (i + 1);
-                            item.SetRightLabel($"${price}");
-                            item.Tag = new ModClass(i, price);
-                        }
-                        else
-                        {
-                            item.Tag = new ModClass(i, 0);
-                        }
+                        int price = GetIndexedModPrice(i, 200);
+                        item.SetRightLabel($"${price}");
+                        item.Tag = new ModClass(i, price);
                     }
 
                     menu.AddItem(item);
@@ -1962,7 +2008,7 @@ namespace BennysMotorworksRevamped
                     }
                     else
                     {
-                        int price = i == -1 ? 0 : 200 * (i + 1);
+                        int price = GetIndexedModPrice(i, 200);
                         if (price > 0)
                         {
                             item.SetRightLabel($"${price}");
@@ -2010,7 +2056,7 @@ namespace BennysMotorworksRevamped
                     }
                     else
                     {
-                        int price = i == -1 ? 0 : 200 * (i + 1);
+                        int price = GetIndexedModPrice(i, 200);
                         if (price > 0)
                         {
                             item.SetRightLabel($"${price}");
@@ -4726,11 +4772,15 @@ namespace BennysMotorworksRevamped
                         Game.Player.Money = (Game.Player.Money - Convert.ToInt32(selectedItem.Tag));
                         RefreshMenus();
                     }
-                    else if (selectedItem == iUpgrade)
+                    else if (selectedItem == iUpgrade || selectedItem == iRemoveUpgrade)
                     {
                         GTA.UI.Screen.FadeOut(1000);
                         Script.Wait(1000);
-                        Vehicle newVeh = World.CreateVehicle(LowriderUpgrade(veh.Model), veh.Position, veh.Heading);
+                        bool isRemovingUpgrade = selectedItem == iRemoveUpgrade;
+                        Model replacementModel = isRemovingUpgrade
+                            ? (Model)selectedItem.Tag
+                            : LowriderUpgrade(veh.Model);
+                        Vehicle newVeh = World.CreateVehicle(replacementModel, veh.Position, veh.Heading);
                         newVeh.IsPersistent = false;
                         newVeh.Mods.PrimaryColor = lastVehMemory.PrimaryColor;
                         newVeh.Mods.SecondaryColor = lastVehMemory.SecondaryColor;
@@ -4803,7 +4853,10 @@ namespace BennysMotorworksRevamped
                         camera.RepositionFor(newVeh);
                         Script.Wait(1000);
                         GTA.UI.Screen.FadeIn(1000);
-                        Game.Player.Money = (Game.Player.Money - Convert.ToInt32(selectedItem.Tag));
+                        if (!isRemovingUpgrade)
+                        {
+                            Game.Player.Money = (Game.Player.Money - Convert.ToInt32(selectedItem.Tag));
+                        }
                         Function.Call((Hash)0x2206BF9A37B7F724UL, "MP_corona_switch_supermod", 0, true);
                         Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "Lowrider_Upgrade", "Lowrider_Super_Mod_Garage_Sounds", 1);
                         PlaySpeech("LR_UPGRADE_SUPERMOD");
