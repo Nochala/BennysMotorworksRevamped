@@ -272,13 +272,61 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static void MoveMainMenuItemToEnd(UIMenuItem item)
+        {
+            if (item != null && MainMenu.MenuItems.Remove(item))
+            {
+                MainMenu.AddItem(item);
+            }
+        }
+
+        private static void ApplyMainMenuCategoryOrder()
+        {
+            // Keep Benny's upgrade/weapon entries at the top, then match the
+            // category flow used by Los Santos Customs.
+            MoveMainMenuItemToEnd(iArmor);
+            MoveMainMenuItemToEnd(giBrakes);
+            MoveMainMenuItemToEnd(giBumper);
+            MoveMainMenuItemToEnd(giBodywork);
+            MoveMainMenuItemToEnd(giEngine);
+            MoveMainMenuItemToEnd(giAirfilter);
+            MoveMainMenuItemToEnd(giStruts);
+            MoveMainMenuItemToEnd(giExhaust);
+            MoveMainMenuItemToEnd(iFender);
+            MoveMainMenuItemToEnd(iRFender);
+            MoveMainMenuItemToEnd(iFrame);
+            MoveMainMenuItemToEnd(giGrille);
+            MoveMainMenuItemToEnd(giHood);
+            MoveMainMenuItemToEnd(iHorn);
+            MoveMainMenuItemToEnd(giHydraulics);
+            MoveMainMenuItemToEnd(giInterior);
+            MoveMainMenuItemToEnd(iSpeaker);
+            MoveMainMenuItemToEnd(giLights);
+            MoveMainMenuItemToEnd(iLivery);
+            MoveMainMenuItemToEnd(iTornadoC);
+            MoveMainMenuItemToEnd(giPlate);
+            MoveMainMenuItemToEnd(giNumberPlate);
+            MoveMainMenuItemToEnd(giPlateHolder);
+            MoveMainMenuItemToEnd(giRespray);
+            MoveMainMenuItemToEnd(iRoof);
+            MoveMainMenuItemToEnd(giTank);
+            MoveMainMenuItemToEnd(giPlaques);
+            MoveMainMenuItemToEnd(giSpoilers);
+            MoveMainMenuItemToEnd(iSuspension);
+            MoveMainMenuItemToEnd(iTransmission);
+            MoveMainMenuItemToEnd(giTrunk);
+            MoveMainMenuItemToEnd(iTurbo);
+            MoveMainMenuItemToEnd(giWheels);
+            MoveMainMenuItemToEnd(iTint);
+        }
+
         public static void RefreshMainMenu()
         {
             try
             {
                 MainMenu.MenuItems.Clear();
 
-                if (veh.HasDamageDecals)
+                if (veh.HasDamageDecals && !isRepairing)
                 {
                     iRepair = new UIMenuItem(LocalizedModGroupName(GroupName.Repair), Game.GetLocalizedString("CMOD_MOD_0_D"));
                     {
@@ -726,6 +774,9 @@ namespace BennysMotorworksRevamped
                     // End If
                     MainMenu.RefreshIndex();
                 }
+
+                ApplyMainMenuCategoryOrder();
+                MainMenu.RefreshIndex();
             }
             catch (Exception ex)
             {
@@ -2593,7 +2644,7 @@ namespace BennysMotorworksRevamped
                     if (iBPTires.RightBadge == UIMenuItem.BadgeStyle.Car)
                     {
                         veh.CanTiresBurst = true;
-                        selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.None);
+                        selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Tick);
                         lastVehMemory.BulletProofTires = true;
                     }
                     else
@@ -2615,7 +2666,10 @@ namespace BennysMotorworksRevamped
             {
                 foreach (UIMenuItem i in sender.MenuItems)
                 {
-                    i.SetRightBadge(UIMenuItem.BadgeStyle.None);
+                    if (i.RightBadge == UIMenuItem.BadgeStyle.Car)
+                    {
+                        i.SetRightBadge(UIMenuItem.BadgeStyle.Tick);
+                    }
                 }
 
                 // Arena War Upgrade
@@ -2704,7 +2758,7 @@ namespace BennysMotorworksRevamped
                 // Performance Mods
                 if (sender == mSuspension)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mi = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Suspension, mi.ModID, false);
@@ -2718,7 +2772,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mArmor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mi = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Armor, mi.ModID, false);
@@ -2732,7 +2786,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mBrakes)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mi = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Brakes, mi.ModID, false);
@@ -2746,7 +2800,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTransmission)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mi = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Transmission, mi.ModID, false);
@@ -2760,7 +2814,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mEngine)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mi = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Engine, mi.ModID, false);
@@ -2774,7 +2828,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mNitro)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetInt(nitroMod, mc.ModID);
@@ -2790,7 +2844,7 @@ namespace BennysMotorworksRevamped
                 // Mods
                 if (sender == mFBumper)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.FrontBumper, mc.ModID, false);
@@ -2804,7 +2858,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mRBumper)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.RearBumper, mc.ModID, false);
@@ -2818,7 +2872,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mSSkirt)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.SideSkirt, mc.ModID, false);
@@ -2832,7 +2886,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mNumberPlate)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.LicensePlateStyle = (LicensePlateStyle)mc.ModID;
@@ -2846,7 +2900,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mHeadlights)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ToggleModClass tmc = (ToggleModClass)selectedItem.Tag;
                         veh.ToggleMod(VehicleToggleMod.XenonHeadlights, tmc.ModToggle);
@@ -2862,7 +2916,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mArchCover)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.ArchCover, mc.ModID, false);
@@ -2876,7 +2930,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mExhaust)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Exhaust, mc.ModID, false);
@@ -2890,7 +2944,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mFender)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Fender, mc.ModID, false);
@@ -2904,7 +2958,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mRFender)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.RightFender, mc.ModID, false);
@@ -2918,7 +2972,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mDoor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.DoorSpeakers, mc.ModID, false);
@@ -2932,7 +2986,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mFrame)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Frame, mc.ModID, false);
@@ -2946,7 +3000,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mAerials)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Aerials, mc.ModID, false);
@@ -2960,7 +3014,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTrim)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Trim, mc.ModID, false);
@@ -2974,7 +3028,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mEngineBlock)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.EngineBlock, mc.ModID, false);
@@ -2988,7 +3042,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mAirFilter)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.AirFilter, mc.ModID, false);
@@ -3002,7 +3056,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mStruts)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Struts, mc.ModID, false);
@@ -3016,7 +3070,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mColumnShifterLevers)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.ColumnShifterLevers, mc.ModID, false);
@@ -3030,7 +3084,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mDashboard)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Dashboard, mc.ModID, false);
@@ -3044,7 +3098,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mDialDesign)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.DialDesign, mc.ModID, false);
@@ -3058,7 +3112,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mOrnaments)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Ornaments, mc.ModID, false);
@@ -3072,7 +3126,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mSeats)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Seats, mc.ModID, false);
@@ -3086,7 +3140,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mSteeringWheels)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.SteeringWheels, mc.ModID, false);
@@ -3100,7 +3154,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTrimDesign)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.TrimDesign, mc.ModID, false);
@@ -3114,7 +3168,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mPlateHolder)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.PlateHolder, mc.ModID, false);
@@ -3128,7 +3182,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mVanityPlates)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.VanityPlates, mc.ModID, false);
@@ -3142,7 +3196,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mGrille)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Grille, mc.ModID, false);
@@ -3156,7 +3210,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mHood)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Hood, mc.ModID, false);
@@ -3170,7 +3224,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mHorn)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Horns, mc.ModID, false);
@@ -3184,7 +3238,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mHydraulics)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Hydraulics, mc.ModID, false);
@@ -3198,7 +3252,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mLivery)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Livery, mc.ModID, false);
@@ -3212,7 +3266,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTornadoC)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetLivery2(mc.ModID);
@@ -3226,7 +3280,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mPlaques)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Plaques, mc.ModID, false);
@@ -3240,7 +3294,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mRoof)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Roof, mc.ModID, false);
@@ -3254,7 +3308,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mSpeakers)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Speakers, mc.ModID, false);
@@ -3268,7 +3322,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mSpoilers)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Spoilers, mc.ModID, false);
@@ -3282,7 +3336,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTank)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Tank, mc.ModID, false);
@@ -3296,7 +3350,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTrunk)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Trunk, mc.ModID, false);
@@ -3310,7 +3364,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mWindow)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Windows, mc.ModID, false);
@@ -3324,7 +3378,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTurbo)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.ToggleMod(VehicleToggleMod.Turbo, mc.ModIDBool());
@@ -3338,7 +3392,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTint)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.WindowTint = (VehicleWindowTint)mc.ModID;
@@ -3354,7 +3408,7 @@ namespace BennysMotorworksRevamped
                 // Bike Mods
                 if (sender == mShifter)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Fender, mc.ModID, false);
@@ -3368,7 +3422,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mFMudguard)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.FrontBumper, mc.ModID, false);
@@ -3382,7 +3436,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mBSeat)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Hood, mc.ModID, false);
@@ -3396,7 +3450,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mOilTank)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Grille, mc.ModID, false);
@@ -3410,7 +3464,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mRMudguard)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.RearBumper, mc.ModID, false);
@@ -3424,7 +3478,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mFuelTank)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Roof, mc.ModID, false);
@@ -3438,7 +3492,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mBeltDriveCovers)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Spoilers, mc.ModID, false);
@@ -3452,7 +3506,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mBEngineBlock)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Frame, mc.ModID, false);
@@ -3466,7 +3520,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mBAirFilter)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.SideSkirt, mc.ModID, false);
@@ -3480,7 +3534,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mBTank)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.Tank, mc.ModID, false);
@@ -3500,7 +3554,7 @@ namespace BennysMotorworksRevamped
                     switch ((NeonLayouts)mc.ModID)
                     {
                         case NeonLayouts.None:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, false);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, false);
@@ -3517,7 +3571,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.Front:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, false);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, true);
@@ -3534,7 +3588,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.Back:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, true);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, false);
@@ -3551,7 +3605,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.Sides:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, false);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, false);
@@ -3568,7 +3622,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.FrontAndBack:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, true);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, true);
@@ -3585,7 +3639,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.FrontAndSides:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, false);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, true);
@@ -3602,7 +3656,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.BackAndSides:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, true);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, false);
@@ -3619,7 +3673,7 @@ namespace BennysMotorworksRevamped
                             }
                             break;
                         case NeonLayouts.FrontBackAndSides:
-                            if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                             {
                                 veh.SetNeonLightsOn(VehicleNeonLight.Back, true);
                                 veh.SetNeonLightsOn(VehicleNeonLight.Front, true);
@@ -3642,7 +3696,7 @@ namespace BennysMotorworksRevamped
                 // Wheels Mods
                 if ((sender == mSBikeWheels) || (sender == mCBikeWheels))
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.FrontWheel, mc.ModID, false);
@@ -3659,7 +3713,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if ((sender == mSHighEnd) || (sender == mSLowrider) || (sender == mSMuscle) || (sender == mSOffroad) || (sender == mSSport) || (sender == mSSUV) || (sender == mSTuner) || (sender == mCHighEnd) || (sender == mCLowrider) || (sender == mCMuscle) || (sender == mCOffroad) || (sender == mCSport) || (sender == mCSUV) || (sender == mCTuner) || (sender == mBennysOriginals) || (sender == mBespoke) || (sender == mRacing) || (sender == mStreet))
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.SetMod(VehicleMod.FrontWheel, mc.ModID, false);
@@ -3674,7 +3728,7 @@ namespace BennysMotorworksRevamped
                 }
                 if (sender == mTires)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         bool bennysWheelType = veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11;
@@ -3835,7 +3889,7 @@ namespace BennysMotorworksRevamped
                 // Color()
                 if (sender == mLightsColor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.DashboardColor = ((VehicleColor)(mc.ModID));
@@ -3849,7 +3903,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTrimColor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.TrimColor = ((VehicleColor)(mc.ModID));
@@ -3863,7 +3917,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mRimColor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.RimColor = ((VehicleColor)(mc.ModID));
@@ -3877,7 +3931,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if ((sender == mPrimaryChromeColor) || (sender == mPrimaryClassicColor) || (sender == mPrimaryMatteColor) || (sender == mPrimaryMetalsColor))
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.PrimaryColor = ((VehicleColor)(mc.ModID));
@@ -3891,7 +3945,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mPrimaryMetallicColor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.PrimaryColor = ((VehicleColor)(mc.ModID));
@@ -3907,7 +3961,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mPrimaryPearlescentColor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.PearlescentColor = ((VehicleColor)(mc.ModID));
@@ -3921,7 +3975,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if ((sender == mSecondaryChromeColor) || (sender == mSecondaryClassicColor) || (sender == mSecondaryMatteColor) || (sender == mSecondaryMetallicColor) || (sender == mSecondaryMetalsColor))
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
                         veh.Mods.SecondaryColor = ((VehicleColor)(mc.ModID));
@@ -3935,7 +3989,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mNeonColor)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         RGBModClass mc = (RGBModClass)selectedItem.Tag;
                         veh.Mods.NeonLightsColor = mc.Color();
@@ -3949,7 +4003,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == mTireSmoke)
                 {
-                    if (selectedItem.RightBadge == UIMenuItem.BadgeStyle.None)
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         RGBModClass mc = (RGBModClass)selectedItem.Tag;
                         veh.Mods.TireSmokeColor = mc.Color();

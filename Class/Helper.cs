@@ -1223,7 +1223,7 @@ namespace BennysMotorworksRevamped
                     }
                     return _hornNames[index].Item2;
                 }
-                return "";
+                return LocalizedModTypeName(modType) + " " + (index + 1).ToString();
             }
             if (modType == VehicleMod.FrontWheel || modType == VehicleMod.RearWheel)
             {
@@ -1239,7 +1239,17 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
-                return Gxt(Function.Call<string>(Hash.GET_MOD_TEXT_LABEL, veh.Handle, (int)modType, index));
+                string wheelLabel = Function.Call<string>(Hash.GET_MOD_TEXT_LABEL, veh.Handle, (int)modType, index);
+                if (!string.IsNullOrWhiteSpace(wheelLabel) && DoesGXTEntryExist(wheelLabel))
+                {
+                    string localizedWheelName = Gxt(wheelLabel);
+                    if (!string.IsNullOrWhiteSpace(localizedWheelName) && !localizedWheelName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return localizedWheelName;
+                    }
+                }
+
+                return LocalizedModTypeName(modType) + " " + (index + 1).ToString();
             }
 
             switch (modType)
@@ -1297,31 +1307,72 @@ namespace BennysMotorworksRevamped
 
         public static string LocalizedLicensePlate(int plateType)
         {
-            string result = null;
+            string result;
+            string fallback;
 
             switch (plateType)
             {
                 case 0:
                     result = Gxt("CMOD_PLA_0");
+                    fallback = "Blue on White 2";
                     break;
                 case 3:
                     result = Gxt("CMOD_PLA_1");
+                    fallback = "Blue on White 1";
                     break;
                 case 4:
                     result = Gxt("CMOD_PLA_2");
+                    fallback = "Blue on White 3";
                     break;
                 case 5:
                     result = Gxt("CMOD_MOD_GLD2");
+                    fallback = "North Yankton";
                     break;
                 case 1:
                     result = Gxt("CMOD_PLA_4");
+                    fallback = "Yellow on Black";
                     break;
                 case 2:
                     result = Gxt("CMOD_PLA_3");
+                    fallback = "Yellow on Blue";
+                    break;
+                case 6:
+                    result = Gxt("CMOD_PLA_6");
+                    fallback = "eCola";
+                    break;
+                case 7:
+                    result = Gxt("CMOD_PLA_7");
+                    fallback = "Las Venturas";
+                    break;
+                case 8:
+                    result = Gxt("CMOD_PLA_8");
+                    fallback = "Liberty City";
+                    break;
+                case 9:
+                    result = Gxt("CMOD_PLA_9");
+                    fallback = "LS Car Meet";
+                    break;
+                case 10:
+                    result = Gxt("CMOD_PLA_10");
+                    fallback = "LS Panic";
+                    break;
+                case 11:
+                    result = Gxt("CMOD_PLA_11");
+                    fallback = "LS Pounders";
+                    break;
+                case 12:
+                    result = Gxt("CMOD_PLA_12");
+                    fallback = "Sprunk";
+                    break;
+                default:
+                    result = null;
+                    fallback = "License Plate " + plateType.ToString();
                     break;
             }
 
-            return result;
+            return string.IsNullOrWhiteSpace(result) || result.Equals("NULL", StringComparison.OrdinalIgnoreCase)
+                ? fallback
+                : result;
         }
 
         public static string LocalizedT5RoofName(int roofID)
