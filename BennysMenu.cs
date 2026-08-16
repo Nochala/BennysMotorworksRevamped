@@ -49,6 +49,7 @@ namespace BennysMotorworksRevamped
             try
             {
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
+                MenuHelper.RefreshMenuMouseBehavior();
                 MenuHelper._menuPool?.Process();
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
 

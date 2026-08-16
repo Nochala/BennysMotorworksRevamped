@@ -3154,6 +3154,11 @@ namespace BennysMotorworksRevamped
 
                 veh.InstallModKit();
                 MenuHelper.RefreshMenus();
+                VehicleWindowTint currentWindowTint = veh.Mods.WindowTint;
+                if (currentWindowTint == VehicleWindowTint.Invalid)
+                {
+                    currentWindowTint = VehicleWindowTint.None;
+                }
                 lastVehMemory = new Memory
                 {
                     Aerials = veh.GetMod(VehicleMod.Aerials),
@@ -3209,7 +3214,7 @@ namespace BennysMotorworksRevamped
                     Trunk = veh.GetMod(VehicleMod.Trunk),
                     Turbo = veh.IsToggleModOn(VehicleToggleMod.Turbo),
                     Windows = veh.GetMod(VehicleMod.Windows),
-                    Tint = veh.Mods.WindowTint,
+                    Tint = currentWindowTint,
                     PearlescentColor = veh.Mods.PearlescentColor,
                     PrimaryColor = veh.Mods.PrimaryColor,
                     RimColor = veh.Mods.RimColor,

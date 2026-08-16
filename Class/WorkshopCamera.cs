@@ -712,7 +712,7 @@ namespace BennysMotorworksRevamped
                     CameraClamp = new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f };
                     _mainCamera.Shake(CameraShake.Hand, 0.5f);
 
-                    Vector3 newCamPos = _targetPos - _target.ForwardVector * 5.0f + new Vector3(0f, 0f, 0.3f);
+                    Vector3 newCamPos = _targetPos + _target.ForwardVector * 5.0f + new Vector3(0f, 0f, 0.3f);
 
                     _mainCamera.StopPointing();
                     _mainCamera.PointAt(_targetPos);
@@ -739,7 +739,7 @@ namespace BennysMotorworksRevamped
                     break;
                 case CameraPosition.Interior:
                     IsLerping = false;
-                    Vector3 headPos = Game.Player.Character.Bones["SKEL_Head"].Position;
+                    Vector3 headPos = Game.Player.Character.Bones[Bone.IKHead].Position;
                     Camera.DeleteAllCameras();
                     _mainCamera = CreateScriptedCamera(headPos + new Vector3(0f, 0f, 0.1f), new Vector3(0f, 0f, _target.Heading), GameplayCamera.FieldOfView);
                     StartRenderingCamera(_mainCamera);
