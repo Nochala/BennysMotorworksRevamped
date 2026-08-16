@@ -131,6 +131,8 @@ namespace BennysMotorworksRevamped
         public static WorkshopCamera camera;
         public static bool isRepairing = false;
         public static VehicleStats vehStats;
+        public static float vehicleStatsOffsetX = 0f;
+        public static float vehicleStatsOffsetY = -10f;
         public static string arenaVehImage = "brusier_apoc";
 
         private static float cachedExitHeading = 0f;
@@ -1831,14 +1833,14 @@ namespace BennysMotorworksRevamped
 
         public static bool IsUpgradeModExist(this string vehDispName)
         {
-            ScriptSettings config = ScriptSettings.Load("scripts\\BennysOriginalMotorWorks.ini");
+            ScriptSettings config = ScriptSettings.Load("scripts\\BennysMotorworksRevamped.ini");
             string v = config.GetValue<string>("UPGRADE", vehDispName.ToLower() + "_Model", null);
             return v != null;
         }
 
         public static Tuple<string, int> GetUpgradeModVehicleInfo(this string vehDispName)
         {
-            ScriptSettings config = ScriptSettings.Load("scripts\\BennysOriginalMotorWorks.ini");
+            ScriptSettings config = ScriptSettings.Load("scripts\\BennysMotorworksRevamped.ini");
             string newModel = config.GetValue<string>("UPGRADE", vehDispName.ToLower() + "_Model", null);
             int newPrice = config.GetValue<int>("UPGRADE", vehDispName.ToLower() + "_Price", 0);
             return Tuple.Create(newModel, newPrice);
@@ -2408,10 +2410,12 @@ namespace BennysMotorworksRevamped
 
         public static void LoadSettings()
         {
-            ScriptSettings config = ScriptSettings.Load("scripts\\BennysOriginalMotorWorks.ini");
+            ScriptSettings config = ScriptSettings.Load("scripts\\BennysMotorworksRevamped.ini");
             optLogging = config.GetValue("SETTINGS", "LOGGING", true);
             onlineMap = config.GetValue<int>("SETTINGS", "OnlineMap", 1);
             fixDoor = config.GetValue<int>("SETTINGS", "FixDoor", 1);
+            vehicleStatsOffsetX = config.GetValue<float>("VEHICLE_STATS", "OffsetX", 0f);
+            vehicleStatsOffsetY = config.GetValue<float>("VEHICLE_STATS", "OffsetY", -10f);
             fpcKey = config.GetValue<GTA.Control>("CONTROLS", "FirstPerson", GTA.Control.NextCamera);
             zoutKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomOut", GTA.Control.FrontendLt);
             zinKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomIn", GTA.Control.FrontendRt);
