@@ -46,15 +46,16 @@ namespace BennysMotorworksRevamped
 
         public static List<Model> lowriders = new()
         {
-            "banshee", "buccaneer", "chino", "diablous", "comet2", "faction", "faction2", "fcr", "italigtb", "minivan",
-            "moonbeam", "nero", "primo", "sabregt", "slamvan", "specter", "sultan", "tornado", "tornado2", "tornado3",
-            "virgo3", "voodoo2", "elegy2", "technical", "insurgent", "youga2", "yosemite", "peyote", "manana", "glendale",
-            "gauntlet3",
+            "banshee", "brioso2", "buccaneer", "chino", "diablous", "comet2", "faction", "faction2", "fcr", "italigtb",
+            "minivan", "moonbeam", "nero", "primo", "sabregt", "sentinel3", "slamvan", "specter", "sultan", "tenf",
+            "tornado", "tornado2", "tornado3", "virgo3", "voodoo2", "weevil", "elegy2", "youga2", "yosemite", "peyote",
+            "manana", "glendale", "gauntlet3",
         };
 
         private static readonly Dictionary<Model, Tuple<Model, int>> lowriderUpgrades = new()
         {
             { new Model("banshee"), Tuple.Create(new Model("banshee2"), 565000) },
+            { new Model("brioso2"), Tuple.Create(new Model("brioso3"), 585000) },
             { new Model("buccaneer"), Tuple.Create(new Model("buccaneer2"), 390000) },
             { new Model("chino"), Tuple.Create(new Model("chino2"), 180000) },
             { new Model("diablous"), Tuple.Create(new Model("diablous2"), 245000) },
@@ -68,18 +69,18 @@ namespace BennysMotorworksRevamped
             { new Model("nero"), Tuple.Create(new Model("nero2"), 605000) },
             { new Model("primo"), Tuple.Create(new Model("primo2"), 400000) },
             { new Model("sabregt"), Tuple.Create(new Model("sabregt2"), 490000) },
+            { new Model("sentinel3"), Tuple.Create(new Model("sentinel4"), 700000) },
             { new Model("slamvan"), Tuple.Create(new Model("slamvan3"), 415000) },
-            { new Model("slamvan2"), Tuple.Create(new Model("slamvan3"), 415000) },
             { new Model("specter"), Tuple.Create(new Model("specter2"), 252000) },
             { new Model("sultan"), Tuple.Create(new Model("sultanrs"), 795000) },
+            { new Model("tenf"), Tuple.Create(new Model("tenf2"), 575000) },
             { new Model("tornado"), Tuple.Create(new Model("tornado5"), 375000) },
             { new Model("tornado2"), Tuple.Create(new Model("tornado5"), 375000) },
             { new Model("tornado3"), Tuple.Create(new Model("tornado5"), 375000) },
             { new Model("virgo3"), Tuple.Create(new Model("virgo2"), 240000) },
             { new Model("voodoo2"), Tuple.Create(new Model("voodoo"), 420000) },
+            { new Model("weevil"), Tuple.Create(new Model("weevil2"), 980000) },
             { new Model("elegy2"), Tuple.Create(new Model("elegy"), 904000) },
-            { new Model("technical"), Tuple.Create(new Model("technical3"), 142500) },
-            { new Model("insurgent"), Tuple.Create(new Model("insurgent3"), 202500) },
             { new Model("youga2"), Tuple.Create(new Model("youga3"), 1288000) },
             { new Model("yosemite"), Tuple.Create(new Model("yosemite3"), 700000) },
             { new Model("peyote"), Tuple.Create(new Model("peyote3"), 620000) },
@@ -95,9 +96,10 @@ namespace BennysMotorworksRevamped
 
         public static List<Model> bennysvehicle = new()
         {
-            "banshee2", "buccaneer2", "chino2", "diablous2", "comet3", "faction2", "faction3", "fcr2", "italigtb2", "minivan2",
-            "moonbeam2", "nero2", "primo2", "sabregt2", "specter2", "sultanrs", "tornado5", "virgo2", "voodoo", "elegy",
-            "technical3", "insurgent3", "youga3", "yosemite3", "peyote3", "manana2", "glendale2", "gauntlet5",
+            "banshee2", "brioso3", "buccaneer2", "chino2", "diablous2", "comet3", "faction2", "faction3", "fcr2", "italigtb2",
+            "minivan2", "moonbeam2", "nero2", "primo2", "sabregt2", "sentinel4", "slamvan3", "specter2", "sultanrs", "tenf2",
+            "tornado5", "virgo2", "voodoo", "weevil2", "elegy", "youga3", "yosemite3", "peyote3", "manana2", "glendale2",
+            "gauntlet5",
         };
 
         public static List<Model> arenavehicle = new()
@@ -2445,11 +2447,11 @@ namespace BennysMotorworksRevamped
         private static readonly Vector3 EnterTriggerPosition = new Vector3(-205.6165f, -1312.976f, 31.1331f);
         private static readonly Vector3 EnterCutsceneStartPosition = new Vector3(-205.8144f, -1310.282f, 31.02291f);
         private static readonly Vector3 EnterCutsceneWaypointA = new Vector3(-207.155f, -1320.521f, 30.8904f);
-        private static readonly Vector3 ShopVehiclePosition = new Vector3(-211.798f, -1324.292f, 30.37535f);
+        private static readonly Vector3 ShopVehiclePosition = new Vector3(-211.801f, -1324.290f, 30.37535f);
         private static readonly Vector3 ExitCutsceneLanePosition = new Vector3(-205.8678f, -1321.805f, 30.41191f);
         private static readonly Vector3 ExitCutsceneWaypointA = new Vector3(-205.743f, -1303.657f, 30.84998f);
         private static readonly Vector3 ExitCutsceneWaypointB = new Vector3(-200.2561f, -1303.021f, 30.66544f);
-        private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-199.8158f, -1317.826f, 32.08391f);
+        private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-200.7804f, -1316.474f, 32.08001f);
         private static readonly Vector3 ExitCutsceneCameraPosition = new Vector3(-197.5533f, -1297.754f, 32.29234f);
         private static WorkshopCutsceneType activeWorkshopCutscene = WorkshopCutsceneType.None;
         private static int activeWorkshopCutsceneStage = -1;
@@ -2857,20 +2859,20 @@ namespace BennysMotorworksRevamped
                     RefreshCutsceneDriveTaskIfNeeded();
                     if (IsNear(veh.Position, EnterCutsceneWaypointA, 3.0f))
                     {
-                        QueueCutsceneDrive(ShopVehiclePosition, 2.0f, 5.0f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 5.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 180.3224f);
-                        QueueCutsceneDrive(ShopVehiclePosition, 2.0f, 5.0f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 5.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ShopVehiclePosition, 2.0f))
+                    if (IsNear(veh.Position, ShopVehiclePosition, 0.5f))
                     {
                         // Stop the driving task so the car can settle
                         Function.Call(Hash.CLEAR_PED_TASKS, ply.Handle);
@@ -2898,7 +2900,7 @@ namespace BennysMotorworksRevamped
         private static void ProcessExitCutscene()
         {
             // Define the intermediate waypoint
-            Vector3 intermediatePoint = new Vector3(-205.7979f, -1309.364f, 31.29297f);
+            Vector3 intermediatePoint = new Vector3(-205.714f, -1309.399f, 31.249f);
 
             switch (activeWorkshopCutsceneStage)
             {
@@ -2909,7 +2911,7 @@ namespace BennysMotorworksRevamped
                     camera?.Stop();
 
                     // Warp to the internal waypoint (inside the garage, near the entrance)
-                    SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 180.3224f);
+                    SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 190.3224f);
 
                     // Face toward the final street point and store the heading
                     Vector3 dirToB = ExitCutsceneWaypointB - veh.Position;
@@ -2930,24 +2932,24 @@ namespace BennysMotorworksRevamped
                     if (IsNear(veh.Position, ExitCutsceneLanePosition, 2.0f))
                     {
                         // Reached lane → drive to intermediate point
-                        QueueCutsceneDrive(intermediatePoint, 1.5f, 5.75f);
+                        QueueCutsceneDrive(intermediatePoint, 0.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         // Fallback: teleport to lane, then drive to intermediate
                         SetCutsceneVehicleTransform(ExitCutsceneLanePosition, cachedExitHeading);
-                        QueueCutsceneDrive(intermediatePoint, 1.5f, 5.75f);
+                        QueueCutsceneDrive(intermediatePoint, 0.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, intermediatePoint, 2.0f))
+                    if (IsNear(veh.Position, intermediatePoint, 0.5f))
                     {
                         // Reached intermediate → drive to final waypoint B
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 5.75f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 0.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
