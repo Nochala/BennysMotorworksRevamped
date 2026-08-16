@@ -1,14 +1,19 @@
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using GTA.UI;
+using LemonUI;
+using LemonUI.Elements;
 using LemonUI.Scaleform;
+using LemonUI.Tools;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Font = GTA.UI.Font;
+using MenuPool = LemonUI.ObjectPool;
+using UIMenu = LemonUI.Menus.NativeMenu;
 using VehicleMod = GTA.VehicleModType;
 using VehicleToggleMod = GTA.VehicleToggleModType;
-using UIMenu = LemonUI.Menus.NativeMenu;
-using MenuPool = LemonUI.ObjectPool;
 
 namespace BennysMotorworksRevamped
 {
@@ -78,6 +83,8 @@ namespace BennysMotorworksRevamped
         public static Ped bennyPed;
         public static bool isCutscene = false;
         public static bool optLogging = true;
+        private static bool _pendingShopInit = false;
+        private static int _shopInitDelayTime = 0;
         public static Camera scriptCam; // ScriptedCamera
         public static List<VehicleClass> unWelcome = new() { VehicleClass.Boats, VehicleClass.Cycles, VehicleClass.Helicopters, VehicleClass.Planes };
         public static GTA.Control fpcKey, zoutKey, zinKey;
@@ -90,8 +97,81 @@ namespace BennysMotorworksRevamped
         public static VehicleStats vehStats;
         public static string arenaVehImage = "brusier_apoc";
 
+        private static float cachedExitHeading = 0f;
+
         private static string Gxt(string key) => Game.GetLocalizedString(key);
 
+        public static void DisplayVehicleInfoBottomRight(string vehicleName, string vehicleClass)
+        {
+            float safeZoneMargin = GetSafeZoneMargin();
+            float rightX = 0.995f - safeZoneMargin;
+            float classY = 0.928f - safeZoneMargin;
+            float nameY = classY - 0.040f;
+
+            Font titleFont = Font.ChaletComprimeCologne;
+            switch (Game.Language.ToString())
+            {
+                case "Chinese":
+                case "Korean":
+                case "Japanese":
+                case "ChineseSimplified":
+                    titleFont = Font.ChaletLondon;
+                    break;
+            }
+
+            DrawTextNormalized(vehicleName, rightX, nameY, 0.64f, titleFont, Color.White, true);
+            DrawTextNormalized(vehicleClass, rightX, classY, 0.40f, Font.ChaletLondon, Color.DodgerBlue, true);
+        }
+
+        private static float GetSafeZoneMargin()
+        {
+            try
+            {
+                float safeZoneSize = Function.Call<float>(Hash.GET_SAFE_ZONE_SIZE);
+                if (safeZoneSize <= 0f || safeZoneSize > 1f)
+                {
+                    return 0f;
+                }
+
+                return (1f - safeZoneSize) * 0.5f;
+            }
+            catch
+            {
+                return 0f;
+            }
+        }
+
+        private static void DrawTextNormalized(string value, float x, float y, float scale, Font font, Color color, bool rightAligned = false)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            Function.Call(Hash.SET_TEXT_FONT, (int)font);
+            Function.Call(Hash.SET_TEXT_SCALE, 1.0f, scale);
+            Function.Call(Hash.SET_TEXT_COLOUR, color.R, color.G, color.B, color.A);
+            Function.Call(Hash.SET_TEXT_DROPSHADOW, 0, 0, 0, 0, 255);
+            Function.Call(Hash.SET_TEXT_EDGE, 1, 0, 0, 0, 205);
+            Function.Call(Hash.SET_TEXT_OUTLINE);
+
+            if (rightAligned)
+            {
+                Function.Call(Hash.SET_TEXT_JUSTIFICATION, 2);
+                Function.Call(Hash.SET_TEXT_WRAP, 0.0f, x);
+                Function.Call(Hash.SET_TEXT_RIGHT_JUSTIFY, true);
+            }
+            else
+            {
+                Function.Call(Hash.SET_TEXT_JUSTIFICATION, 1);
+                Function.Call(Hash.SET_TEXT_WRAP, x, 1.0f);
+                Function.Call(Hash.SET_TEXT_RIGHT_JUSTIFY, false);
+            }
+
+            Function.Call(Hash.BEGIN_TEXT_COMMAND_DISPLAY_TEXT, "STRING");
+            Function.Call(Hash.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME, value);
+            Function.Call(Hash.END_TEXT_COMMAND_DISPLAY_TEXT, x, y, 0);
+        }
 
         public static void InstallModKit(this Vehicle vehicle)
         {
@@ -2313,16 +2393,14 @@ namespace BennysMotorworksRevamped
         }
 
         private static readonly Vector3 EnterTriggerPosition = new Vector3(-205.6165f, -1312.976f, 31.1331f);
-        private static readonly Vector3 EnterCutsceneStartPosition = new Vector3(-205.4903f, -1313.958f, 31.02291f);
+        private static readonly Vector3 EnterCutsceneStartPosition = new Vector3(-205.8144f, -1310.282f, 31.02291f);
         private static readonly Vector3 EnterCutsceneWaypointA = new Vector3(-207.155f, -1320.521f, 30.8904f);
         private static readonly Vector3 ShopVehiclePosition = new Vector3(-211.798f, -1324.292f, 30.37535f);
         private static readonly Vector3 ExitCutsceneLanePosition = new Vector3(-205.8678f, -1321.805f, 30.41191f);
         private static readonly Vector3 ExitCutsceneWaypointA = new Vector3(-205.743f, -1303.657f, 30.84998f);
         private static readonly Vector3 ExitCutsceneWaypointB = new Vector3(-200.2561f, -1303.021f, 30.66544f);
-        private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-200.7804f, -1316.474f, 32.08001f);
+        private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-199.8158f, -1317.826f, 32.08391f);
         private static readonly Vector3 ExitCutsceneCameraPosition = new Vector3(-197.5533f, -1297.754f, 32.29234f);
-        private static readonly VehicleDrivingFlags DefaultCutsceneDrivingFlags = VehicleDrivingFlags.StopAtDestination;
-
         private static WorkshopCutsceneType activeWorkshopCutscene = WorkshopCutsceneType.None;
         private static int activeWorkshopCutsceneStage = -1;
         private static int activeWorkshopCutsceneStageStartedAt;
@@ -2349,15 +2427,14 @@ namespace BennysMotorworksRevamped
 
         private static void EnsurePlayerInVehicleForCutscene()
         {
-            if (ply == null || veh == null)
-            {
-                return;
-            }
+            if (ply == null || veh == null) return;
 
             if (ply.CurrentVehicle != veh)
             {
+                Logger.Log("EnsurePlayerInVehicle: warping player into vehicle");
                 Function.Call(Hash.SET_PED_INTO_VEHICLE, ply.Handle, veh.Handle, (int)VehicleSeat.Driver);
             }
+            // No log for "already in vehicle" – removes spam
         }
 
         private static void StartWorkshopAudioScene()
@@ -2406,6 +2483,40 @@ namespace BennysMotorworksRevamped
 
                 scriptCam = null;
             }
+        }
+        private static void CleanupEnterCutsceneWithoutCameraReset()
+        {
+            try
+            {
+                if (ply != null)
+                    Function.Call(Hash.CLEAR_PED_TASKS, ply.Handle);
+            }
+            catch { }
+
+            try
+            {
+                if (veh != null)
+                {
+                    Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
+                    Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
+                }
+            }
+            catch { }
+
+            // Stop the audio scene (radio mute)
+            StopWorkshopAudioScene();
+
+            // Clear cutscene state but leave the camera intact
+            activeWorkshopCutscene = WorkshopCutsceneType.None;
+            activeWorkshopCutsceneStage = -1;
+            activeWorkshopCutsceneLastDriveTaskAt = 0;
+            activeWorkshopCutsceneLastProgressAt = 0;
+            activeWorkshopCutsceneLastDistanceSq = float.MaxValue;
+            activeWorkshopCutsceneTarget = Vector3.Zero;
+            activeWorkshopCutsceneTargetRadius = 0.0f;
+            activeWorkshopCutsceneTargetSpeed = 0.0f;
+            isExiting = false;
+            isCutscene = false;
         }
 
         private static void StartWorkshopCutsceneCamera(Vector3 position)
@@ -2463,24 +2574,27 @@ namespace BennysMotorworksRevamped
 
         private static void SetCutsceneVehicleTransform(Vector3 position, float heading)
         {
-            if (veh == null)
-            {
-                return;
-            }
-
+            if (veh == null) return;
             Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, veh.Handle, position.X, position.Y, position.Z, false, false, false);
             veh.Heading = heading;
             Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
             Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
+            // Force ground and freeze briefly to settle
             Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
+            Function.Call(Hash.FREEZE_ENTITY_POSITION, veh.Handle, true);
+            Script.Wait(50);
+            Function.Call(Hash.FREEZE_ENTITY_POSITION, veh.Handle, false);
         }
 
         private static void QueueCutsceneDrive(Vector3 target, float radius, float speed)
         {
             if (ply == null || veh == null)
             {
+                Logger.Log("QueueCutsceneDrive: ply or veh is null");
                 return;
             }
+
+            Logger.Log($"QueueCutsceneDrive: target={target}, radius={radius}, speed={speed}");
 
             activeWorkshopCutsceneTarget = target;
             activeWorkshopCutsceneTargetRadius = radius;
@@ -2488,24 +2602,29 @@ namespace BennysMotorworksRevamped
             activeWorkshopCutsceneLastDriveTaskAt = Game.GameTime;
 
             EnsurePlayerInVehicleForCutscene();
+
             Function.Call(Hash.SET_VEHICLE_ENGINE_ON, veh.Handle, true, true, false);
+            Function.Call(Hash.SET_VEHICLE_HANDBRAKE, veh.Handle, false);
             Function.Call(Hash.SET_DRIVER_ABILITY, ply.Handle, 1.0f);
             Function.Call(Hash.SET_DRIVER_AGGRESSIVENESS, ply.Handle, 0.0f);
-            Function.Call(Hash.SET_VEHICLE_HANDBRAKE, veh.Handle, false);
-            Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD,
+
+            // Use default driving style (0) – smoother parking
+            uint drivingStyle = 0;
+
+            Logger.Log($"Issuing TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE with style {drivingStyle:X}");
+
+            Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE,
                 ply.Handle,
                 veh.Handle,
                 target.X, target.Y, target.Z,
                 speed,
-                0,
-                veh.Model.Hash,
-                (int)DefaultCutsceneDrivingFlags,
-                radius,
-                6.0f);
+                drivingStyle,
+                radius);
 
-            if (veh.Speed < Math.Max(1.5f, speed * 0.45f))
+            // Small nudge to overcome inertia if completely stopped
+            if (veh.Speed < 0.1f)
             {
-                Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, Math.Max(1.5f, speed * 0.45f));
+                Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.5f);
             }
         }
 
@@ -2530,33 +2649,31 @@ namespace BennysMotorworksRevamped
         private static void RefreshCutsceneDriveTaskIfNeeded()
         {
             if (activeWorkshopCutscene == WorkshopCutsceneType.None || ply == null || veh == null)
-            {
                 return;
-            }
 
             if (activeWorkshopCutsceneTarget.Length() <= 0.001f)
-            {
                 return;
-            }
 
             if (IsNear(veh.Position, activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius + 0.5f))
-            {
                 return;
-            }
 
             UpdateCutsceneProgress();
 
             int now = Game.GameTime;
-            if (now - activeWorkshopCutsceneLastDriveTaskAt < 1000)
-            {
-                return;
-            }
 
-            bool stalled = veh.Speed < 0.75f && now - activeWorkshopCutsceneLastProgressAt > 1250;
-            bool notProgressing = now - activeWorkshopCutsceneLastProgressAt > 2000;
-            if (stalled || notProgressing)
+            // Do not re-issue too often – increase to 3 seconds
+            if (now - activeWorkshopCutsceneLastDriveTaskAt < 3000)
+                return;
+
+            // Relaxed stuck detection: speed below 0.5 for 4 seconds, or no progress for 6 seconds
+            bool isStuck = veh.Speed < 0.5f && (now - activeWorkshopCutsceneLastProgressAt) > 4000;
+            bool noProgress = (now - activeWorkshopCutsceneLastProgressAt) > 6000;
+
+            if (isStuck || noProgress)
             {
-                QueueCutsceneDrive(activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius, activeWorkshopCutsceneTargetSpeed);
+                Logger.Log($"Refresh: re-issuing drive, stuck={isStuck}, noProgress={noProgress}");
+                float boostedSpeed = activeWorkshopCutsceneTargetSpeed * 1.2f;
+                QueueCutsceneDrive(activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius, boostedSpeed);
             }
         }
 
@@ -2628,7 +2745,7 @@ namespace BennysMotorworksRevamped
         {
             EnsurePlayerInVehicleForCutscene();
             PlayerVehicleHalt();
-            AbortWorkshopCutscene(false);
+            CleanupEnterCutsceneWithoutCameraReset();
             PutVehIntoShop();
         }
 
@@ -2666,44 +2783,61 @@ namespace BennysMotorworksRevamped
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
                     camera?.Stop();
 
-                    Vector3 firstTargetDirection = NormalizeOrZero(EnterCutsceneWaypointA - veh.Position);
-                    if (firstTargetDirection.Length() > 0.001f && Dot(NormalizeOrZero(veh.ForwardVector), firstTargetDirection) < -0.25f)
-                    {
-                        veh.Heading = 180.3224f;
-                    }
-
-                    if (veh.Position.DistanceToSquared(EnterCutsceneStartPosition) > 81.0f)
-                    {
-                        SetCutsceneVehicleTransform(EnterCutsceneStartPosition, 180.3224f);
-                    }
-
+                    // Start the cutscene camera FIRST so the player doesn't see the vehicle warp
                     StartWorkshopCutsceneCamera(EnterCutsceneCameraPosition);
-                    QueueCutsceneDrive(EnterCutsceneWaypointA, 1.75f, 7.25f);
-                    PlaySpeech("SHOP_NICE_VEHICLE");
-                    AdvanceWorkshopCutsceneStage(1);
+
+                    // Then warp the vehicle to the starting position
+                    SetCutsceneVehicleTransform(EnterCutsceneStartPosition, 180.3224f);
+
+                    // Advance to the settle stage (allows the vehicle to settle before driving)
+                    AdvanceWorkshopCutsceneStage(-1);
+                    break;
+
+                case -1:
+                    // Small settle delay (100ms) then start driving
+                    if (IsWorkshopCutsceneStageTimedOut(100))
+                    {
+                        QueueCutsceneDrive(EnterCutsceneWaypointA, 3.5f, 6.5f);
+                        PlaySpeech("SHOP_NICE_VEHICLE");
+                        AdvanceWorkshopCutsceneStage(1);
+                    }
                     break;
 
                 case 1:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, EnterCutsceneWaypointA, 2.25f))
+                    if (IsNear(veh.Position, EnterCutsceneWaypointA, 3.0f))
                     {
-                        QueueCutsceneDrive(ShopVehiclePosition, 1.3f, 5.25f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 2.0f, 5.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(9000) && veh.Position.DistanceToSquared(EnterCutsceneWaypointA) <= 20.25f)
+                    else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
-                        QueueCutsceneDrive(ShopVehiclePosition, 1.3f, 5.25f);
+                        SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 180.3224f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 2.0f, 5.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ShopVehiclePosition, 2.1f))
+                    if (IsNear(veh.Position, ShopVehiclePosition, 2.0f))
                     {
+                        // Stop the driving task so the car can settle
+                        Function.Call(Hash.CLEAR_PED_TASKS, ply.Handle);
+                        // Move to stage 3 to wait for the car to stop
+                        AdvanceWorkshopCutsceneStage(3);
+                    }
+                    else if (IsWorkshopCutsceneStageTimedOut(8000))
+                    {
+                        // Fallback: teleport directly and complete
+                        SetCutsceneVehicleTransform(ShopVehiclePosition, 150.2801f);
                         CompleteEnterCutscene();
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(8000) && veh.Position.DistanceToSquared(ShopVehiclePosition) <= 25.0f)
+                    break;
+
+                case 3:
+                    // Wait for the vehicle to settle (speed < 0.3) or timeout after 1.5 seconds
+                    if (veh.Speed < 0.3f || IsWorkshopCutsceneStageTimedOut(1500))
                     {
                         CompleteEnterCutscene();
                     }
@@ -2713,6 +2847,9 @@ namespace BennysMotorworksRevamped
 
         private static void ProcessExitCutscene()
         {
+            // Define the intermediate waypoint
+            Vector3 intermediatePoint = new Vector3(-205.7979f, -1309.364f, 31.29297f);
+
             switch (activeWorkshopCutsceneStage)
             {
                 case 0:
@@ -2720,48 +2857,70 @@ namespace BennysMotorworksRevamped
                     EnsurePlayerInVehicleForCutscene();
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
                     camera?.Stop();
+
+                    // Warp to the internal waypoint (inside the garage, near the entrance)
+                    SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 180.3224f);
+
+                    // Face toward the final street point and store the heading
+                    Vector3 dirToB = ExitCutsceneWaypointB - veh.Position;
+                    dirToB.Normalize();
+                    cachedExitHeading = (float)(Math.Atan2(dirToB.X, dirToB.Y) * 180.0 / Math.PI);
+                    veh.Heading = cachedExitHeading;
+                    Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
+
                     StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition);
-                    QueueCutsceneDrive(ExitCutsceneLanePosition, 1.5f, 4.5f);
+                    // Drive to the lane (just outside the garage)
+                    QueueCutsceneDrive(ExitCutsceneLanePosition, 1.8f, 4.5f);
                     PlaySpeech("SHOP_GOODBYE");
                     AdvanceWorkshopCutsceneStage(1);
                     break;
 
                 case 1:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ExitCutsceneLanePosition, 2.1f))
+                    if (IsNear(veh.Position, ExitCutsceneLanePosition, 2.0f))
                     {
-                        QueueCutsceneDrive(ExitCutsceneWaypointA, 1.6f, 7.75f);
+                        // Reached lane → drive to intermediate point
+                        QueueCutsceneDrive(intermediatePoint, 1.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(7000) && veh.Position.DistanceToSquared(ExitCutsceneLanePosition) <= 20.25f)
+                    else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
-                        QueueCutsceneDrive(ExitCutsceneWaypointA, 1.6f, 7.75f);
+                        // Fallback: teleport to lane, then drive to intermediate
+                        SetCutsceneVehicleTransform(ExitCutsceneLanePosition, cachedExitHeading);
+                        QueueCutsceneDrive(intermediatePoint, 1.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ExitCutsceneWaypointA, 2.4f))
+                    if (IsNear(veh.Position, intermediatePoint, 2.0f))
                     {
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.35f, 5.75f);
+                        // Reached intermediate → drive to final waypoint B
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(8000) && veh.Position.DistanceToSquared(ExitCutsceneWaypointA) <= 20.25f)
+                    else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.35f, 5.75f);
+                        // Fallback: teleport to intermediate, head toward B, then drive to B
+                        Vector3 dirToBFromIntermediate = ExitCutsceneWaypointB - intermediatePoint;
+                        dirToBFromIntermediate.Normalize();
+                        float headingToB = (float)(Math.Atan2(dirToBFromIntermediate.X, dirToBFromIntermediate.Y) * 180.0 / Math.PI);
+                        SetCutsceneVehicleTransform(intermediatePoint, headingToB);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     break;
 
                 case 3:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ExitCutsceneWaypointB, 2.25f))
+                    if (IsNear(veh.Position, ExitCutsceneWaypointB, 2.0f))
                     {
                         CompleteExitCutscene();
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(8000) && veh.Position.DistanceToSquared(ExitCutsceneWaypointB) <= 20.25f)
+                    else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
+                        SetCutsceneVehicleTransform(ExitCutsceneWaypointB, 312.8701f);
                         CompleteExitCutscene();
                     }
                     break;
@@ -2772,6 +2931,12 @@ namespace BennysMotorworksRevamped
         {
             try
             {
+                // Handle pending shop init (deferred heavy work)
+                if (_pendingShopInit && Game.GameTime >= _shopInitDelayTime)
+                {
+                    FinishShopInit();
+                }
+
                 if (activeWorkshopCutscene == WorkshopCutsceneType.None)
                 {
                     return;
@@ -2801,7 +2966,6 @@ namespace BennysMotorworksRevamped
                 AbortWorkshopCutscene(true);
             }
         }
-
         public static bool CanTriggerEnterCutscene()
         {
             if (veh == null || ply == null)
@@ -2838,7 +3002,7 @@ namespace BennysMotorworksRevamped
                 return false;
             }
 
-            if (veh.Speed < 1.25f)
+            if (veh.Speed < 0.8f)
             {
                 return false;
             }
@@ -2907,6 +3071,41 @@ namespace BennysMotorworksRevamped
         {
             try
             {
+                // Check how far the vehicle is from the desired parking spot
+                float distance = veh.Position.DistanceTo(ShopVehiclePosition);
+
+                if (distance < 0.25f)
+                {
+                    // Already close enough – just set heading and stop, no teleport
+                    veh.Heading = 150.2801f;
+                    veh.Speed = 0f;
+                    Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
+                }
+                else
+                {
+                    // Teleport to exact spot (but without freezing – just a direct set)
+                    veh.Position = ShopVehiclePosition;
+                    veh.Heading = 150.2801f;
+                    Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
+                    veh.Speed = 0f;
+                }
+
+                // Schedule the heavy init after 500ms to let the vehicle settle
+                _pendingShopInit = true;
+                _shopInitDelayTime = Game.GameTime + 500;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message + " " + ex.StackTrace);
+            }
+        }
+
+        private static void FinishShopInit()
+        {
+            try
+            {
+                _pendingShopInit = false;
+
                 veh.InstallModKit();
                 MenuHelper.RefreshMenus();
                 lastVehMemory = new Memory
@@ -2977,8 +3176,7 @@ namespace BennysMotorworksRevamped
                     Nitro = Helper.GetInt(veh, nitroMod),
                     BulletProofTires = veh.CanTiresBurst,
                 };
-                veh.Position = ShopVehiclePosition;
-                veh.Heading = 150.2801f;
+
                 if (MenuHelper.MainMenu != null)
                 {
                     MenuHelper.MainMenu.Visible = true;
@@ -2990,6 +3188,7 @@ namespace BennysMotorworksRevamped
 
                 camera.RepositionFor(veh);
                 StartWorkshopAudioScene();
+                ResetWorkshopCutsceneCamera();
             }
             catch (Exception ex)
             {

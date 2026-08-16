@@ -47,14 +47,16 @@ namespace BennysMotorworksRevamped
         public static LemonUI.ObjectPool _menuPool;
         private static bool _suppressMenuRestoreOnClose;
 
-        private static void SetAllMenusVisible(bool visible)
+        public static void HideAllMenus()
         {
-            foreach (Reflection.FieldInfo field in typeof(MenuHelper).GetFields(Reflection.BindingFlags.Public | Reflection.BindingFlags.Static))
+            _suppressMenuRestoreOnClose = true;
+            try
             {
-                if (field.GetValue(null) is UIMenu uiMenu)
-                {
-                    uiMenu.Visible = visible;
-                }
+                UIMenu.HideAll();
+            }
+            finally
+            {
+                _suppressMenuRestoreOnClose = false;
             }
         }
 
@@ -194,6 +196,82 @@ namespace BennysMotorworksRevamped
             RefreshMainMenu();
         }
 
+        private static void AddEngineItemsToMainMenu(bool motorcycle)
+        {
+            bool hasEngineUpgrade = veh.GetModCount(VehicleMod.Engine) != 0;
+            bool hasNitro = veh.CanInstallNitroMod();
+            bool hasBennysEngineOptions = motorcycle
+                ? veh.GetModCount(VehicleMod.Frame) != 0 || veh.GetModCount(VehicleMod.SideSkirt) != 0
+                : veh.GetModCount(VehicleMod.EngineBlock) != 0 || veh.GetModCount(VehicleMod.AirFilter) != 0 || veh.GetModCount(VehicleMod.Struts) != 0;
+
+            if (!hasEngineUpgrade && !hasNitro && !hasBennysEngineOptions)
+            {
+                return;
+            }
+
+            if (bennysvehicle.Contains(veh.Model))
+            {
+                giEngine = new UIMenuItem(LocalizedModGroupName(GroupName.Engine), Game.GetLocalizedString("CMOD_SMOD_2_D"));
+                MainMenu.AddItem(giEngine);
+                MainMenu.BindMenuToItem(gmEngine, giEngine);
+                return;
+            }
+
+            // A stock vehicle goes straight to its engine upgrades. The extra
+            // Engine -> Engine level is reserved for converted Benny's vehicles,
+            // where several engine-customization categories actually exist.
+            if (hasEngineUpgrade)
+            {
+                giEngine = new UIMenuItem(LocalizedModGroupName(GroupName.Engine), Game.GetLocalizedString("CMOD_SMOD_2_D"));
+                MainMenu.AddItem(giEngine);
+                MainMenu.BindMenuToItem(mEngine, giEngine);
+            }
+
+            if (motorcycle)
+            {
+                if (veh.GetModCount(VehicleMod.Frame) != 0)
+                {
+                    giBEngineBlock = new UIMenuItem(LocalizedModTypeName(VehicleMod.Frame), Game.GetLocalizedString("SMOD_ENGINE_1"));
+                    MainMenu.AddItem(giBEngineBlock);
+                    MainMenu.BindMenuToItem(mBEngineBlock, giBEngineBlock);
+                }
+                if (veh.GetModCount(VehicleMod.SideSkirt) != 0)
+                {
+                    giBAirFilter = new UIMenuItem(LocalizedModTypeName(VehicleMod.SideSkirt), Game.GetLocalizedString("CMOD_SMOD_2_D"));
+                    MainMenu.AddItem(giBAirFilter);
+                    MainMenu.BindMenuToItem(mBAirFilter, giBAirFilter);
+                }
+            }
+            else
+            {
+                if (veh.GetModCount(VehicleMod.EngineBlock) != 0)
+                {
+                    iEngineBlock = new UIMenuItem(LocalizedModTypeName(VehicleMod.EngineBlock), Game.GetLocalizedString("SMOD_ENGINE_1"));
+                    MainMenu.AddItem(iEngineBlock);
+                    MainMenu.BindMenuToItem(mEngineBlock, iEngineBlock);
+                }
+                if (veh.GetModCount(VehicleMod.AirFilter) != 0)
+                {
+                    giAirfilter = new UIMenuItem(LocalizedModTypeName(VehicleMod.AirFilter), Game.GetLocalizedString("SMOD_ENGINE_2"));
+                    MainMenu.AddItem(giAirfilter);
+                    MainMenu.BindMenuToItem(mAirFilter, giAirfilter);
+                }
+                if (veh.GetModCount(VehicleMod.Struts) != 0)
+                {
+                    giStruts = new UIMenuItem(LocalizedModTypeName(VehicleMod.Struts), Game.GetLocalizedString("SMOD_ENGINE_3b"));
+                    MainMenu.AddItem(giStruts);
+                    MainMenu.BindMenuToItem(mStruts, giStruts);
+                }
+            }
+
+            if (hasNitro)
+            {
+                iNitro = new UIMenuItem(Game.GetLocalizedString("CMM_MOD_NJBOS"), Game.GetLocalizedString("SMOD_ENGINE_2"));
+                MainMenu.AddItem(iNitro);
+                MainMenu.BindMenuToItem(mNitro, iNitro);
+            }
+        }
+
         public static void RefreshMainMenu()
         {
             try
@@ -303,12 +381,7 @@ namespace BennysMotorworksRevamped
                             MainMenu.AddItem(giBodywork);
                             MainMenu.BindMenuToItem(gmBodywork, giBodywork);
                         }
-                        if ((veh.GetModCount(VehicleMod.Engine) != 0 || veh.GetModCount(VehicleMod.Frame) != 0 || veh.GetModCount(VehicleMod.SideSkirt) != 0) || veh.CanInstallNitroMod())
-                        {
-                            giEngine = new UIMenuItem(LocalizedModGroupName(GroupName.Engine), Game.GetLocalizedString("CMOD_SMOD_2_D"));
-                            MainMenu.AddItem(giEngine);
-                            MainMenu.BindMenuToItem(gmEngine, giEngine);
-                        }
+                        AddEngineItemsToMainMenu(true);
                         giPlate = new UIMenuItem(LocalizedModGroupName(GroupName.Plate), Game.GetLocalizedString("CMOD_MOD_18_D"));
                         MainMenu.AddItem(giPlate);
                         MainMenu.BindMenuToItem(gmPlate, giPlate);
@@ -488,12 +561,7 @@ namespace BennysMotorworksRevamped
                             MainMenu.AddItem(giBodywork);
                             MainMenu.BindMenuToItem(gmBodywork, giBodywork);
                         }
-                        if ((veh.GetModCount(VehicleMod.Engine) != 0 || veh.GetModCount(VehicleMod.EngineBlock) != 0 || veh.GetModCount(VehicleMod.AirFilter) != 0 || veh.GetModCount(VehicleMod.Struts) != 0) || veh.CanInstallNitroMod())
-                        {
-                            giEngine = new UIMenuItem(LocalizedModGroupName(GroupName.Engine), Game.GetLocalizedString("CMOD_SMOD_2_D"));
-                            MainMenu.AddItem(giEngine);
-                            MainMenu.BindMenuToItem(gmEngine, giEngine);
-                        }
+                        AddEngineItemsToMainMenu(false);
                         if ((veh.GetModCount(VehicleMod.ColumnShifterLevers) != 0 || veh.GetModCount(VehicleMod.Dashboard) != 0 || veh.GetModCount(VehicleMod.DialDesign) != 0 || veh.GetModCount(VehicleMod.Ornaments) != 0 || veh.GetModCount(VehicleMod.Seats) != 0 || veh.GetModCount(VehicleMod.SteeringWheels) != 0 || veh.GetModCount(VehicleMod.TrimDesign) != 0 || veh.GetModCount(VehicleMod.DoorSpeakers) != 0 || veh.GetModCount(VehicleMod.Speakers) != 0))
                         {
                             giInterior = new UIMenuItem(LocalizedModGroupName(GroupName.Interior), Game.GetLocalizedString("SMOD_IN_1"));
@@ -2510,6 +2578,8 @@ namespace BennysMotorworksRevamped
             mBAirFilter = NewUIMenu(ref mBAirFilter, "CMM_MOD_ST15", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mBTank = NewUIMenu(ref mBTank, "CMM_MOD_ST20", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
         }
+
+
 
         #region Menu Event Handlers
 
@@ -5090,16 +5160,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == QuitMenu)
                 {
-                    _suppressMenuRestoreOnClose = true;
-                    try
-                    {
-                        SetAllMenusVisible(false);
-                    }
-                    finally
-                    {
-                        _suppressMenuRestoreOnClose = false;
-                    }
-
+                    HideAllMenus();
                     PlayExitCutScene();
                 }
             }
@@ -5255,6 +5316,10 @@ namespace BennysMotorworksRevamped
                 menu = new UIMenu(string.Empty, title ?? string.Empty, showStats);
                 menu.MouseEdgeEnabled = false;
 
+                // NOTE: Mouse button behaviour is handled by the compatibility layer.
+                // Removing the explicit assignments below avoids build errors.
+                // The menu will use default LemonUI behaviour: left-click selects, right-click goes back.
+
                 if (!string.IsNullOrWhiteSpace(itemName) && !string.Equals(itemName, "null", StringComparison.OrdinalIgnoreCase))
                 {
                     menu.AddItem(new UIMenuItem(itemName, itemDesc));
@@ -5262,17 +5327,13 @@ namespace BennysMotorworksRevamped
                 }
 
                 if (_menuPool != null)
-                {
                     _menuPool.Add(menu.NativeMenu);
-                }
                 else
-                {
                     Logger.Log($"NewUIMenu: menu pool was null while creating '{title ?? string.Empty}'.");
-                }
 
-                if (closeHandler != null) { menu.OnMenuClose += closeHandler; }
-                if (selectHandler != null) { menu.OnItemSelect += selectHandler; }
-                if (indexChangeHandler != null) { menu.OnIndexChange += indexChangeHandler; }
+                if (closeHandler != null) menu.OnMenuClose += closeHandler;
+                if (selectHandler != null) menu.OnItemSelect += selectHandler;
+                if (indexChangeHandler != null) menu.OnIndexChange += indexChangeHandler;
             }
             catch (Exception ex)
             {

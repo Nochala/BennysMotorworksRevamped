@@ -2,7 +2,6 @@ using GTA;
 using GTA.Native;
 using LemonUI;
 using LemonUI.Scaleform;
-using System.Reflection;
 using System;
 using System.Drawing;
 using static BennysMotorworksRevamped.Helper;
@@ -49,32 +48,38 @@ namespace BennysMotorworksRevamped
 
             try
             {
+                BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
                 MenuHelper._menuPool?.Process();
+                BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
+
+                bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
 
                 if (veh != null)
                 {
                     vehStats = GetVehicleStats(veh);
                 }
 
-                if (MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible)
+                if (isMenuVisible)
                 {
                     Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
                 }
 
+                // Only show the vehicle title once the workshop entry cutscene starts,
+                // and keep it visible while a Benny's menu is open.
+                if (veh != null && (isCutscene || isMenuVisible))
+                {
+                    Helper.DisplayVehicleInfoBottomRight(veh.DisplayName, GetClassDisplayName(veh.ClassType));
+                }
 
                 if (isCutscene && veh != null)
                 {
                     Game.DisableAllControlsThisFrame();
                     Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
-
-                    string vehicleName = veh.DisplayName;
-                    string vehicleClass = GetClassDisplayName(veh.ClassType);
-                    Helper.DisplayHelpTextThisFrame($"{vehicleName}~n~{vehicleClass}");
                 }
 
                 if (isRepairing)
                 {
-                    CloseAllMenus();
+                    MenuHelper.HideAllMenus();
                     if (MainMenu != null)
                     {
                         MainMenu.Visible = true;
@@ -83,7 +88,7 @@ namespace BennysMotorworksRevamped
                     isRepairing = false;
                 }
 
-                if (MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible)
+                if (isMenuVisible)
                 {
                     SuspendKeys();
                 }
@@ -93,23 +98,5 @@ namespace BennysMotorworksRevamped
                 Logger.Log(ex.Message + " " + ex.StackTrace);
             }
         }
-        private static void CloseAllMenus()
-        {
-            foreach (FieldInfo field in typeof(MenuHelper).GetFields(BindingFlags.Public | BindingFlags.Static))
-            {
-                object value = field.GetValue(null);
-                if (value == null)
-                {
-                    continue;
-                }
-
-                PropertyInfo visibleProperty = value.GetType().GetProperty("Visible", BindingFlags.Public | BindingFlags.Instance);
-                if (visibleProperty != null && visibleProperty.PropertyType == typeof(bool) && visibleProperty.CanWrite)
-                {
-                    visibleProperty.SetValue(value, false);
-                }
-            }
-        }
-
     }
 }

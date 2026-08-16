@@ -30,10 +30,7 @@ namespace BennysMotorworksRevamped.Compat
 
         public void CloseAllMenus()
         {
-            foreach (UIMenu menu in _menus)
-            {
-                menu.Visible = false;
-            }
+            UIMenu.HideAll();
         }
 
         public void UpdateStats(float topSpeed, float acceleration, float braking, float traction)
@@ -43,6 +40,10 @@ namespace BennysMotorworksRevamped.Compat
 
     public class UIMenu
     {
+        private static readonly List<UIMenu> RegisteredMenus = new List<UIMenu>();
+        private static bool IsVisibilityTransition;
+        private static UIMenu ActiveMenu;
+
         public delegate void MenuCloseEvent(UIMenu sender);
         public delegate void ItemSelectEvent(UIMenu sender, UIMenuItem selectedItem, int index);
         public delegate void IndexChangedEvent(UIMenu sender, UIMenuItem selectedItem, int index);
@@ -55,9 +56,20 @@ namespace BennysMotorworksRevamped.Compat
         {
             NativeMenu = new NativeMenu(title ?? string.Empty, subtitle ?? string.Empty);
             MenuItems = new List<UIMenuItem>();
+            RegisteredMenus.Add(this);
 
             NativeMenu.Closed += (sender, args) =>
             {
+                if (IsVisibilityTransition)
+                {
+                    return;
+                }
+
+                if (ReferenceEquals(ActiveMenu, this))
+                {
+                    ActiveMenu = null;
+                }
+
                 bool suppressCallback = SuppressCloseCallbackOnce;
                 bool restoreParent = ParentMenu != null && !SuppressParentRestoreOnce;
 
@@ -116,19 +128,70 @@ namespace BennysMotorworksRevamped.Compat
         private bool SuppressCloseCallbackOnce { get; set; }
         public int Size => MenuItems.Count;
 
-        private void HideVisibleParentChain()
+        internal static void HideAll()
         {
-            UIMenu current = ParentMenu;
-            while (current != null)
+            SetExclusiveVisibleMenu(null);
+        }
+
+        internal static void ShowOnly(UIMenu menu)
+        {
+            SetExclusiveVisibleMenu(menu);
+        }
+
+        internal static void EnsureSingleVisibleMenu()
+        {
+            UIMenu visibleMenu = null;
+            int visibleCount = 0;
+
+            foreach (UIMenu menu in RegisteredMenus)
             {
-                if (current.NativeMenu.Visible)
+                if (!menu.NativeMenu.Visible)
                 {
-                    current.SuppressParentRestoreOnce = true;
-                    current.SuppressCloseCallbackOnce = true;
-                    current.NativeMenu.Visible = false;
+                    continue;
                 }
 
-                current = current.ParentMenu;
+                visibleCount++;
+                if (ReferenceEquals(menu, ActiveMenu))
+                {
+                    visibleMenu = menu;
+                }
+                else if (visibleMenu == null)
+                {
+                    visibleMenu = menu;
+                }
+            }
+
+            if (visibleCount == 0)
+            {
+                ActiveMenu = null;
+            }
+            else if (visibleCount == 1)
+            {
+                ActiveMenu = visibleMenu;
+            }
+            else
+            {
+                SetExclusiveVisibleMenu(visibleMenu);
+            }
+        }
+
+        private static void SetExclusiveVisibleMenu(UIMenu menuToShow)
+        {
+            bool previousTransitionState = IsVisibilityTransition;
+            IsVisibilityTransition = true;
+
+            try
+            {
+                foreach (UIMenu menu in RegisteredMenus)
+                {
+                    menu.NativeMenu.Visible = ReferenceEquals(menu, menuToShow);
+                }
+
+                ActiveMenu = menuToShow;
+            }
+            finally
+            {
+                IsVisibilityTransition = previousTransitionState;
             }
         }
 
@@ -139,10 +202,12 @@ namespace BennysMotorworksRevamped.Compat
             {
                 if (value)
                 {
-                    HideVisibleParentChain();
+                    ShowOnly(this);
                 }
-
-                NativeMenu.Visible = value;
+                else
+                {
+                    NativeMenu.Visible = false;
+                }
             }
         }
 
@@ -219,6 +284,8 @@ namespace BennysMotorworksRevamped.Compat
 
     public class UIMenuItem
     {
+        private string _rightLabel = string.Empty;
+
         public enum BadgeStyle
         {
             None,
@@ -256,13 +323,30 @@ namespace BennysMotorworksRevamped.Compat
 
         public void SetRightLabel(string value)
         {
-            NativeItem.AltTitle = value ?? string.Empty;
+            _rightLabel = value ?? string.Empty;
+            RefreshRightText();
         }
 
         public void SetRightBadge(BadgeStyle value)
         {
             RightBadge = value;
-            NativeItem.AltTitle = value == BadgeStyle.Car ? "Installed" : string.Empty;
+            RefreshRightText();
+        }
+
+        private void RefreshRightText()
+        {
+            if (RightBadge == BadgeStyle.Car)
+            {
+                NativeItem.AltTitle = "Purchased";
+            }
+            else if (!string.IsNullOrEmpty(_rightLabel))
+            {
+                NativeItem.AltTitle = _rightLabel;
+            }
+            else
+            {
+                NativeItem.AltTitle = Submenu != null ? ">" : string.Empty;
+            }
         }
     }
 
