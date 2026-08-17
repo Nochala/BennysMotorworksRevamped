@@ -2444,12 +2444,12 @@ namespace BennysMotorworksRevamped
             Exit,
         }
 
-        private static readonly Vector3 EnterTriggerPosition = new Vector3(-205.6165f, -1312.976f, 31.1331f);
-        private static readonly Vector3 EnterCutsceneStartPosition = new Vector3(-205.8144f, -1310.282f, 31.02291f);
+        private static readonly Vector3 EnterTriggerPosition = new Vector3(-205.553f, -1316.169f, 30.890f);
+        private static readonly Vector3 EnterCutsceneStartPosition = new Vector3(-205.698f, -1312.353f, 31.203f);
         private static readonly Vector3 EnterCutsceneWaypointA = new Vector3(-207.155f, -1320.521f, 30.8904f);
         private static readonly Vector3 ShopVehiclePosition = new Vector3(-211.801f, -1324.290f, 30.37535f);
         private static readonly Vector3 ExitCutsceneLanePosition = new Vector3(-205.8678f, -1321.805f, 30.41191f);
-        private static readonly Vector3 ExitCutsceneWaypointA = new Vector3(-205.743f, -1303.657f, 30.84998f);
+        private static readonly Vector3 ExitCutsceneWaypointA = new Vector3(-205.714f, -1309.399f, 31.249f);
         private static readonly Vector3 ExitCutsceneWaypointB = new Vector3(-200.2561f, -1303.021f, 30.66544f);
         private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-200.7804f, -1316.474f, 32.08001f);
         private static readonly Vector3 ExitCutsceneCameraPosition = new Vector3(-197.5533f, -1297.754f, 32.29234f);
@@ -2872,24 +2872,11 @@ namespace BennysMotorworksRevamped
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ShopVehiclePosition, 0.5f))
+                    if (IsNear(veh.Position, ShopVehiclePosition, activeWorkshopCutsceneTargetRadius + 0.5f))
                     {
-                        // Stop the driving task so the car can settle
-                        Function.Call(Hash.CLEAR_PED_TASKS, ply.Handle);
-                        // Move to stage 3 to wait for the car to stop
-                        AdvanceWorkshopCutsceneStage(3);
-                    }
-                    else if (IsWorkshopCutsceneStageTimedOut(8000))
-                    {
-                        // Fallback: teleport directly and complete
-                        SetCutsceneVehicleTransform(ShopVehiclePosition, 150.2801f);
                         CompleteEnterCutscene();
                     }
-                    break;
-
-                case 3:
-                    // Wait for the vehicle to settle (speed < 0.3) or timeout after 1.5 seconds
-                    if (veh.Speed < 0.3f || IsWorkshopCutsceneStageTimedOut(1500))
+                    else if (IsWorkshopCutsceneStageTimedOut(8000))
                     {
                         CompleteEnterCutscene();
                     }
@@ -3123,28 +3110,21 @@ namespace BennysMotorworksRevamped
         {
             try
             {
-                // Check how far the vehicle is from the desired parking spot
-                float distance = veh.Position.DistanceTo(ShopVehiclePosition);
+                Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, veh.Handle, ShopVehiclePosition.X, ShopVehiclePosition.Y, ShopVehiclePosition.Z, false, false, false);
+                veh.Heading = 150.2801f;
+                Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
+                Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
+                Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
 
-                if (distance < 0.25f)
-                {
-                    // Already close enough – just set heading and stop, no teleport
-                    veh.Heading = 150.2801f;
-                    veh.Speed = 0f;
-                    Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
-                }
-                else
-                {
-                    // Teleport to exact spot (but without freezing – just a direct set)
-                    veh.Position = ShopVehiclePosition;
-                    veh.Heading = 150.2801f;
-                    Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
-                    veh.Speed = 0f;
-                }
+                // Switch from the entrance camera to the workshop camera in the
+                // same tick as the final positioning snap.
+                ResetWorkshopCutsceneCamera();
+                camera.RepositionFor(veh);
 
-                // Schedule the heavy init after 500ms to let the vehicle settle
+                // Finish menu initialization on the next tick without an
+                // artificial settling delay.
                 _pendingShopInit = true;
-                _shopInitDelayTime = Game.GameTime + 500;
+                _shopInitDelayTime = Game.GameTime;
             }
             catch (Exception ex)
             {
@@ -3243,9 +3223,7 @@ namespace BennysMotorworksRevamped
                     Logger.Log("PutVehIntoShop: MainMenu was null.");
                 }
 
-                camera.RepositionFor(veh);
                 StartWorkshopAudioScene();
-                ResetWorkshopCutsceneCamera();
             }
             catch (Exception ex)
             {
