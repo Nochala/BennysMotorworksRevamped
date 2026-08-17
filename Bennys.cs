@@ -42,6 +42,14 @@ namespace BennysMotorworksRevamped
 
                 ProcessWorkshopCutscene();
 
+                bool isInsideWorkshop = isCutscene
+                    || (Helper._menuPool != null && Helper._menuPool.AreAnyVisible)
+                    || GetInteriorID(ply.Position) == bennyIntID;
+                if (isInsideWorkshop)
+                {
+                    Function.Call(Hash.HIDE_HUD_COMPONENT_THIS_FRAME, 10);
+                }
+
                 if (fixDoor == 1 && !unWelcome.Contains(veh.ClassType))
                 {
                     bool openDoor = veh.Position.DistanceTo(new Vector3(-205.6828f, -1310.683f, 30.29572f)) <= 15.0f;

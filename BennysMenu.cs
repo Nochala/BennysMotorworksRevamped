@@ -491,15 +491,12 @@ namespace BennysMotorworksRevamped
                     DrawVehicleStatsPanel();
                 }
 
-                // Only show the vehicle title once the workshop entry cutscene starts,
-                // and keep it visible while a Benny's menu is open.
-                if (veh != null && (isCutscene || isMenuVisible))
+                // Only show the vehicle title during workshop cutscenes, never over an open menu.
+                if (isCutscene && !isMenuVisible && veh != null)
                 {
-                    Helper.DisplayVehicleInfoBottomRight(veh.DisplayName, GetClassDisplayName(veh.ClassType));
-                }
-
-                if (isCutscene && veh != null)
-                {
+                    Helper.DisplayVehicleInfoBottomRight(
+                        Helper.GetVehicleMakeAndModelDisplayName(veh),
+                        GetClassDisplayName(veh.ClassType));
                     Game.DisableAllControlsThisFrame();
                     Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
                 }
