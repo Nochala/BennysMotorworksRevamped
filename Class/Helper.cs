@@ -141,12 +141,70 @@ namespace BennysMotorworksRevamped
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
 
+        private static bool IsMissingDisplayText(string value)
+        {
+            return string.IsNullOrWhiteSpace(value)
+                || value.Equals("NULL", StringComparison.OrdinalIgnoreCase)
+                || value.Equals("CARNOTFOUND", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static string GetVehicleMakeAndModelDisplayName(Vehicle vehicle)
+        {
+            if (vehicle == null)
+            {
+                return string.Empty;
+            }
+
+            string modelLabel = vehicle.DisplayName;
+            if (IsMissingDisplayText(modelLabel))
+            {
+                modelLabel = vehicle.Model.ToString();
+            }
+
+            string modelName;
+            try
+            {
+                modelName = Gxt(modelLabel);
+            }
+            catch
+            {
+                modelName = modelLabel;
+            }
+
+            if (IsMissingDisplayText(modelName))
+            {
+                modelName = modelLabel;
+            }
+
+            string makeName;
+            try
+            {
+                makeName = vehicle.Brand();
+            }
+            catch
+            {
+                return modelName;
+            }
+
+            if (IsMissingDisplayText(makeName))
+            {
+                return modelName;
+            }
+
+            if (modelName.StartsWith(makeName + " ", StringComparison.OrdinalIgnoreCase))
+            {
+                return modelName;
+            }
+
+            return makeName + " " + modelName;
+        }
+
         public static void DisplayVehicleInfoBottomRight(string vehicleName, string vehicleClass)
         {
             float safeZoneMargin = GetSafeZoneMargin();
             float rightX = 0.995f - safeZoneMargin;
             float classY = 0.928f - safeZoneMargin;
-            float nameY = classY - 0.040f;
+            float nameY = classY - 0.052f;
 
             Font titleFont = Font.ChaletComprimeCologne;
             switch (Game.Language.ToString())
@@ -159,8 +217,8 @@ namespace BennysMotorworksRevamped
                     break;
             }
 
-            DrawTextNormalized(vehicleName, rightX, nameY, 0.64f, titleFont, Color.White, true);
-            DrawTextNormalized(vehicleClass, rightX, classY, 0.40f, Font.ChaletLondon, Color.DodgerBlue, true);
+            DrawTextNormalized(vehicleName, rightX, nameY, 0.85f, titleFont, Color.White, true);
+            DrawTextNormalized(vehicleClass, rightX, classY, 0.85f, Font.HouseScript, Color.DodgerBlue, true);
         }
 
         private static float GetSafeZoneMargin()
@@ -2462,6 +2520,8 @@ namespace BennysMotorworksRevamped
         private static float activeWorkshopCutsceneTargetRadius;
         private static float activeWorkshopCutsceneTargetSpeed;
         private static float activeWorkshopCutsceneLastDistanceSq;
+        private const float MinimumCutsceneWaypointRadius = 2.0f;
+        private const float ExitIntermediateHandoffRadius = 3.0f;
         private static int enterCutsceneBlockedUntil;
         private static Vector3 lastGarageTriggerSamplePosition = Vector3.Zero;
         private static bool hasGarageTriggerSample;
@@ -2608,6 +2668,17 @@ namespace BennysMotorworksRevamped
             return position.DistanceToSquared(target) <= radius * radius;
         }
 
+        private static bool HasReachedActiveCutsceneTarget()
+        {
+            if (veh == null || activeWorkshopCutsceneTarget.Length() <= 0.001f)
+            {
+                return false;
+            }
+
+            float reachRadius = Math.Max(activeWorkshopCutsceneTargetRadius + 0.5f, MinimumCutsceneWaypointRadius);
+            return IsNear(veh.Position, activeWorkshopCutsceneTarget, reachRadius);
+        }
+
         private static float Dot(Vector3 left, Vector3 right)
         {
             return (left.X * right.X) + (left.Y * right.Y) + (left.Z * right.Z);
@@ -2663,6 +2734,8 @@ namespace BennysMotorworksRevamped
             activeWorkshopCutsceneTargetRadius = radius;
             activeWorkshopCutsceneTargetSpeed = speed;
             activeWorkshopCutsceneLastDriveTaskAt = Game.GameTime;
+            activeWorkshopCutsceneLastProgressAt = Game.GameTime;
+            activeWorkshopCutsceneLastDistanceSq = veh.Position.DistanceToSquared(target);
 
             EnsurePlayerInVehicleForCutscene();
 
@@ -2671,8 +2744,9 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.SET_DRIVER_ABILITY, ply.Handle, 1.0f);
             Function.Call(Hash.SET_DRIVER_AGGRESSIVENESS, ply.Handle, 0.0f);
 
-            // Use default driving style (0) – smoother parking
-            uint drivingStyle = 0;
+            // Use GTA's normal driving style so slow and heavy vehicles keep a stable drive task.
+            uint drivingStyle = 786603;
+            float stopRange = Math.Max(radius, MinimumCutsceneWaypointRadius - 0.5f);
 
             Logger.Log($"Issuing TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE with style {drivingStyle:X}");
 
@@ -2682,12 +2756,12 @@ namespace BennysMotorworksRevamped
                 target.X, target.Y, target.Z,
                 speed,
                 drivingStyle,
-                radius);
+                stopRange);
 
-            // Small nudge to overcome inertia if completely stopped
-            if (veh.Speed < 0.1f)
+            // Give slow or heavy vehicles enough initial momentum to overcome inertia.
+            if (veh.Speed < 0.5f)
             {
-                Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.5f);
+                Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, Math.Min(speed, 1.25f));
             }
         }
 
@@ -2717,25 +2791,24 @@ namespace BennysMotorworksRevamped
             if (activeWorkshopCutsceneTarget.Length() <= 0.001f)
                 return;
 
-            if (IsNear(veh.Position, activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius + 0.5f))
+            if (HasReachedActiveCutsceneTarget())
                 return;
 
             UpdateCutsceneProgress();
 
             int now = Game.GameTime;
 
-            // Do not re-issue too often – increase to 3 seconds
-            if (now - activeWorkshopCutsceneLastDriveTaskAt < 3000)
+            // Give the task time to start, but recover promptly if a heavy vehicle stalls.
+            if (now - activeWorkshopCutsceneLastDriveTaskAt < 1500)
                 return;
 
-            // Relaxed stuck detection: speed below 0.5 for 4 seconds, or no progress for 6 seconds
-            bool isStuck = veh.Speed < 0.5f && (now - activeWorkshopCutsceneLastProgressAt) > 4000;
-            bool noProgress = (now - activeWorkshopCutsceneLastProgressAt) > 6000;
+            bool isStuck = veh.Speed < 0.5f && (now - activeWorkshopCutsceneLastProgressAt) > 2000;
+            bool noProgress = (now - activeWorkshopCutsceneLastProgressAt) > 4000;
 
             if (isStuck || noProgress)
             {
                 Logger.Log($"Refresh: re-issuing drive, stuck={isStuck}, noProgress={noProgress}");
-                float boostedSpeed = activeWorkshopCutsceneTargetSpeed * 1.2f;
+                float boostedSpeed = Math.Min(activeWorkshopCutsceneTargetSpeed * 1.2f, 8.0f);
                 QueueCutsceneDrive(activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius, boostedSpeed);
             }
         }
@@ -2868,7 +2941,7 @@ namespace BennysMotorworksRevamped
 
                 case 1:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, EnterCutsceneWaypointA, 3.0f))
+                    if (HasReachedActiveCutsceneTarget())
                     {
                         QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 5.0f);
                         AdvanceWorkshopCutsceneStage(2);
@@ -2883,11 +2956,11 @@ namespace BennysMotorworksRevamped
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ShopVehiclePosition, activeWorkshopCutsceneTargetRadius + 0.5f))
+                    if (HasReachedActiveCutsceneTarget())
                     {
                         CompleteEnterCutscene();
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(8000))
+                    else if (IsWorkshopCutsceneStageTimedOut(4000))
                     {
                         CompleteEnterCutscene();
                     }
@@ -2925,14 +2998,14 @@ namespace BennysMotorworksRevamped
 
                 case 1:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ExitCutsceneLanePosition, 2.0f))
+                    if (HasReachedActiveCutsceneTarget())
                     {
                         // Reached lane → drive to intermediate point
-                        if (veh.Speed < 0.5f)
+                        if (veh.Speed < 1.5f)
                         {
                             veh.Heading = GetHeadingToward(veh.Position, intermediatePoint, veh.Heading);
                         }
-                        QueueCutsceneDrive(intermediatePoint, 0.5f, 5.75f);
+                        QueueCutsceneDrive(intermediatePoint, 0.0f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
@@ -2940,17 +3013,18 @@ namespace BennysMotorworksRevamped
                         // Fallback: teleport to lane, then drive to intermediate
                         float headingToIntermediate = GetHeadingToward(ExitCutsceneLanePosition, intermediatePoint, cachedExitHeading);
                         SetCutsceneVehicleTransform(ExitCutsceneLanePosition, headingToIntermediate);
-                        QueueCutsceneDrive(intermediatePoint, 0.5f, 5.75f);
+                        QueueCutsceneDrive(intermediatePoint, 0.0f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, intermediatePoint, activeWorkshopCutsceneTargetRadius + 0.5f))
+                    // This waypoint is only a cue; switch tasks before slow or long vehicles brake to a stop.
+                    if (IsNear(veh.Position, intermediatePoint, ExitIntermediateHandoffRadius))
                     {
                         // Reached intermediate → drive to final waypoint B
-                        if (veh.Speed < 0.5f)
+                        if (veh.Speed < 1.5f)
                         {
                             veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
                         }
@@ -2969,7 +3043,7 @@ namespace BennysMotorworksRevamped
 
                 case 3:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, ExitCutsceneWaypointB, 2.0f))
+                    if (HasReachedActiveCutsceneTarget())
                     {
                         CompleteExitCutscene();
                     }
