@@ -2624,6 +2624,17 @@ namespace BennysMotorworksRevamped
             return value;
         }
 
+        private static float GetHeadingToward(Vector3 position, Vector3 target, float fallbackHeading)
+        {
+            Vector3 direction = target - position;
+            if (direction.Length() <= 0.001f)
+            {
+                return fallbackHeading;
+            }
+
+            return (float)(Math.Atan2(direction.X, direction.Y) * 180.0 / Math.PI);
+        }
+
         private static void SetCutsceneVehicleTransform(Vector3 position, float heading)
         {
             if (veh == null) return;
@@ -2900,10 +2911,8 @@ namespace BennysMotorworksRevamped
                     // Warp to the internal waypoint (inside the garage, near the entrance)
                     SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 190.3224f);
 
-                    // Face toward the final street point and store the heading
-                    Vector3 dirToB = ExitCutsceneWaypointB - veh.Position;
-                    dirToB.Normalize();
-                    cachedExitHeading = (float)(Math.Atan2(dirToB.X, dirToB.Y) * 180.0 / Math.PI);
+                    // Face the first destination before starting the drive task.
+                    cachedExitHeading = GetHeadingToward(veh.Position, ExitCutsceneLanePosition, 190.3224f);
                     veh.Heading = cachedExitHeading;
                     Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
 
@@ -2919,13 +2928,18 @@ namespace BennysMotorworksRevamped
                     if (IsNear(veh.Position, ExitCutsceneLanePosition, 2.0f))
                     {
                         // Reached lane → drive to intermediate point
+                        if (veh.Speed < 0.5f)
+                        {
+                            veh.Heading = GetHeadingToward(veh.Position, intermediatePoint, veh.Heading);
+                        }
                         QueueCutsceneDrive(intermediatePoint, 0.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         // Fallback: teleport to lane, then drive to intermediate
-                        SetCutsceneVehicleTransform(ExitCutsceneLanePosition, cachedExitHeading);
+                        float headingToIntermediate = GetHeadingToward(ExitCutsceneLanePosition, intermediatePoint, cachedExitHeading);
+                        SetCutsceneVehicleTransform(ExitCutsceneLanePosition, headingToIntermediate);
                         QueueCutsceneDrive(intermediatePoint, 0.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
@@ -2933,18 +2947,20 @@ namespace BennysMotorworksRevamped
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, intermediatePoint, 0.5f))
+                    if (IsNear(veh.Position, intermediatePoint, activeWorkshopCutsceneTargetRadius + 0.5f))
                     {
                         // Reached intermediate → drive to final waypoint B
+                        if (veh.Speed < 0.5f)
+                        {
+                            veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
+                        }
                         QueueCutsceneDrive(ExitCutsceneWaypointB, 0.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         // Fallback: teleport to intermediate, head toward B, then drive to B
-                        Vector3 dirToBFromIntermediate = ExitCutsceneWaypointB - intermediatePoint;
-                        dirToBFromIntermediate.Normalize();
-                        float headingToB = (float)(Math.Atan2(dirToBFromIntermediate.X, dirToBFromIntermediate.Y) * 180.0 / Math.PI);
+                        float headingToB = GetHeadingToward(intermediatePoint, ExitCutsceneWaypointB, cachedExitHeading);
                         SetCutsceneVehicleTransform(intermediatePoint, headingToB);
                         QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 5.75f);
                         AdvanceWorkshopCutsceneStage(3);
