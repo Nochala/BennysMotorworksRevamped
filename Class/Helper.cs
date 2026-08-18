@@ -114,6 +114,8 @@ namespace BennysMotorworksRevamped
         public static Ped ply;
         public static int onlineMap = 1;
         public static int fixDoor = 1;
+        public static bool allowOversizedVehicles = true;
+        public static bool allowEmergencyVehicles = true;
         public static int bennyIntID;
         public static bool isExiting = false;
         public static Memory lastVehMemory;
@@ -138,6 +140,10 @@ namespace BennysMotorworksRevamped
         public static string arenaVehImage = "brusier_apoc";
 
         private static float cachedExitHeading = 0f;
+        private const float MaximumWorkshopVehicleWidth = 3.0f;
+        private const float MaximumWorkshopVehicleLength = 7.0f;
+        private const float MaximumWorkshopVehicleHeight = 3.5f;
+        private static readonly Dictionary<int, bool> oversizedVehicleModels = new Dictionary<int, bool>();
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
 
@@ -278,7 +284,7 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
-            vehicle.Mods.InstallModKit();
+            Function.Call(Hash.SET_VEHICLE_MOD_KIT, vehicle.Handle, 0);
         }
 
         public static int GetMod(this Vehicle vehicle, VehicleMod modType)
@@ -290,7 +296,7 @@ namespace BennysMotorworksRevamped
                     return -1;
                 }
 
-                return vehicle.Mods[modType].Index;
+                return Function.Call<int>(Hash.GET_VEHICLE_MOD, vehicle.Handle, (int)modType);
             }
             catch
             {
@@ -307,7 +313,7 @@ namespace BennysMotorworksRevamped
                     return 0;
                 }
 
-                return vehicle.Mods[modType].Count;
+                return Function.Call<int>(Hash.GET_NUM_VEHICLE_MODS, vehicle.Handle, (int)modType);
             }
             catch
             {
@@ -1204,6 +1210,7 @@ namespace BennysMotorworksRevamped
         {
             Chrome,
             Classic,
+            Chameleon,
             Metallic,
             Metals,
             Matte,
@@ -1226,6 +1233,13 @@ namespace BennysMotorworksRevamped
                     break;
                 case ColorType.Classic:
                     cur = Gxt("CMOD_COL1_1");
+                    break;
+                case ColorType.Chameleon:
+                    cur = Gxt("CMOD_COL1_7");
+                    if (string.IsNullOrWhiteSpace(cur) || cur.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        cur = "Chameleon";
+                    }
                     break;
                 case ColorType.Crew:
                     cur = Gxt("CMOD_COL1_2");
@@ -1526,17 +1540,22 @@ namespace BennysMotorworksRevamped
                 Function.Call(Hash.REQUEST_ADDITIONAL_TEXT, "mod_mnu", 10);
             }
 
-            if (_colorNames.ContainsKey(vehColor))
+            if (_colorNames.TryGetValue(vehColor, out Tuple<string, string> colorName))
             {
-                if (DoesGXTEntryExist(_colorNames[vehColor].Item1))
+                if (DoesGXTEntryExist(colorName.Item1))
                 {
-                    return Gxt(_colorNames[vehColor].Item1);
+                    return Gxt(colorName.Item1);
                 }
 
-                return System.Text.RegularExpressions.Regex.Replace(_colorNames[vehColor].Item2, "[A-Z]", " $0").Trim();
+                return System.Text.RegularExpressions.Regex.Replace(colorName.Item2, "[A-Z]", " $0").Trim();
             }
 
-            throw new ArgumentException("Vehicle Color == undefined", nameof(vehColor));
+            if (_chameleonColorNames.TryGetValue(vehColor, out string chameleonName))
+            {
+                return chameleonName;
+            }
+
+            return "Color " + ((int)vehColor).ToString();
         }
 
         public static readonly List<VehicleColor> ClassicColor = new List<VehicleColor>
@@ -1563,6 +1582,53 @@ namespace BennysMotorworksRevamped
         {
             (VehicleColor)0, (VehicleColor)147, (VehicleColor)1, (VehicleColor)11, (VehicleColor)2, (VehicleColor)3, (VehicleColor)4, (VehicleColor)5, (VehicleColor)6, (VehicleColor)7, (VehicleColor)8, (VehicleColor)9, (VehicleColor)10, (VehicleColor)27, (VehicleColor)28, (VehicleColor)29, (VehicleColor)150, (VehicleColor)30, (VehicleColor)31, (VehicleColor)32, (VehicleColor)33, (VehicleColor)34, (VehicleColor)143, (VehicleColor)35, (VehicleColor)135, (VehicleColor)137, (VehicleColor)136, (VehicleColor)36, (VehicleColor)38, (VehicleColor)138, (VehicleColor)99, (VehicleColor)90, (VehicleColor)88, (VehicleColor)89, (VehicleColor)91, (VehicleColor)49, (VehicleColor)50, (VehicleColor)51, (VehicleColor)52, (VehicleColor)53, (VehicleColor)54, (VehicleColor)92, (VehicleColor)141, (VehicleColor)61, (VehicleColor)62, (VehicleColor)63, (VehicleColor)64, (VehicleColor)65, (VehicleColor)66, (VehicleColor)67, (VehicleColor)68, (VehicleColor)69, (VehicleColor)73, (VehicleColor)70, (VehicleColor)74, (VehicleColor)96, (VehicleColor)101, (VehicleColor)95, (VehicleColor)94, (VehicleColor)97, (VehicleColor)103, (VehicleColor)104, (VehicleColor)98, (VehicleColor)100, (VehicleColor)102, (VehicleColor)99, (VehicleColor)105, (VehicleColor)106, (VehicleColor)71, (VehicleColor)72, (VehicleColor)142, (VehicleColor)145, (VehicleColor)107, (VehicleColor)111, (VehicleColor)112, (VehicleColor)117, (VehicleColor)118, (VehicleColor)119, (VehicleColor)158, (VehicleColor)159, (VehicleColor)160
         };
+
+        public static readonly List<VehicleColor> ChameleonColor = CreateVehicleColorRange(161, 222);
+        public static readonly List<VehicleColor> AllVehicleColors = CreateAllVehicleColors();
+
+        internal static bool AreChameleonColorsAvailable()
+        {
+            try
+            {
+                return Function.Call<int>(Hash.GET_NUM_MOD_COLORS, 6, true) > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static List<VehicleColor> CreateVehicleColorRange(int first, int last)
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            for (int colorIndex = first; colorIndex <= last; colorIndex++)
+            {
+                colors.Add((VehicleColor)colorIndex);
+            }
+            return colors;
+        }
+
+        private static List<VehicleColor> CreateAllVehicleColors()
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            foreach (VehicleColor color in Enum.GetValues(typeof(VehicleColor)))
+            {
+                if (!colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+
+            foreach (VehicleColor color in ChameleonColor)
+            {
+                if (!colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+
+            return colors;
+        }
 
         private static readonly Dictionary<VehicleColor, Tuple<string, string>> _colorNames =
             new Dictionary<VehicleColor, Tuple<string, string>>
@@ -1728,6 +1794,73 @@ namespace BennysMotorworksRevamped
                 [(VehicleColor)158] = Tuple.Create("GOLD_P", "PureGold"),
                 [(VehicleColor)159] = Tuple.Create("GOLD_S", "BrushedGold"),
                 [(VehicleColor)160] = Tuple.Create("NULL", "SecretGold")
+            };
+
+        private static readonly Dictionary<VehicleColor, string> _chameleonColorNames =
+            new Dictionary<VehicleColor, string>
+            {
+                [(VehicleColor)161] = "Anodized Red Pearl",
+                [(VehicleColor)162] = "Anodized Wine Pearl",
+                [(VehicleColor)163] = "Anodized Purple Pearl",
+                [(VehicleColor)164] = "Anodized Blue Pearl",
+                [(VehicleColor)165] = "Anodized Green Pearl",
+                [(VehicleColor)166] = "Anodized Lime Pearl",
+                [(VehicleColor)167] = "Anodized Copper Pearl",
+                [(VehicleColor)168] = "Anodized Bronze Pearl",
+                [(VehicleColor)169] = "Anodized Champagne Pearl",
+                [(VehicleColor)170] = "Anodized Gold Pearl",
+                [(VehicleColor)171] = "Green/Blue Flip",
+                [(VehicleColor)172] = "Green/Red Flip",
+                [(VehicleColor)173] = "Green/Brown Flip",
+                [(VehicleColor)174] = "Green/Turquoise Flip",
+                [(VehicleColor)175] = "Green/Purple Flip",
+                [(VehicleColor)176] = "Teal/Purple Flip",
+                [(VehicleColor)177] = "Turquoise/Red Flip",
+                [(VehicleColor)178] = "Turquoise/Purple Flip",
+                [(VehicleColor)179] = "Cyan/Purple Flip",
+                [(VehicleColor)180] = "Blue/Pink Flip",
+                [(VehicleColor)181] = "Blue/Green Flip",
+                [(VehicleColor)182] = "Purple/Red Flip",
+                [(VehicleColor)183] = "Purple/Green Flip",
+                [(VehicleColor)184] = "Magenta/Green Flip",
+                [(VehicleColor)185] = "Magenta/Yellow Flip",
+                [(VehicleColor)186] = "Burgundy/Green Flip",
+                [(VehicleColor)187] = "Magenta/Cyan Flip",
+                [(VehicleColor)188] = "Copper/Purple Flip",
+                [(VehicleColor)189] = "Magenta/Orange Flip",
+                [(VehicleColor)190] = "Red/Orange Flip",
+                [(VehicleColor)191] = "Orange/Purple Flip",
+                [(VehicleColor)192] = "Orange/Blue Flip",
+                [(VehicleColor)193] = "White/Purple Flip",
+                [(VehicleColor)194] = "Red/Rainbow Flip",
+                [(VehicleColor)195] = "Blue/Rainbow Flip",
+                [(VehicleColor)196] = "Dark Green Pearl",
+                [(VehicleColor)197] = "Dark Teal Pearl",
+                [(VehicleColor)198] = "Dark Blue Pearl",
+                [(VehicleColor)199] = "Dark Purple Pearl",
+                [(VehicleColor)200] = "Oil Slick Pearl",
+                [(VehicleColor)201] = "Light Green Pearl",
+                [(VehicleColor)202] = "Light Blue Pearl",
+                [(VehicleColor)203] = "Light Purple Pearl",
+                [(VehicleColor)204] = "Light Pink Pearl",
+                [(VehicleColor)205] = "Off White Pearl",
+                [(VehicleColor)206] = "Cute Pink Pearl",
+                [(VehicleColor)207] = "Baby Yellow Pearl",
+                [(VehicleColor)208] = "Baby Green Pearl",
+                [(VehicleColor)209] = "Baby Blue Pearl",
+                [(VehicleColor)210] = "Cream Pearl",
+                [(VehicleColor)211] = "White Prismatic Pearl",
+                [(VehicleColor)212] = "Graphite Prismatic Pearl",
+                [(VehicleColor)213] = "Blue Prismatic Pearl",
+                [(VehicleColor)214] = "Purple Prismatic Pearl",
+                [(VehicleColor)215] = "Hot Pink Prismatic Pearl",
+                [(VehicleColor)216] = "Red Prismatic Pearl",
+                [(VehicleColor)217] = "Green Prismatic Pearl",
+                [(VehicleColor)218] = "Black Prismatic Pearl",
+                [(VehicleColor)219] = "Oil Spill Prismatic Pearl",
+                [(VehicleColor)220] = "Rainbow Prismatic Pearl",
+                [(VehicleColor)221] = "Black Holographic Pearl",
+                [(VehicleColor)222] = "White Holographic Pearl"
             };
 
         private static readonly Dictionary<int, Tuple<string, string>> _hornNames =
@@ -2474,6 +2607,8 @@ namespace BennysMotorworksRevamped
             optLogging = config.GetValue("SETTINGS", "LOGGING", true);
             onlineMap = config.GetValue<int>("SETTINGS", "OnlineMap", 1);
             fixDoor = config.GetValue<int>("SETTINGS", "FixDoor", 1);
+            allowOversizedVehicles = config.GetValue("SETTINGS", "AllowOversizedVehicles", true);
+            allowEmergencyVehicles = config.GetValue("SETTINGS", "AllowEmergencyVehicles", true);
             vehicleStatsOffsetX = config.GetValue<float>("VEHICLE_STATS", "OffsetX", 0f);
             vehicleStatsOffsetY = config.GetValue<float>("VEHICLE_STATS", "OffsetY", -10f);
             fpcKey = config.GetValue<GTA.Control>("CONTROLS", "FirstPerson", GTA.Control.NextCamera);
@@ -2492,6 +2627,77 @@ namespace BennysMotorworksRevamped
             BennysBlip.Color = BlipColor.Yellow;
             BennysBlip.IsShortRange = true;
             BennysBlip.Name = Gxt("S_MO_09");
+        }
+
+        private static bool IsOversizedWorkshopVehicle(Vehicle vehicle)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return false;
+            }
+
+            if (IsVehicleAttachedToTrailer(vehicle))
+            {
+                return true;
+            }
+
+            int modelHash = vehicle.Model.Hash;
+            if (oversizedVehicleModels.TryGetValue(modelHash, out bool isOversized))
+            {
+                return isOversized;
+            }
+
+            try
+            {
+                OutputArgument minimumArgument = new OutputArgument();
+                OutputArgument maximumArgument = new OutputArgument();
+                Function.Call(Hash.GET_MODEL_DIMENSIONS, modelHash, minimumArgument, maximumArgument);
+
+                Vector3 minimum = minimumArgument.GetResult<Vector3>();
+                Vector3 maximum = maximumArgument.GetResult<Vector3>();
+                float width = Math.Abs(maximum.X - minimum.X);
+                float length = Math.Abs(maximum.Y - minimum.Y);
+                float height = Math.Abs(maximum.Z - minimum.Z);
+
+                isOversized = width > MaximumWorkshopVehicleWidth
+                    || length > MaximumWorkshopVehicleLength
+                    || height > MaximumWorkshopVehicleHeight;
+                oversizedVehicleModels[modelHash] = isOversized;
+                return isOversized;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Unable to read vehicle dimensions: " + ex.Message);
+                return false;
+            }
+        }
+
+        public static string GetWorkshopVehicleDenialMessage(Vehicle vehicle)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return null;
+            }
+
+            if (!allowEmergencyVehicles && vehicle.ClassType == VehicleClass.Emergency)
+            {
+                return "Emergency Vehicles Not Allowed";
+            }
+
+            if (!allowOversizedVehicles && IsOversizedWorkshopVehicle(vehicle))
+            {
+                return "Oversized Vehicles Not Allowed";
+            }
+
+            return null;
+        }
+
+        public static bool IsWorkshopVehicleAllowed(Vehicle vehicle)
+        {
+            return vehicle != null
+                && vehicle.Exists()
+                && !unWelcome.Contains(vehicle.ClassType)
+                && GetWorkshopVehicleDenialMessage(vehicle) == null;
         }
 
 
@@ -2933,7 +3139,7 @@ namespace BennysMotorworksRevamped
                     // Small settle delay (100ms) then start driving
                     if (IsWorkshopCutsceneStageTimedOut(100))
                     {
-                        QueueCutsceneDrive(EnterCutsceneWaypointA, 3.5f, 6.5f);
+                        QueueCutsceneDrive(EnterCutsceneWaypointA, 3.5f, 8.5f);
                         PlaySpeech("SHOP_NICE_VEHICLE");
                         AdvanceWorkshopCutsceneStage(1);
                     }
@@ -2943,13 +3149,13 @@ namespace BennysMotorworksRevamped
                     RefreshCutsceneDriveTaskIfNeeded();
                     if (HasReachedActiveCutsceneTarget())
                     {
-                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 5.0f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 6.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 180.3224f);
-                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 5.0f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 6.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
@@ -2960,7 +3166,7 @@ namespace BennysMotorworksRevamped
                     {
                         CompleteEnterCutscene();
                     }
-                    else if (IsWorkshopCutsceneStageTimedOut(4000))
+                    else if (IsWorkshopCutsceneStageTimedOut(6000))
                     {
                         CompleteEnterCutscene();
                     }
@@ -2991,7 +3197,7 @@ namespace BennysMotorworksRevamped
 
                     StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition);
                     // Drive to the lane (just outside the garage)
-                    QueueCutsceneDrive(ExitCutsceneLanePosition, 1.8f, 4.5f);
+                    QueueCutsceneDrive(ExitCutsceneLanePosition, 1.8f, 5.5f);
                     PlaySpeech("SHOP_GOODBYE");
                     AdvanceWorkshopCutsceneStage(1);
                     break;
@@ -3005,7 +3211,7 @@ namespace BennysMotorworksRevamped
                         {
                             veh.Heading = GetHeadingToward(veh.Position, intermediatePoint, veh.Heading);
                         }
-                        QueueCutsceneDrive(intermediatePoint, 0.0f, 5.75f);
+                        QueueCutsceneDrive(intermediatePoint, 0.0f, 8.5f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
@@ -3013,7 +3219,7 @@ namespace BennysMotorworksRevamped
                         // Fallback: teleport to lane, then drive to intermediate
                         float headingToIntermediate = GetHeadingToward(ExitCutsceneLanePosition, intermediatePoint, cachedExitHeading);
                         SetCutsceneVehicleTransform(ExitCutsceneLanePosition, headingToIntermediate);
-                        QueueCutsceneDrive(intermediatePoint, 0.0f, 5.75f);
+                        QueueCutsceneDrive(intermediatePoint, 0.0f, 8.5f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
@@ -3028,7 +3234,7 @@ namespace BennysMotorworksRevamped
                         {
                             veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
                         }
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 0.5f, 5.75f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 0.5f, 7.5f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
@@ -3036,7 +3242,7 @@ namespace BennysMotorworksRevamped
                         // Fallback: teleport to intermediate, head toward B, then drive to B
                         float headingToB = GetHeadingToward(intermediatePoint, ExitCutsceneWaypointB, cachedExitHeading);
                         SetCutsceneVehicleTransform(intermediatePoint, headingToB);
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 5.75f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 7.75f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     break;
@@ -3102,6 +3308,11 @@ namespace BennysMotorworksRevamped
                 return false;
             }
 
+            if (!IsWorkshopVehicleAllowed(veh))
+            {
+                return false;
+            }
+
             Vector3 garageApproachDirection = Vector3.Zero;
             if (hasGarageTriggerSample)
             {
@@ -3158,7 +3369,7 @@ namespace BennysMotorworksRevamped
         {
             try
             {
-                if (veh == null || ply == null || activeWorkshopCutscene != WorkshopCutsceneType.None || isCutscene)
+                if (veh == null || ply == null || !IsWorkshopVehicleAllowed(veh) || activeWorkshopCutscene != WorkshopCutsceneType.None || isCutscene)
                 {
                     return;
                 }

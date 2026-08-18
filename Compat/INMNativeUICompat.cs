@@ -4,7 +4,7 @@ using GTA;
 using LemonUI;
 using LemonUI.Menus;
 using LemonUI.Tools;
-using System;
+using LemonUI.Elements;
 
 namespace BennysMotorworksRevamped.Compat
 {
@@ -165,10 +165,12 @@ namespace BennysMotorworksRevamped.Compat
 
         public UIMenu(string title, string subtitle, bool showStats) : this(title, subtitle)
         {
+            ShowStats = showStats;
         }
 
         public NativeMenu NativeMenu { get; }
         public UIMenuItemCollection MenuItems { get; }
+        internal bool ShowStats { get; private set; }
         public bool MouseEdgeEnabled { get; set; }
         public UIMenu ParentMenu { get; internal set; }
         private bool SuppressParentRestoreOnce { get; set; }
@@ -220,6 +222,24 @@ namespace BennysMotorworksRevamped.Compat
             {
                 SetExclusiveVisibleMenu(visibleMenu);
             }
+        }
+
+        internal static UIMenu GetVisibleMenu()
+        {
+            if (ActiveMenu != null && ActiveMenu.NativeMenu.Visible)
+            {
+                return ActiveMenu;
+            }
+
+            foreach (UIMenu menu in RegisteredMenus)
+            {
+                if (menu.NativeMenu.Visible)
+                {
+                    return menu;
+                }
+            }
+
+            return null;
         }
 
         private static void SetExclusiveVisibleMenu(UIMenu menuToShow)
@@ -287,6 +307,10 @@ namespace BennysMotorworksRevamped.Compat
 
         public void SetBannerType(object sprite)
         {
+            if (sprite is I2Dimensional banner)
+            {
+                NativeMenu.Banner = banner;
+            }
         }
 
         public void AddInstructionalButton(InstructionalButton button)

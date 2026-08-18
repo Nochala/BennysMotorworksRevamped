@@ -42,26 +42,41 @@ namespace BennysMotorworksRevamped
 
                 ProcessWorkshopCutscene();
 
+                int currentInteriorId = GetInteriorID(ply.Position);
+                bool isMenuVisible = Helper._menuPool != null && Helper._menuPool.AreAnyVisible;
+                string vehicleDenialMessage = GetWorkshopVehicleDenialMessage(veh);
+                bool isWorkshopVehicleAllowed = !unWelcome.Contains(veh.ClassType) && vehicleDenialMessage == null;
+                bool isNearGarageDoor = veh.Position.DistanceTo(new Vector3(-205.6828f, -1310.683f, 30.29572f)) <= 15.0f;
+
                 bool isInsideWorkshop = isCutscene
-                    || (Helper._menuPool != null && Helper._menuPool.AreAnyVisible)
-                    || GetInteriorID(ply.Position) == bennyIntID;
+                    || isMenuVisible
+                    || (isWorkshopVehicleAllowed && currentInteriorId == bennyIntID);
                 if (isInsideWorkshop)
                 {
                     Function.Call(Hash.HIDE_HUD_COMPONENT_THIS_FRAME, 10);
                 }
 
-                if (fixDoor == 1 && !unWelcome.Contains(veh.ClassType))
+                if (fixDoor == 1 || !isWorkshopVehicleAllowed)
                 {
-                    bool openDoor = veh.Position.DistanceTo(new Vector3(-205.6828f, -1310.683f, 30.29572f)) <= 15.0f;
+                    bool openDoor = fixDoor == 1 && isWorkshopVehicleAllowed && isNearGarageDoor;
                     Function.Call((Hash)0x9B12F9A24FABEDB0UL, -427498890, -205.6828f, -1310.683f, 30.29572f, openDoor ? 0 : 1, 0.0f, 50.0f, 0);
                 }
 
-                if (GetInteriorID(ply.Position) == bennyIntID && !IsArenaWarDLCInstalled())
+                if (currentInteriorId == bennyIntID && !IsArenaWarDLCInstalled())
                 {
                     Helper.DisplayHelpTextThisFrame("Un-supported GTA V version detected! SPB may not work properly on this version.");
                 }
 
-                if (Helper.GetInteriorID(ply.Position) == bennyIntID && !unWelcome.Contains(veh.ClassType))
+                if (!string.IsNullOrEmpty(vehicleDenialMessage)
+                    && isNearGarageDoor
+                    && ply.CurrentVehicle == veh
+                    && !isCutscene
+                    && !isMenuVisible)
+                {
+                    Helper.DisplayHelpTextThisFrame(vehicleDenialMessage);
+                }
+
+                if (currentInteriorId == bennyIntID && isWorkshopVehicleAllowed)
                 {
                     if (!isExiting)
                     {
