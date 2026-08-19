@@ -123,6 +123,12 @@ namespace BennysMotorworksRevamped
         public static Ped bennyPed;
         public static bool isCutscene = false;
         public static bool optLogging = true;
+        private const int MPDLCMapInitialDelayMs = 1000;
+        private const int MPDLCMapRetryDelayMs = 5000;
+        private const int MPDLCMapInteriorFinalizeTimeMs = 10000;
+        private const string MPDLCMapProbeIpl = "xm_hatch_closed";
+        private static bool _pendingMPDLCMapLoad = false;
+        private static int _nextMPDLCMapLoadAttemptTime = 0;
         private static bool _pendingShopInit = false;
         private static int _shopInitDelayTime = 0;
         public static Camera scriptCam; // ScriptedCamera
@@ -431,18 +437,76 @@ namespace BennysMotorworksRevamped
             return World.CreateVehicle(model, position, heading);
         }
 
+        private static bool IsIplActive(string iplName)
+        {
+            return Function.Call<bool>((Hash)0x88A741E44A2B3495UL, iplName);
+        }
+
         public static void LoadMPDLCMap()
         {
+            // Match the Enhanced-safe sequence used by Enable All Interiors:
+            // invoke ON_ENTER_MP normally, then request a known MP IPL and wait for it to become active.
+            Function.Call((Hash)0x0888C3502DBBEEF5UL);
+            Function.Call((Hash)0x41B4893843BBDB74UL, MPDLCMapProbeIpl);
+        }
+
+        internal static void ProcessPendingMPDLCMapLoad()
+        {
+            if (!_pendingMPDLCMapLoad)
+            {
+                return;
+            }
+
+            if (Game.GameTime < MPDLCMapInitialDelayMs
+                || Game.IsMissionActive
+                || Function.Call<bool>((Hash)0x10D0A8F259E93EC9UL))
+            {
+                return;
+            }
+
+            // Do not force the Los Santos MP map while another major map group owns streaming.
+            if (IsIplActive("manhat06_slod")
+                || IsIplActive("prologue01")
+                || IsIplActive("h4_islandairstrip"))
+            {
+                return;
+            }
+
+            if (IsIplActive(MPDLCMapProbeIpl))
+            {
+                // Enable All Interiors waits until the world has been controllable for its initial startup period
+                // before it starts resolving/refreshing interiors. Keep the same separation here so
+                // GET_INTERIOR_AT_COORDS is not called while Enhanced is still rebuilding interior proxies.
+                if (Game.GameTime < MPDLCMapInteriorFinalizeTimeMs || !Game.Player.CanControlCharacter)
+                {
+                    return;
+                }
+
+                _pendingMPDLCMapLoad = false;
+                _nextMPDLCMapLoadAttemptTime = 0;
+                LoadMPDLCMapMissingObjects();
+                bennyIntID = GetInteriorID(new Vector3(-211.798f, -1324.292f, 30.37535f));
+                Logger.Log("LoadMPDLCMap: MP map confirmed active and interior restoration completed.");
+                return;
+            }
+
+            if (Game.GameTime < _nextMPDLCMapLoadAttemptTime)
+            {
+                return;
+            }
+
+            _nextMPDLCMapLoadAttemptTime = Game.GameTime + MPDLCMapRetryDelayMs;
+
             try
             {
-                Function.Call((Hash)0x0888C3502DBBEEF5UL);
+                Logger.Log("LoadMPDLCMap: invoking ON_ENTER_MP and requesting MP probe IPL.");
+                LoadMPDLCMap();
+                Logger.Log("LoadMPDLCMap: ON_ENTER_MP returned; waiting for MP probe IPL.");
             }
             catch (Exception ex)
             {
-                Logger.Log("LoadMPDLCMap: failed to load MP DLC maps. " + ex.Message + " " + ex.StackTrace);
+                Logger.Log("LoadMPDLCMap: failed to request MP DLC maps. " + ex.Message + " " + ex.StackTrace);
             }
-
-            LoadMPDLCMapMissingObjects();
         }
 
         public static void LoadMPDLCMapMissingObjects()
@@ -462,49 +526,34 @@ namespace BennysMotorworksRevamped
             int WMDID = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, 120.5, 549.952026367, 184.09700012207); //3677 Whispymound Drive
             int MWTDID = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, -1288, 440.74798583, 97.694602966); //2113 Mad Wayne Thunder Drive
 
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID1, "V_57_FranklinStuff");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, TID2, "swap_clean_apt");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, TID2, "layer_whiskey");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, TID2, "layer_sextoys_a");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, TID2, "swap_mrJam_A");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, TID2, "swap_sofa_A");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "V_Michael_bed_tidy");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "V_Michael_L_Items");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "V_Michael_S_Items");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "V_Michael_D_Items");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "V_Michael_M_Items");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "Michael_premier");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MID, "V_Michael_plane_ticket");
-            //Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "showhome_only")
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "franklin_settled");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "franklin_unpacking");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "bong_and_wine");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "progress_flyer");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "progress_tshirt");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "progress_tux");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, FID2, "unlocked");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, WODID, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, NCAID1, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, NCAID2, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, HCAID1, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, HCAID2, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, HCAID3, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MRID, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, WMDID, "Stilts_Kitchen_Window");
-            Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, MWTDID, "Stilts_Kitchen_Window");
-            Function.Call(Hash.REFRESH_INTERIOR, FID1);
-            Function.Call(Hash.REFRESH_INTERIOR, TID2);
-            Function.Call(Hash.REFRESH_INTERIOR, MID);
-            Function.Call(Hash.REFRESH_INTERIOR, FID2);
-            Function.Call(Hash.REFRESH_INTERIOR, WODID);
-            Function.Call(Hash.REFRESH_INTERIOR, NCAID1);
-            Function.Call(Hash.REFRESH_INTERIOR, NCAID2);
-            Function.Call(Hash.REFRESH_INTERIOR, HCAID1);
-            Function.Call(Hash.REFRESH_INTERIOR, HCAID2);
-            Function.Call(Hash.REFRESH_INTERIOR, HCAID3);
-            Function.Call(Hash.REFRESH_INTERIOR, MRID);
-            Function.Call(Hash.REFRESH_INTERIOR, WMDID);
-            Function.Call(Hash.REFRESH_INTERIOR, MWTDID);
+            ActivateAndRefreshInteriorEntitySets(FID1, "V_57_FranklinStuff");
+            ActivateAndRefreshInteriorEntitySets(TID2, "swap_clean_apt", "layer_whiskey", "layer_sextoys_a", "swap_mrJam_A", "swap_sofa_A");
+            ActivateAndRefreshInteriorEntitySets(MID, "V_Michael_bed_tidy", "V_Michael_L_Items", "V_Michael_S_Items", "V_Michael_D_Items", "V_Michael_M_Items", "Michael_premier", "V_Michael_plane_ticket");
+            ActivateAndRefreshInteriorEntitySets(FID2, "franklin_settled", "franklin_unpacking", "bong_and_wine", "progress_flyer", "progress_tshirt", "progress_tux", "unlocked");
+            ActivateAndRefreshInteriorEntitySets(WODID, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(NCAID1, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(NCAID2, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(HCAID1, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(HCAID2, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(HCAID3, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(MRID, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(WMDID, "Stilts_Kitchen_Window");
+            ActivateAndRefreshInteriorEntitySets(MWTDID, "Stilts_Kitchen_Window");
+        }
+
+        private static void ActivateAndRefreshInteriorEntitySets(int interiorId, params string[] entitySets)
+        {
+            if (interiorId == 0 || !Function.Call<bool>(Hash.IS_VALID_INTERIOR, interiorId))
+            {
+                return;
+            }
+
+            foreach (string entitySet in entitySets)
+            {
+                Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, interiorId, entitySet);
+            }
+
+            Function.Call(Hash.REFRESH_INTERIOR, interiorId);
         }
 
         public static void DisplayHelpTextThisFrame(string helpText, int Shape = -1)
@@ -2614,10 +2663,8 @@ namespace BennysMotorworksRevamped
             fpcKey = config.GetValue<GTA.Control>("CONTROLS", "FirstPerson", GTA.Control.NextCamera);
             zoutKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomOut", GTA.Control.FrontendLt);
             zinKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomIn", GTA.Control.FrontendRt);
-            if (onlineMap == 1)
-            {
-                LoadMPDLCMap();
-            }
+            _pendingMPDLCMapLoad = onlineMap == 1;
+            _nextMPDLCMapLoadAttemptTime = 0;
         }
 
         public static void CreateBlip()
