@@ -40,13 +40,13 @@ namespace BennysMotorworksRevamped
         public BennysMenu()
         {
             Tick += OnTick;
+            Aborted += OnAborted;
 
             MenuHelper._menuPool = new ObjectPool();
             Helper._menuPool = MenuHelper._menuPool;
             Logger.Initialize();
             Logger.Log("BennysMenu initialized.");
             camera = new WorkshopCamera();
-            BtnFirstPerson = new LemonUI.Scaleform.InstructionalButton(Game.GetLocalizedString("MO_ZOOM_FIRST"), fpcKey);
             BtnZoom = new LemonUI.Scaleform.InstructionalButton(Game.GetLocalizedString("INPUT_CREATOR_ZOOM_IN_DISPLAYONLY"), zinKey);
             BtnZoomOut = new LemonUI.Scaleform.InstructionalButton(Game.GetLocalizedString("INPUT_CREATOR_ZOOM_OUT_DISPLAYONLY"), zoutKey);
 
@@ -474,11 +474,20 @@ namespace BennysMotorworksRevamped
             try
             {
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
+                if (optEnableMouse && MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible)
+                {
+                    EnableWorkshopMenuMouseControls();
+                }
                 MenuHelper.RefreshMenuMouseBehavior();
                 MenuHelper._menuPool?.Process();
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
 
                 bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
+                SetWorkshopPlayerControlSuppressed(isMenuVisible && !optEnableMouse);
+                if (isMenuVisible && optEnableMouse)
+                {
+                    EnableWorkshopMenuMouseControls();
+                }
 
                 if (veh != null)
                 {
@@ -491,7 +500,6 @@ namespace BennysMotorworksRevamped
                     DrawVehicleStatsPanel();
                 }
 
-                // Only show the vehicle title during workshop cutscenes, never over an open menu.
                 if (isCutscene && !isMenuVisible && veh != null)
                 {
                     Helper.DisplayVehicleInfoBottomRight(
@@ -521,6 +529,11 @@ namespace BennysMotorworksRevamped
             {
                 Logger.Log(ex.Message + " " + ex.StackTrace);
             }
+        }
+
+        private void OnAborted(object sender, EventArgs e)
+        {
+            SetWorkshopPlayerControlSuppressed(false);
         }
     }
 }

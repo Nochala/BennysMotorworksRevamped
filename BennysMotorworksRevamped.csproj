@@ -12,6 +12,8 @@
     <PackageProjectUrl>https://github.com/Nochala/BennysMotorworksRevamped</PackageProjectUrl>
     <Authors>Nochala</Authors>
     <Title>BennysMotorworksRevamped</Title>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LemonUI.SHVDN3">

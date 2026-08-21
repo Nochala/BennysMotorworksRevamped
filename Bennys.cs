@@ -20,13 +20,18 @@ namespace BennysMotorworksRevamped
             Logger.Log("Bennys initialized.");
             bennyIntID = Helper.GetInteriorID(new Vector3(-211.798f, -1324.292f, 30.37535f));
             CreateBlip();
-            GTA.Native.GlobalVariable.Get((int)Helper.GetGlobalValue()).Write(1);
         }
 
         private void OnTick(object sender, EventArgs e)
         {
             try
             {
+                if (optEnableMouse && Helper._menuPool != null && Helper._menuPool.AreAnyVisible)
+                {
+                    EnableWorkshopMenuMouseControls();
+                }
+
+                ProcessPendingMPDLCMapLoad();
                 veh = Game.Player.Character.LastVehicle;
                 ply = Game.Player.Character;
 
@@ -37,6 +42,8 @@ namespace BennysMotorworksRevamped
 
                 if (veh == null || ply == null)
                 {
+                    SetWorkshopPlayerControlSuppressed(false);
+                    SetWorkshopCarModShopState(false);
                     return;
                 }
 
@@ -51,6 +58,12 @@ namespace BennysMotorworksRevamped
                 bool isInsideWorkshop = isCutscene
                     || isMenuVisible
                     || (isWorkshopVehicleAllowed && currentInteriorId == bennyIntID);
+
+                SetWorkshopCarModShopState(
+                    isInsideWorkshop
+                    && isWorkshopVehicleAllowed
+                    && ply.CurrentVehicle == veh);
+
                 if (isInsideWorkshop)
                 {
                     Function.Call(Hash.HIDE_HUD_COMPONENT_THIS_FRAME, 10);
@@ -110,7 +123,9 @@ namespace BennysMotorworksRevamped
 
             if (Helper._menuPool != null && Helper._menuPool.AreAnyVisible)
             {
-                if (Game.IsControlPressed(zinKey) && camera.MainCameraPosition != CameraPosition.Interior)
+                if ((Game.IsControlPressed(zinKey)
+                    || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_PRESSED, 0, (int)zinKey))
+                    && camera.MainCameraPosition != CameraPosition.Interior)
                 {
                     PointF max = new PointF(6.0f, 3.0f);
                     if (camera.CameraZoom > max.Y)
@@ -123,7 +138,9 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
-                if (Game.IsControlPressed(zoutKey) && camera.MainCameraPosition != CameraPosition.Interior)
+                if ((Game.IsControlPressed(zoutKey)
+                    || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_PRESSED, 0, (int)zoutKey))
+                    && camera.MainCameraPosition != CameraPosition.Interior)
                 {
                     PointF max = new PointF(6.0f, 3.0f);
                     if (camera.CameraZoom < max.X)
@@ -136,27 +153,14 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
-                if (Game.IsControlJustReleased(fpcKey))
-                {
-                    CameraPosition previousCameraPosition = lastCameraPos;
-                    lastCameraPos = camera.MainCameraPosition;
-
-                    if (camera.MainCameraPosition == CameraPosition.Interior)
-                    {
-                        camera.MainCameraPosition = previousCameraPosition == CameraPosition.Interior
-                            ? CameraPosition.Car
-                            : previousCameraPosition;
-                    }
-                    else
-                    {
-                        camera.MainCameraPosition = CameraPosition.Interior;
-                    }
-                }
             }
         }
 
         private void OnAborted(object sender, EventArgs e)
         {
+            SetWorkshopPlayerControlSuppressed(false);
+            SetWorkshopCarModShopState(false);
+            Helper.CleanupMPDLCMapLoad();
             BennysBlip?.Delete();
             GTA.UI.Screen.FadeIn(1000);
 
