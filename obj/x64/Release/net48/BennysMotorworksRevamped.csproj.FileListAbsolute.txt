@@ -1,0 +1,14 @@
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.csproj.AssemblyReference.cache
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.GeneratedMSBuildEditorConfig.editorconfig
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.AssemblyInfoInputs.cache
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.AssemblyInfo.cs
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.csproj.CoreCompileInputs.cache
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\bin\x64\Release\net48\BennysMotorworksRevamped.dll
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\bin\x64\Release\net48\BennysMotorworksRevamped.pdb
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\bin\x64\Release\net48\LemonUI.SHVDN3.dll
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\bin\x64\Release\net48\ScriptHookVDotNet3.dll
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\bin\x64\Release\net48\LemonUI.SHVDN3.pdb
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\bin\x64\Release\net48\LemonUI.SHVDN3.xml
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMo.305210C9.Up2Date
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.dll
+D:\VirtualStudioProjects\BennysOriginalMotorWorks-master\BennysMotorworksRevamped\obj\x64\Release\net48\BennysMotorworksRevamped.pdb
