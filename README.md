@@ -23,7 +23,7 @@ ___________________________________
 * Vehicle stats and make/model display
 * Chameleon paint and proper license plate support
 * Addon vehicle and modification compatibility
-* Mouse, keyboard, and controller support
+* Controller support
 * Configurable vehicle restrictions and custom upgrade mappings
 * GTA V Legacy and Enhanced support
 * Built for ScriptHookVDotNet v3 + LemonUI
@@ -53,9 +53,27 @@ ___________________________________
 GTA V/scripts/ folder.
 - Enjoy
 
+#### _Known Issues_ 
+- Cutscene cues can be buggy, sometimes a vehicle will miss the drive cue and teleport
+- The camera position of the entrance cutscene briefly looks at the wall
+- Oversized vehicles have broken cutscene cues 
+
+  
 ### Planned Upcoming Features 
-- Rewritten cutscenes
 - Improved Addon Vehicle Support
+- Cutscene improvements
+- Multiple languages
+
+## Credits
+### _ImNotMentaL_   
+### _Guadmaz_
+### _Rockstar Games_
+### _Chiheb-Bacha_
+### _crosire & ScriptHookVDotNet contributors_
+### _Alexander Blade_
+### _justalemon_
+### _Crosire_
+
 
 
 
