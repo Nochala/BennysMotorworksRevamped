@@ -14,7 +14,7 @@
 
 ___________________________________
 ### **Features:**
-* Full SP Benny’s Motorworks experience
+* Fully working SP Benny’s Motor Works 
 * Benny’s and Arena vehicle conversions
 * GTA-style LemonUI customization menus
 * Native-style pricing, badges, labels, and category ordering
