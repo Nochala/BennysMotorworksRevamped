@@ -27,7 +27,6 @@ ___________________________________
 * Configurable vehicle restrictions and custom upgrade mappings
 * GTA V Legacy and Enhanced support
 * Built for ScriptHookVDotNet v3 + LemonUI
-___________________________________
 ### **General changes from original Benny's Original Motor Works SP by** **ImNotMentaL:**
 * Rewritten and modernized from **VB.NET to C#**
 * Updated from **ScriptHookVDotNet v2 to ScriptHookVDotNet v3**
@@ -47,6 +46,16 @@ ___________________________________
 * Added configurable emergency and oversized vehicle restrictions
 * Improved addon vehicle and addon modification compatibility
 * Fixed numerous original bugs involving menus, cameras, previews, purchases, localization, vehicle upgrades, and restoration behavior
+___________________________________
+### INSTALLATION 
+- Install latest ScriptHookV, ScripHookVDotNet v3, and LemonUI
+- Place _BennysMotorworksRevamped.dll_, _BennysMotorworksRevamped.pdb_, and _BennysMotorworksRevamped.ini_ into your
+GTA V/scripts/ folder.
+- Enjoy
+
+### Planned Upcoming Features 
+- Rewritten cutscenes
+- Improved Addon Vehicle Support
 
 
 
