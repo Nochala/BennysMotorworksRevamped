@@ -70,10 +70,9 @@ GTA V/scripts/ folder.
 ### _Guadmaz_
 ### _Rockstar Games_
 ### _Chiheb-Bacha_
-### _crosire & ScriptHookVDotNet contributors_
+### _Crosire & ScriptHookVDotNet contributors_
 ### _Alexander Blade_
 ### _justalemon_
-### _Crosire_
 
 
 
