@@ -50,7 +50,7 @@ ___________________________________
 ___________________________________
 ### INSTALLATION 
 - Install latest ScriptHookV, ScripHookVDotNet v3, and LemonUI
-- Place _BennysMotorworksRevamped.dll_, _BennysMotorworksRevamped.pdb_, and _BennysMotorworksRevamped.ini_ into your
+- Place `_BennysMotorworksRevamped.dll_` and `_BennysMotorworksRevamped.ini_` into your
 GTA V/scripts/ folder.
 - Enjoy
 
