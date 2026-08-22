@@ -20,6 +20,7 @@ ___________________________________
 * Native-style pricing, badges, labels, and category ordering
 * Entrance and exit cutscenes
 * Modification preview cameras and interactive vehicle parts
+* Openable vehicle doors in the Benny's menu
 * Vehicle stats and make/model display
 * Chameleon paint and proper license plate support
 * Addon vehicle and modification compatibility
