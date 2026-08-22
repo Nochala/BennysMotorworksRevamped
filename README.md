@@ -29,13 +29,13 @@ ___________________________________
 * GTA V Legacy and Enhanced support
 * Built for ScriptHookVDotNet v3 + LemonUI
 ### **General changes from original Benny's Original Motor Works SP by** **ImNotMentaL:**
-* Rewritten and modernized from **VB.NET to C#**
+* Completely rewritten and modernized from **VB.NET to C#**
 * Updated from **ScriptHookVDotNet v2 to ScriptHookVDotNet v3**
 * Replaced the original **INMNativeUI** implementation with **LemonUI**
 * Added full **GTA V Legacy and GTA V Enhanced** compatibility
 * Completely reworked menu behavior to more closely match native **Los Santos Customs/Benny’s**
 * Improved category ordering, submenu navigation, Back/Escape behavior, and menu restoration
-* Added proper GTA-style **purchased checkmarks, equipped vehicle badges, pricing, and purchase tracking**
+* Added proper **purchased checkmarks, equipped vehicle badges, pricing, and purchase tracking**
 * Expanded support for newer GTA V vehicle modifications, wheels, colors, and customization options
 * Added **Chameleon paint and wheel color** support
 * Added support and fallback names for newer **license plates, wheels, horns, and unnamed modifications**
@@ -46,7 +46,7 @@ ___________________________________
 * Added configurable **mouse support**, including proper mouse camera control and cursor behavior
 * Added configurable emergency and oversized vehicle restrictions
 * Improved addon vehicle and addon modification compatibility
-* Fixed numerous original bugs involving menus, cameras, previews, purchases, localization, vehicle upgrades, and restoration behavior
+* Fixed all original bugs involving menus, cameras, previews, purchases, localization, vehicle upgrades, and restoration behavior
 ___________________________________
 ### INSTALLATION 
 - Install latest ScriptHookV, ScripHookVDotNet v3, and LemonUI
