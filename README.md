@@ -75,8 +75,8 @@ GTA V/scripts/ folder.
 ### _justalemon_
 
 ## Mod pages:
-- [GTA5 Mods](https://www.gta5-mods.com/scripts/benny-s-motor-works-in-sp-revamped)
-- [Nexus](https://www.nexusmods.com/gta5enhanced/mods/1337)
+- [**GTA5 Mods**](https://www.gta5-mods.com/scripts/benny-s-motor-works-in-sp-revamped)
+- [**Nexus**](https://www.nexusmods.com/gta5enhanced/mods/1337)
 
 
 
