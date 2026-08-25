@@ -2485,6 +2485,14 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static bool HasNeonLayoutInstalled()
+        {
+            return veh.IsNeonLightsOn(VehicleNeonLight.Back)
+                || veh.IsNeonLightsOn(VehicleNeonLight.Front)
+                || veh.IsNeonLightsOn(VehicleNeonLight.Left)
+                || veh.IsNeonLightsOn(VehicleNeonLight.Right);
+        }
+
         public static void RefreshNeonKitsMenu()
         {
             try
@@ -2493,7 +2501,7 @@ namespace BennysMotorworksRevamped
                 iNeon = new UIMenuItem(LocalizedModGroupName(GroupName.NeonLayout));
                 gmNeonKits.AddItem(iNeon);
                 gmNeonKits.BindMenuToItem(mNeon, iNeon);
-                if (veh.ClassType != VehicleClass.Motorcycles || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
+                if ((veh.ClassType != VehicleClass.Motorcycles || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase)) && HasNeonLayoutInstalled())
                 {
                     iNeonColor = new UIMenuItem(LocalizedModGroupName(GroupName.NeonColor), Game.GetLocalizedString("CMOD_MOD_6_D"));
                     gmNeonKits.AddItem(iNeonColor);
@@ -3038,6 +3046,11 @@ namespace BennysMotorworksRevamped
         {
             try
             {
+                if (sender == mNeonColor && !HasNeonLayoutInstalled())
+                {
+                    return;
+                }
+
                 if (!CanAffordPurchase(GetPurchasePrice(selectedItem)))
                 {
                     return;
@@ -4071,6 +4084,7 @@ namespace BennysMotorworksRevamped
                     }
 
                     PlaySpeech("");
+                    RefreshNeonKitsMenu();
                 }
                 // Wheels Mods
                 if ((sender == mSBikeWheels) || (sender == mCBikeWheels))
@@ -4702,6 +4716,11 @@ namespace BennysMotorworksRevamped
         {
             try
             {
+                if (sender == mNeonColor && !HasNeonLayoutInstalled())
+                {
+                    return;
+                }
+
                 if (sender == mHeadlights)
                 {
                     // Headlights color

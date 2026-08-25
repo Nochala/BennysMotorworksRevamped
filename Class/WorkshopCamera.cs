@@ -1089,8 +1089,9 @@ namespace BennysMotorworksRevamped
                     SetAroundCamera(_targetPos, 1.5f, _targetPos + _target.ForwardVector * -2.0f + _target.UpVector, new Vector3(0f, 0f, _target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;
                 case CameraPosition.Exhaust:
-                    _targetPos = _target.Position;
-                    SetAroundCamera(_targetPos, 4.0f, _target.Position - _target.RightVector + new Vector3(1f, 0f, 0f) * 4.0f + _target.UpVector, new Vector3(0f, 0f, _target.Heading - 60.0f), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
+                    _targetPos = _target.Position - _target.ForwardVector * 0.65f + _target.UpVector * 0.2f;
+                    Vector3 exhaustCameraPosition = _target.Position - _target.ForwardVector * 4.25f - _target.RightVector * 2.75f + _target.UpVector * 1.15f;
+                    SetAroundCamera(_targetPos, _targetPos.DistanceTo(exhaustCameraPosition), exhaustCameraPosition, GetStableLookRotation(_targetPos - exhaustCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;
                 case CameraPosition.FrontTrunk:
                     _targetPos = GetBonePosition(_target, "boot");
@@ -1180,7 +1181,8 @@ namespace BennysMotorworksRevamped
                     break;
                 case CameraPosition.BackPlate:
                     _targetPos = _target.Bones.Contains("platelight") ? GetBonePosition(_target, "platelight") : GetBonePosition(_target, "neon_b");
-                    SetAroundCamera(_targetPos, 1.0f, _targetPos + _target.ForwardVector * -1.0f + _target.UpVector, new Vector3(0f, 0f, _target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
+                    Vector3 backPlateCameraPosition = _targetPos - _target.ForwardVector * 1.35f + _target.UpVector * 0.05f;
+                    SetAroundCamera(_targetPos, _targetPos.DistanceTo(backPlateCameraPosition), backPlateCameraPosition, GetStableLookRotation(_targetPos - backPlateCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;
                 case CameraPosition.FrontPlate:
                     _targetPos = GetBonePosition(_target, "neon_f");

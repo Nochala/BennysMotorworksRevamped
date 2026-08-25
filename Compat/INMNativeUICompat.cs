@@ -304,9 +304,32 @@ namespace BennysMotorworksRevamped.Compat
             item.Submenu = submenu;
             submenu.ParentMenu = this;
 
+            if (ParentMenu != null)
+            {
+                item.SuppressDescription();
+            }
+
+            submenu.SuppressNestedSubmenuDescriptions();
+
             if (string.IsNullOrWhiteSpace(item.NativeItem.AltTitle))
             {
                 item.NativeItem.AltTitle = ">";
+            }
+        }
+
+        private void SuppressNestedSubmenuDescriptions()
+        {
+            if (ParentMenu == null)
+            {
+                return;
+            }
+
+            foreach (UIMenuItem item in MenuItems)
+            {
+                if (item?.Submenu != null)
+                {
+                    item.SuppressDescription();
+                }
             }
         }
 
@@ -375,7 +398,8 @@ namespace BennysMotorworksRevamped.Compat
 
         public UIMenuItem(string text, string description)
         {
-            NativeItem = new NativeItem(NormalizeItemText(text), description ?? string.Empty);
+            string normalizedText = NormalizeItemText(text);
+            NativeItem = new NativeItem(normalizedText, NormalizeDescription(normalizedText, description));
             NativeItem.Tag = this;
         }
 
@@ -407,6 +431,11 @@ namespace BennysMotorworksRevamped.Compat
         {
             RightBadge = value;
             RefreshRightText();
+        }
+
+        internal void SuppressDescription()
+        {
+            NativeItem.Description = string.Empty;
         }
 
         private void RefreshRightText()
@@ -441,6 +470,18 @@ namespace BennysMotorworksRevamped.Compat
         private static string NormalizeItemText(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? "Unnamed Item" : value;
+        }
+
+        private static string NormalizeDescription(string text, string description)
+        {
+            if (string.IsNullOrWhiteSpace(description)
+                || description.Equals("NULL", System.StringComparison.OrdinalIgnoreCase)
+                || description.Equals(text, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
+            return description;
         }
     }
 
