@@ -10,6 +10,20 @@ namespace BennysMotorworksRevamped
 {
     public class Bennys : Script
     {
+        private const int StartupNativeDelayMs = 1000;
+        private const int StartupNativeRetryDelayMs = 500;
+        private const int PlayerInteriorProbeDelayMs = 250;
+        private const float PlayerInteriorProbeRadius = 100.0f;
+        private static readonly Vector3 WorkshopInteriorPosition = new Vector3(-211.798f, -1324.292f, 30.37535f);
+
+        private bool _garageDoorStateKnown;
+        private bool _garageDoorOpen;
+        private bool _startupNativeInitializationScheduled;
+        private bool _startupNativeInitialized;
+        private int _startupNativeInitializeAt;
+        private int _nextPlayerInteriorProbeTime;
+        private int _cachedPlayerInteriorId;
+
         public Bennys()
         {
             Tick += OnTick;
@@ -17,23 +31,104 @@ namespace BennysMotorworksRevamped
 
             LoadSettings();
             Logger.Initialize();
-            Logger.Log("Bennys initialized.");
-            bennyIntID = Helper.GetInteriorID(new Vector3(-211.798f, -1324.292f, 30.37535f));
-            CreateBlip();
+            Logger.Log("Bennys startup queued.");
+        }
+
+        private bool EnsureGameNativeStartupInitialized()
+        {
+            if (_startupNativeInitialized)
+            {
+                return true;
+            }
+
+            if (!_startupNativeInitializationScheduled)
+            {
+                _startupNativeInitializationScheduled = true;
+                _startupNativeInitializeAt = Game.GameTime + StartupNativeDelayMs;
+                return false;
+            }
+
+            if (Game.GameTime < _startupNativeInitializeAt)
+            {
+                return false;
+            }
+
+            try
+            {
+                Ped player = Game.Player.Character;
+                if (player == null || !player.Exists())
+                {
+                    _startupNativeInitializeAt = Game.GameTime + StartupNativeRetryDelayMs;
+                    return false;
+                }
+
+                int detectedInteriorId = Helper.GetInteriorID(WorkshopInteriorPosition);
+                if (detectedInteriorId != 0)
+                {
+                    bennyIntID = detectedInteriorId;
+                }
+
+                if (BennysBlip == null || !BennysBlip.Exists())
+                {
+                    CreateBlip();
+                }
+
+                _startupNativeInitialized = true;
+                Logger.Log("Bennys initialized. Game-native startup completed. interiorId=" + bennyIntID);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _startupNativeInitializeAt = Game.GameTime + StartupNativeRetryDelayMs;
+                Logger.Debug("Bennys game-native startup deferred. " + ex.Message);
+                return false;
+            }
+        }
+
+        private int GetCurrentPlayerInteriorId(bool isMenuVisible)
+        {
+            if (ply == null)
+            {
+                return 0;
+            }
+
+            bool shouldProbe = isCutscene
+                || isMenuVisible
+                || ply.Position.DistanceTo(WorkshopInteriorPosition) <= PlayerInteriorProbeRadius;
+
+            if (!shouldProbe)
+            {
+                _cachedPlayerInteriorId = 0;
+                _nextPlayerInteriorProbeTime = 0;
+                return 0;
+            }
+
+            if (Game.GameTime >= _nextPlayerInteriorProbeTime)
+            {
+                _cachedPlayerInteriorId = GetInteriorID(ply.Position);
+                _nextPlayerInteriorProbeTime = Game.GameTime + PlayerInteriorProbeDelayMs;
+            }
+
+            return _cachedPlayerInteriorId;
         }
 
         private void OnTick(object sender, EventArgs e)
         {
             try
             {
+                if (!EnsureGameNativeStartupInitialized())
+                {
+                    return;
+                }
+
                 if (optEnableMouse && Helper._menuPool != null && Helper._menuPool.AreAnyVisible)
                 {
                     EnableWorkshopMenuMouseControls();
                 }
 
                 ProcessPendingMPDLCMapLoad();
-                veh = Game.Player.Character.LastVehicle;
                 ply = Game.Player.Character;
+                veh = ply?.LastVehicle;
 
                 if (veh != null && veh.IsVehicleAttachedToTrailer())
                 {
@@ -49,15 +144,16 @@ namespace BennysMotorworksRevamped
 
                 ProcessWorkshopCutscene();
 
-                int currentInteriorId = GetInteriorID(ply.Position);
                 bool isMenuVisible = Helper._menuPool != null && Helper._menuPool.AreAnyVisible;
+                int currentInteriorId = GetCurrentPlayerInteriorId(isMenuVisible);
+                bool isInBennysInterior = bennyIntID != 0 && currentInteriorId == bennyIntID;
                 string vehicleDenialMessage = GetWorkshopVehicleDenialMessage(veh);
                 bool isWorkshopVehicleAllowed = !unWelcome.Contains(veh.ClassType) && vehicleDenialMessage == null;
                 bool isNearGarageDoor = veh.Position.DistanceTo(new Vector3(-205.6828f, -1310.683f, 30.29572f)) <= 15.0f;
 
                 bool isInsideWorkshop = isCutscene
                     || isMenuVisible
-                    || (isWorkshopVehicleAllowed && currentInteriorId == bennyIntID);
+                    || (isWorkshopVehicleAllowed && isInBennysInterior);
 
                 SetWorkshopCarModShopState(
                     isInsideWorkshop
@@ -72,10 +168,19 @@ namespace BennysMotorworksRevamped
                 if (fixDoor == 1 || !isWorkshopVehicleAllowed)
                 {
                     bool openDoor = fixDoor == 1 && isWorkshopVehicleAllowed && isNearGarageDoor;
-                    Function.Call((Hash)0x9B12F9A24FABEDB0UL, -427498890, -205.6828f, -1310.683f, 30.29572f, openDoor ? 0 : 1, 0.0f, 50.0f, 0);
+                    if (!_garageDoorStateKnown || _garageDoorOpen != openDoor)
+                    {
+                        Function.Call((Hash)0x9B12F9A24FABEDB0UL, -427498890, -205.6828f, -1310.683f, 30.29572f, openDoor ? 0 : 1, 0.0f, 50.0f, 0);
+                        _garageDoorOpen = openDoor;
+                        _garageDoorStateKnown = true;
+                    }
+                }
+                else
+                {
+                    _garageDoorStateKnown = false;
                 }
 
-                if (currentInteriorId == bennyIntID && !IsArenaWarDLCInstalled())
+                if (isInBennysInterior && !IsArenaWarDLCInstalled())
                 {
                     Helper.DisplayHelpTextThisFrame("Un-supported GTA V version detected! SPB may not work properly on this version.");
                 }
@@ -89,7 +194,7 @@ namespace BennysMotorworksRevamped
                     Helper.DisplayHelpTextThisFrame(vehicleDenialMessage);
                 }
 
-                if (currentInteriorId == bennyIntID && isWorkshopVehicleAllowed)
+                if (isInBennysInterior && isWorkshopVehicleAllowed)
                 {
                     if (!isExiting)
                     {
@@ -98,9 +203,9 @@ namespace BennysMotorworksRevamped
                             UpdateTitleName();
                             PlayEnterCutScene();
                         }
-                        else if (veh.Position.DistanceTo(new Vector3(-211.798f, -1324.292f, 30.37535f)) <= 5.0f)
+                        else if (veh.Position.DistanceTo(WorkshopInteriorPosition) <= 5.0f)
                         {
-                            camera.Update();
+                            camera?.Update();
                             Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
                             Function.Call(Hash.SHOW_HUD_COMPONENT_THIS_FRAME, 3);
                             Function.Call(Hash.SHOW_HUD_COMPONENT_THIS_FRAME, 4);
