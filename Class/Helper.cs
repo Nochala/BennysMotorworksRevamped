@@ -112,7 +112,7 @@ namespace BennysMotorworksRevamped
 
         public static Vehicle veh, tra;
         public static Ped ply;
-        public static int onlineMap = 1;
+        public static int onlineMap = 0;
         public static int fixDoor = 1;
         public static bool allowOversizedVehicles = true;
         public static bool allowEmergencyVehicles = true;
@@ -125,57 +125,10 @@ namespace BennysMotorworksRevamped
         public static bool optLogging = true;
         public static bool optDebugLogging = true;
         public static bool optEnableMouse = false;
-        private const int MPDLCMapRetryDelayMs = 1000;
-        private const int MPDLCMapValidationDelayMs = 1000;
-        private const int MPDLCMapSwapTimeoutMs = 20000;
-        private const int MPDLCMapPostTimeoutRetryDelayMs = 5000;
-        private const int MPDLCMapStartupGuardTimeoutMs = 30000;
-        private const int MPDLCMapStartupGuardLogDelayMs = 5000;
-        private const int MPDLCMapStoryRestoreTimeoutMs = 15000;
-        private const int MPDLCMapDebugSnapshotDelayMs = 1000;
         private const int ExternalBennysInteriorProbeDelayMs = 1000;
-        private const string BennysSupermodInteriorIpl = "lr_sc1_02_interior_0_supermod_int_milo_";
-        private const ulong OnEnterMpHash = 0x0888C3502DBBEEF5UL;
-        private const ulong OnEnterSpHash = 0xD7C10C4A637992C9UL;
-        private const ulong SetInstancePriorityModeHash = 0x9BAE5AD2508DF078UL;
-        private const ulong AreAnyCcsPendingHash = 0x241FCA5B1AA14F75UL;
-        private const ulong IsLoadingScreenActiveHash = 0x10D0A8F259E93EC9UL;
-        private const ulong IsInitialLoadingScreenActiveHash = 0xC4637A6D03C24CC3UL;
         private const ulong SetVehicleInCarModShopHash = 0x9D44FCCE98450843UL;
-        private static readonly string[] BennysLowriderMapIpls = new string[]
-        {
-            "lr_sc1_02",
-            "lr_sc1_02_critical_0",
-            "lr_sc1_02_interior_0_supermod_int_milo_",
-            "lr_sc1_02_long_0",
-            "lr_sc1_02_strm_0",
-            "lr_sc1_rd_critical_0",
-            "lr_sc1_rd_long_0",
-        };
-        private static readonly string[] BennysStoryMapIpls = new string[]
-        {
-            "sc1_02",
-            "sc1_02_critical_0",
-            "sc1_02_long_0",
-            "sc1_02_strm_0",
-            "sc1_rd_critical_0",
-            "sc1_rd_long_0",
-        };
-        private static bool _pendingMPDLCMapLoad = false;
-        private static bool _bennysMPContentTransitionStarted = false;
-        private static bool _bennysMPContentTransitionSettled = false;
-        private static int _bennysInteriorRequestStartTime = 0;
-        private static int _nextMPDLCMapLoadAttemptTime = 0;
-        private static int _nextMPDLCMapDebugSnapshotTime = 0;
-        private static int _bennysMPStartupGuardStartTime = 0;
-        private static int _nextMPDLCMapStartupGuardLogTime = 0;
-        private static bool _bennysMPStartupGuardBypassed = false;
-        private static bool _bennysMPMapTimeoutLogged = false;
         private static int _nextExternalBennysInteriorProbeTime = 0;
-        private static bool _bennysDebugDoorModelRequested = false;
-        private static bool _bennysStoryRestoreStarted = false;
-        private static int _bennysStoryRestoreStartTime = 0;
-        private static bool _loggedLowriderAssetDiagnostics = false;
+        private static bool _bennysSPInteriorRegistrationLogged = false;
         private static bool _pendingShopInit = false;
         private static int _shopInitDelayTime = 0;
         private static int _carModShopVehicleHandle = 0;
@@ -488,16 +441,6 @@ namespace BennysMotorworksRevamped
             return World.CreateVehicle(model, position, heading);
         }
 
-        private static bool IsIplActive(string iplName)
-        {
-            return Function.Call<bool>(Hash.IS_IPL_ACTIVE, iplName);
-        }
-
-        private static bool AreContentChangeSetsPending()
-        {
-            return Function.Call<bool>((Hash)AreAnyCcsPendingHash); // ARE_ANY_CCS_PENDING
-        }
-
         private static bool IsEnhancedGameBuild()
         {
             try
@@ -510,123 +453,6 @@ namespace BennysMotorworksRevamped
             }
         }
 
-        private static string GetIplStateSummary(string[] iplNames)
-        {
-            List<string> states = new List<string>();
-            foreach (string iplName in iplNames)
-            {
-                bool active = false;
-                try
-                {
-                    active = IsIplActive(iplName);
-                }
-                catch
-                {
-                }
-
-                states.Add(iplName + "=" + active);
-            }
-
-            return string.Join(", ", states);
-        }
-
-        private static bool AreAllIplsActive(string[] iplNames)
-        {
-            foreach (string iplName in iplNames)
-            {
-                if (!IsIplActive(iplName))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static void RequestIpls(string[] iplNames)
-        {
-            foreach (string iplName in iplNames)
-            {
-                Function.Call(Hash.REQUEST_IPL, iplName);
-            }
-        }
-
-        private static string GetSHVDNERuntimeIdentity()
-        {
-            try
-            {
-                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
-                string processVersion = "unknown";
-                try
-                {
-                    if (process.MainModule != null && process.MainModule.FileVersionInfo != null)
-                    {
-                        processVersion = process.MainModule.FileVersionInfo.FileVersion ?? "unknown";
-                    }
-                }
-                catch
-                {
-                }
-
-                Version apiVersion = typeof(Script).Assembly.GetName().Version;
-                return "process=" + process.ProcessName
-                    + " processVersion=" + processVersion
-                    + " SHVDNApiAssembly=" + typeof(Script).Assembly.GetName().Name
-                    + " SHVDNApiVersion=" + (apiVersion != null ? apiVersion.ToString() : "unknown");
-            }
-            catch (Exception ex)
-            {
-                return "runtimeIdentityError=" + ex.Message;
-            }
-        }
-
-        private static void LogMapDebugSnapshot(bool primaryIplActive, int referenceInteriorId, int workshopInteriorId, int selectedInteriorId, bool validInterior, bool readyInterior)
-        {
-            if (!Logger.DebugEnabled)
-            {
-                return;
-            }
-
-            int lowriderDlcHash = (int)StringHash.AtStringHashUtf8("mplowrider");
-            int supermodDoorHash = (int)StringHash.AtStringHashUtf8("lr_prop_supermod_door_01");
-
-            if (!_bennysDebugDoorModelRequested)
-            {
-                Function.Call(Hash.REQUEST_MODEL, supermodDoorHash);
-                _bennysDebugDoorModelRequested = true;
-            }
-
-            bool dlcPresent = Function.Call<bool>(Hash.IS_DLC_PRESENT, lowriderDlcHash);
-            bool doorInCdImage = Function.Call<bool>(Hash.IS_MODEL_IN_CDIMAGE, supermodDoorHash);
-            bool doorValid = Function.Call<bool>(Hash.IS_MODEL_VALID, supermodDoorHash);
-            bool doorLoaded = Function.Call<bool>(Hash.HAS_MODEL_LOADED, supermodDoorHash);
-            bool ccsPending = AreContentChangeSetsPending();
-            bool loadingScreen = Function.Call<bool>((Hash)IsLoadingScreenActiveHash);
-            bool initialLoadingScreen = Function.Call<bool>((Hash)IsInitialLoadingScreenActiveHash);
-
-            Logger.Debug("LoadMPDLCMap runtime: " + GetSHVDNERuntimeIdentity());
-            Logger.Debug("LoadMPDLCMap state: elapsedMs=" + (Game.GameTime - _bennysInteriorRequestStartTime)
-                + " enhanced=" + IsEnhancedGameBuild()
-                + " missionActive=" + Game.IsMissionActive
-                + " canControl=" + Game.Player.CanControlCharacter
-                + " ccsPending=" + ccsPending
-                + " loadingScreen=" + loadingScreen
-                + " initialLoadingScreen=" + initialLoadingScreen);
-            Logger.Debug("LoadMPDLCMap assets: mplowriderPresent=" + dlcPresent
-                + " supermodDoorInCdImage=" + doorInCdImage
-                + " supermodDoorValid=" + doorValid
-                + " supermodDoorLoaded=" + doorLoaded);
-            Logger.Debug("LoadMPDLCMap Story IPLs: " + GetIplStateSummary(BennysStoryMapIpls));
-            Logger.Debug("LoadMPDLCMap Lowrider IPLs: " + GetIplStateSummary(BennysLowriderMapIpls));
-            Logger.Debug("LoadMPDLCMap Benny interior: primaryIplActive=" + primaryIplActive
-                + " referenceInteriorId=" + referenceInteriorId
-                + " workshopInteriorId=" + workshopInteriorId
-                + " selectedInteriorId=" + selectedInteriorId
-                + " valid=" + validInterior
-                + " ready=" + readyInterior
-                + " bennyIntID=" + bennyIntID);
-        }
-
         private static int GetBennysInteriorId(out int referenceProbeInteriorId, out int workshopInteriorId)
         {
             referenceProbeInteriorId = GetInteriorID(new Vector3(-205.8687f, -1314.41f, 30.47519f));
@@ -634,66 +460,8 @@ namespace BennysMotorworksRevamped
             return referenceProbeInteriorId != 0 ? referenceProbeInteriorId : workshopInteriorId;
         }
 
-        private static void ActivateBennysInterior(int interiorId)
-        {
-            if (interiorId == 0)
-            {
-                return;
-            }
-
-            bennyIntID = interiorId;
-            Function.Call(Hash.PIN_INTERIOR_IN_MEMORY, bennyIntID);
-            Function.Call(Hash.DISABLE_INTERIOR, bennyIntID, false);
-            Function.Call(Hash.SET_INTERIOR_ACTIVE, bennyIntID, true);
-            Function.Call(Hash.REFRESH_INTERIOR, bennyIntID);
-        }
-
-        private static void RestoreStoryContentState()
-        {
-            if (!_bennysMPContentTransitionStarted || _bennysStoryRestoreStarted)
-            {
-                return;
-            }
-
-            try
-            {
-                Logger.Log("LoadMPDLCMap: restoring Story content with ON_ENTER_SP.");
-                Function.Call((Hash)OnEnterSpHash);
-                Function.Call((Hash)SetInstancePriorityModeHash, 0);
-                _bennysStoryRestoreStarted = true;
-                _bennysStoryRestoreStartTime = Game.GameTime;
-                Logger.Log("LoadMPDLCMap: ON_ENTER_SP returned successfully; waiting for the Story content change set to settle.");
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("LoadMPDLCMap: failed to restore Story content state. " + ex.Message + " " + ex.StackTrace);
-            }
-        }
-
-        private static void ResetMPDLCMapLoadState(bool restoreStoryContent)
-        {
-            if (restoreStoryContent)
-            {
-                RestoreStoryContentState();
-            }
-
-            _bennysMPContentTransitionStarted = false;
-            _bennysMPContentTransitionSettled = false;
-            _bennysInteriorRequestStartTime = 0;
-            _nextMPDLCMapLoadAttemptTime = 0;
-            _nextMPDLCMapDebugSnapshotTime = 0;
-            _bennysMPStartupGuardStartTime = Game.GameTime;
-            _nextMPDLCMapStartupGuardLogTime = 0;
-            _bennysMPStartupGuardBypassed = false;
-            _bennysMPMapTimeoutLogged = false;
-            _bennysDebugDoorModelRequested = false;
-            _bennysStoryRestoreStarted = false;
-            _bennysStoryRestoreStartTime = 0;
-        }
-
         internal static void CleanupMPDLCMapLoad()
         {
-            RestoreStoryContentState();
         }
 
         private static void ProcessExternallyLoadedBennysInterior()
@@ -707,30 +475,31 @@ namespace BennysMotorworksRevamped
 
             try
             {
-                if (!IsIplActive(BennysSupermodInteriorIpl))
-                {
-                    return;
-                }
-
                 int referenceInteriorId;
                 int workshopInteriorId;
                 int externalInteriorId = GetBennysInteriorId(out referenceInteriorId, out workshopInteriorId);
 
                 if (externalInteriorId == 0
-                    || !Function.Call<bool>(Hash.IS_VALID_INTERIOR, externalInteriorId)
-                    || externalInteriorId == bennyIntID)
+                    || !Function.Call<bool>(Hash.IS_VALID_INTERIOR, externalInteriorId))
                 {
                     return;
                 }
 
+                bool interiorReady = Function.Call<bool>(Hash.IS_INTERIOR_READY, externalInteriorId);
                 bennyIntID = externalInteriorId;
-                Logger.Log("LoadMPDLCMap: EnableMPMap=false; detected Benny's interior loaded by another script and adopted its interior ID without requesting or changing map content. interiorId="
-                    + externalInteriorId + " referenceInteriorId=" + referenceInteriorId
-                    + " workshopInteriorId=" + workshopInteriorId);
+
+                if (!_bennysSPInteriorRegistrationLogged)
+                {
+                    _bennysSPInteriorRegistrationLogged = true;
+                    Logger.Log("Benny's SP map registration detected. Using the Lowriders interior already registered through GROUP_MAP_SP. BennysMapLoader owns interior activation/refresh. interiorId="
+                        + externalInteriorId + " ready=" + interiorReady
+                        + " referenceInteriorId=" + referenceInteriorId
+                        + " workshopInteriorId=" + workshopInteriorId);
+                }
             }
             catch (Exception ex)
             {
-                Logger.Debug("LoadMPDLCMap: external Benny's interior probe failed. " + ex.Message);
+                Logger.Debug("Benny's SP interior probe failed. " + ex.Message);
             }
         }
 
@@ -740,249 +509,12 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.REQUEST_ADDITIONAL_COLLISION_AT_COORD, -211.798f, -1324.292f, 30.37535f);
             Function.Call(Hash.REQUEST_COLLISION_AT_COORD, -205.8687f, -1314.41f, 30.47519f);
             Function.Call(Hash.REQUEST_ADDITIONAL_COLLISION_AT_COORD, -205.8687f, -1314.41f, 30.47519f);
-            RequestIpls(BennysLowriderMapIpls);
+            ProcessExternallyLoadedBennysInterior();
         }
 
         internal static void ProcessPendingMPDLCMapLoad()
         {
-            if (!_pendingMPDLCMapLoad)
-            {
-                if (onlineMap == 0)
-                {
-                    ProcessExternallyLoadedBennysInterior();
-                }
-
-                return;
-            }
-
-            bool loadingScreenActive = Function.Call<bool>((Hash)IsLoadingScreenActiveHash);
-            bool initialLoadingScreenActive = Function.Call<bool>((Hash)IsInitialLoadingScreenActiveHash);
-            if (loadingScreenActive || initialLoadingScreenActive)
-            {
-                if (Game.GameTime >= _nextMPDLCMapStartupGuardLogTime)
-                {
-                    _nextMPDLCMapStartupGuardLogTime = Game.GameTime + MPDLCMapStartupGuardLogDelayMs;
-                    Logger.Log("LoadMPDLCMap: waiting for loading screen to finish. loadingScreen=" + loadingScreenActive
-                        + " initialLoadingScreen=" + initialLoadingScreenActive);
-                }
-                return;
-            }
-
-            if (!_bennysMPContentTransitionStarted)
-            {
-                bool gameplayGuardBlocked = Game.IsMissionActive || !Game.Player.CanControlCharacter;
-                if (gameplayGuardBlocked && !_bennysMPStartupGuardBypassed)
-                {
-                    int guardElapsedMs = Game.GameTime - _bennysMPStartupGuardStartTime;
-                    if (guardElapsedMs < MPDLCMapStartupGuardTimeoutMs)
-                    {
-                        if (Game.GameTime >= _nextMPDLCMapStartupGuardLogTime)
-                        {
-                            _nextMPDLCMapStartupGuardLogTime = Game.GameTime + MPDLCMapStartupGuardLogDelayMs;
-                            Logger.Log("LoadMPDLCMap: waiting for gameplay startup guard. missionActive=" + Game.IsMissionActive
-                                + " canControl=" + Game.Player.CanControlCharacter
-                                + " elapsedMs=" + guardElapsedMs);
-                        }
-                        return;
-                    }
-
-                    _bennysMPStartupGuardBypassed = true;
-                    Logger.Log("LoadMPDLCMap: gameplay startup guard persisted for " + guardElapsedMs
-                        + "ms; continuing Benny's map initialization to avoid being blocked indefinitely. missionActive="
-                        + Game.IsMissionActive + " canControl=" + Game.Player.CanControlCharacter);
-                }
-
-                bool incompatibleMapStateActive = IsIplActive("manhat06_slod")
-                    || IsIplActive("prologue01")
-                    || IsIplActive("h4_islandairstrip");
-                if (incompatibleMapStateActive)
-                {
-                    if (Game.GameTime >= _nextMPDLCMapStartupGuardLogTime)
-                    {
-                        _nextMPDLCMapStartupGuardLogTime = Game.GameTime + MPDLCMapStartupGuardLogDelayMs;
-                        Logger.Log("LoadMPDLCMap: waiting because an incompatible alternate map state is active. manhat06_slod="
-                            + IsIplActive("manhat06_slod") + " prologue01=" + IsIplActive("prologue01")
-                            + " h4_islandairstrip=" + IsIplActive("h4_islandairstrip"));
-                    }
-                    return;
-                }
-            }
-
-            try
-            {
-                if (!_loggedLowriderAssetDiagnostics)
-                {
-                    int lowriderDlcHash = (int)StringHash.AtStringHashUtf8("mplowrider");
-                    int supermodDoorHash = (int)StringHash.AtStringHashUtf8("lr_prop_supermod_door_01");
-                    bool lowriderDlcPresent = Function.Call<bool>(Hash.IS_DLC_PRESENT, lowriderDlcHash);
-                    bool supermodDoorInCdImage = Function.Call<bool>(Hash.IS_MODEL_IN_CDIMAGE, supermodDoorHash);
-                    bool supermodDoorValid = Function.Call<bool>(Hash.IS_MODEL_VALID, supermodDoorHash);
-
-                    Logger.Log("LoadMPDLCMap: Lowrider diagnostics: mplowrider present=" + lowriderDlcPresent
-                        + " supermodDoorInCdImage=" + supermodDoorInCdImage
-                        + " supermodDoorValid=" + supermodDoorValid);
-                    _loggedLowriderAssetDiagnostics = true;
-                }
-
-                if (!_bennysMPContentTransitionStarted)
-                {
-                    bool existingSupermodIplActive = IsIplActive(BennysSupermodInteriorIpl);
-                    bool existingLowriderSetActive = AreAllIplsActive(BennysLowriderMapIpls);
-                    int existingReferenceInteriorId;
-                    int existingWorkshopInteriorId;
-                    int existingInteriorId = GetBennysInteriorId(out existingReferenceInteriorId, out existingWorkshopInteriorId);
-                    bool existingInteriorValid = existingInteriorId != 0 && Function.Call<bool>(Hash.IS_VALID_INTERIOR, existingInteriorId);
-                    bool existingInteriorReady = existingInteriorId != 0 && Function.Call<bool>(Hash.IS_INTERIOR_READY, existingInteriorId);
-
-                    if (existingSupermodIplActive && existingInteriorValid)
-                    {
-                        ActivateBennysInterior(existingInteriorId);
-                        _pendingMPDLCMapLoad = false;
-                        Logger.Log("LoadMPDLCMap: existing Benny's Lowrider interior detected; adopting it without changing external map ownership. interiorId="
-                            + existingInteriorId + " ready=" + existingInteriorReady
-                            + " completeLowriderSet=" + existingLowriderSetActive);
-                        return;
-                    }
-
-                    if (AreContentChangeSetsPending())
-                    {
-                        return;
-                    }
-
-                    string editionName = IsEnhancedGameBuild() ? "Enhanced" : "Legacy";
-                    Logger.Log("LoadMPDLCMap: " + editionName + " - using the supported full MP content registration path. Enabling instance priority mode before ON_ENTER_MP.");
-                    Function.Call((Hash)SetInstancePriorityModeHash, 1);
-                    Function.Call((Hash)OnEnterMpHash);
-                    _bennysMPContentTransitionStarted = true;
-                    _bennysMPContentTransitionSettled = false;
-                    Logger.Log("LoadMPDLCMap: " + editionName + " ON_ENTER_MP returned successfully; continuing as soon as pending content change sets clear.");
-                    return;
-                }
-
-                if (_bennysMPContentTransitionStarted && !_bennysMPContentTransitionSettled)
-                {
-                    if (AreContentChangeSetsPending())
-                    {
-                        return;
-                    }
-
-                    _bennysMPContentTransitionSettled = true;
-                    _bennysInteriorRequestStartTime = Game.GameTime;
-                    _nextMPDLCMapLoadAttemptTime = 0;
-                    _nextMPDLCMapDebugSnapshotTime = 0;
-                    Logger.Log("LoadMPDLCMap: MP content settled; requesting the complete Benny's Lowrider sc1_02 sector immediately.");
-                }
-
-                if (!_bennysStoryRestoreStarted)
-                {
-                    if (Game.GameTime >= _nextMPDLCMapLoadAttemptTime)
-                    {
-                        int retryDelayMs = Game.GameTime - _bennysInteriorRequestStartTime >= MPDLCMapSwapTimeoutMs
-                            ? MPDLCMapPostTimeoutRetryDelayMs
-                            : MPDLCMapRetryDelayMs;
-                        _nextMPDLCMapLoadAttemptTime = Game.GameTime + retryDelayMs;
-                        LoadMPDLCMap();
-                    }
-
-                    bool lowriderSetActive = AreAllIplsActive(BennysLowriderMapIpls);
-                    bool supermodIplActive = IsIplActive(BennysSupermodInteriorIpl);
-                    int referenceInteriorId;
-                    int workshopInteriorId;
-                    int interiorId = GetBennysInteriorId(out referenceInteriorId, out workshopInteriorId);
-
-                    if (interiorId != 0)
-                    {
-                        ActivateBennysInterior(interiorId);
-                    }
-
-                    bool validInterior = interiorId != 0 && Function.Call<bool>(Hash.IS_VALID_INTERIOR, interiorId);
-                    bool interiorReady = interiorId != 0 && Function.Call<bool>(Hash.IS_INTERIOR_READY, interiorId);
-
-                    if (Game.GameTime >= _nextMPDLCMapDebugSnapshotTime)
-                    {
-                        _nextMPDLCMapDebugSnapshotTime = Game.GameTime + MPDLCMapDebugSnapshotDelayMs;
-                        LogMapDebugSnapshot(supermodIplActive, referenceInteriorId, workshopInteriorId, interiorId, validInterior, interiorReady);
-                    }
-
-                    if (supermodIplActive && validInterior)
-                    {
-                        _pendingMPDLCMapLoad = false;
-                        Logger.Log("LoadMPDLCMap: Benny's Lowrider map registered successfully through the MP content path on "
-                            + (IsEnhancedGameBuild() ? "Enhanced" : "Legacy")
-                            + ". interiorId=" + interiorId
-                            + " ready=" + interiorReady
-                            + " supermodIplActive=" + supermodIplActive
-                            + " completeLowriderSet=" + lowriderSetActive
-                            + ". Keeping the MP map content active while EnableMPMap=true.");
-                        return;
-                    }
-
-                    if (Game.GameTime - _bennysInteriorRequestStartTime >= MPDLCMapSwapTimeoutMs)
-                    {
-                        if (!_bennysMPMapTimeoutLogged)
-                        {
-                            _bennysMPMapTimeoutLogged = true;
-                            Logger.Log("LoadMPDLCMap: Benny's was not ready within the initial MP content registration window. storyIpls=["
-                                + GetIplStateSummary(BennysStoryMapIpls) + "] lowriderIpls=["
-                                + GetIplStateSummary(BennysLowriderMapIpls) + "] referenceInteriorId="
-                                + referenceInteriorId + " workshopInteriorId=" + workshopInteriorId
-                                + " selectedInteriorId=" + interiorId + " valid=" + validInterior
-                                + " ready=" + interiorReady
-                                + ". Keeping MP content active and continuing non-destructive Benny's IPL retries instead of restoring Story content.");
-                        }
-                    }
-
-                    return;
-                }
-
-                if (AreContentChangeSetsPending())
-                {
-                    if (Game.GameTime - _bennysStoryRestoreStartTime >= MPDLCMapStoryRestoreTimeoutMs)
-                    {
-                        Logger.Log("LoadMPDLCMap: timed out waiting for Story content restoration to finish.");
-                        _pendingMPDLCMapLoad = false;
-                        ResetMPDLCMapLoadState(false);
-                    }
-
-                    return;
-                }
-
-                if (Game.GameTime - _bennysStoryRestoreStartTime < MPDLCMapValidationDelayMs)
-                {
-                    return;
-                }
-
-                int restoredReferenceInteriorId;
-                int restoredWorkshopInteriorId;
-                int restoredInteriorId = GetBennysInteriorId(out restoredReferenceInteriorId, out restoredWorkshopInteriorId);
-
-                Logger.Log("LoadMPDLCMap: Story content restoration completed. storyIpls=["
-                    + GetIplStateSummary(BennysStoryMapIpls) + "] lowriderIpls=["
-                    + GetIplStateSummary(BennysLowriderMapIpls) + "] referenceInteriorId="
-                    + restoredReferenceInteriorId + " workshopInteriorId=" + restoredWorkshopInteriorId
-                    + " selectedInteriorId=" + restoredInteriorId);
-                bennyIntID = restoredInteriorId;
-                _pendingMPDLCMapLoad = false;
-                ResetMPDLCMapLoadState(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("LoadMPDLCMap: map loading failed. " + ex.Message + " " + ex.StackTrace);
-
-                RestoreStoryContentState();
-                if (!_bennysMPContentTransitionStarted)
-                {
-                    try
-                    {
-                        Function.Call((Hash)SetInstancePriorityModeHash, 0);
-                    }
-                    catch
-                    {
-                    }
-
-                    _pendingMPDLCMapLoad = false;
-                }
-            }
+            ProcessExternallyLoadedBennysInterior();
         }
 
         public static void LoadMPDLCMapMissingObjects()
@@ -2031,6 +1563,11 @@ namespace BennysMotorworksRevamped
         {
             if (wheelType == (VehicleWheelType)10)
             {
+                return "Race";
+            }
+
+            if (wheelType == (VehicleWheelType)12)
+            {
                 return "Track";
             }
 
@@ -2466,8 +2003,9 @@ namespace BennysMotorworksRevamped
                 [VehicleWheelType.Tuner] = Tuple.Create("CMOD_WHE1_7", "Tuner"),
                 [(VehicleWheelType)8] = Tuple.Create("CMOD_WHE1_8", "Benny's Originals"),
                 [(VehicleWheelType)9] = Tuple.Create("CMOD_WHE1_9", "Benny's Bespoke"),
-                [(VehicleWheelType)10] = Tuple.Create("CMOD_WHE1_10", "Racing"),
-                [(VehicleWheelType)11] = Tuple.Create("CMOD_WHE1_11", "Street")
+                [(VehicleWheelType)10] = Tuple.Create("CMOD_WHE1_10", "Race"),
+                [(VehicleWheelType)11] = Tuple.Create("CMOD_WHE1_11", "Street"),
+                [(VehicleWheelType)12] = Tuple.Create("CMOD_WHE1_12", "Track")
             };
 
         public static bool IsCustomWheels()
@@ -2613,7 +2151,12 @@ namespace BennysMotorworksRevamped
         {
             int totalWheelsCount = veh.GetModCount(VehicleMod.FrontWheel);
             int howMany = totalWheelsCount / 7;
-            return curRim <= howMany ? curRim : curRim % 31;
+            if (howMany <= 0)
+            {
+                return curRim;
+            }
+
+            return curRim < howMany ? curRim : curRim % howMany;
         }
 
         public static bool CanEnterBennysMotorwork(Vehicle veh)
@@ -3045,7 +2588,7 @@ namespace BennysMotorworksRevamped
                     _carModShopVehicleHandle = 0;
                 }
 
-                if (targetHandle != 0)
+                if (targetHandle != 0 && _carModShopVehicleHandle != targetHandle)
                 {
                     Function.Call((Hash)SetVehicleInCarModShopHash, targetHandle, true);
                     _carModShopVehicleHandle = targetHandle;
@@ -3241,8 +2784,7 @@ namespace BennysMotorworksRevamped
             optLogging = config.GetValue("SETTINGS", "LOGGING", true);
             optDebugLogging = config.GetValue("SETTINGS", "DEBUGLOGGING", true);
             optEnableMouse = config.GetValue("SETTINGS", "EnableMouse", false);
-            bool enableMPMap = config.GetValue("SETTINGS", "EnableMPMap", true);
-            onlineMap = enableMPMap ? 1 : 0;
+            onlineMap = 0;
             fixDoor = config.GetValue<int>("SETTINGS", "FixDoor", 1);
             allowOversizedVehicles = config.GetValue("SETTINGS", "AllowOversizedVehicles", true);
             allowEmergencyVehicles = config.GetValue("SETTINGS", "AllowEmergencyVehicles", true);
@@ -3252,11 +2794,8 @@ namespace BennysMotorworksRevamped
             zoutKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomOut", GTA.Control.FrontendLt);
             zinKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomIn", GTA.Control.FrontendRt);
             doorKey = config.GetValue<GTA.Control>("CONTROLS", "Door", GTA.Control.ParachuteBrakeLeft);
-            ResetMPDLCMapLoadState(true);
-            _pendingMPDLCMapLoad = enableMPMap;
-            _bennysMPStartupGuardStartTime = Game.GameTime;
             _nextExternalBennysInteriorProbeTime = 0;
-            _loggedLowriderAssetDiagnostics = false;
+            _bennysSPInteriorRegistrationLogged = false;
         }
 
         public static void CreateBlip()

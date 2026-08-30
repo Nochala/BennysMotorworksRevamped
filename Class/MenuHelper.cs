@@ -39,9 +39,9 @@ namespace BennysMotorworksRevamped
         }
 
         public static UIMenu QuitMenu, MainMenu, gmSpecialUpgrades, gmBodywork, gmBodyworkArena, gmEngine, gmInterior, gmPlate, gmLights, gmRespray, gmWheels, gmBumper, gmWheelType, gmTires, gmNeonKits, gmWeapon;
-        public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mSecondaryColor, mSecondaryClassicColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
-        public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
-        public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
+        public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mSecondaryColor, mSecondaryClassicColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
+        public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
+        public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giTrackWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
         public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank;
         public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank;
         public static UIMenu mShifter, mFMudguard, mBSeat, mOilTank, mRMudguard, mFuelTank, mBeltDriveCovers, mBEngineBlock, mBAirFilter, mBTank, gmTrailer;
@@ -338,6 +338,7 @@ namespace BennysMotorworksRevamped
             RefreshLowriderDLCWheelsModMenuFor(ref mBespoke, ref iBespoke, VehicleMod.FrontWheel);
             RefreshLowriderDLCWheelsModMenuFor(ref mRacing, ref iRacing, VehicleMod.FrontWheel);
             RefreshLowriderDLCWheelsModMenuFor(ref mStreet, ref iStreet, VehicleMod.FrontWheel);
+            RefreshLowriderDLCWheelsModMenuFor(ref mTrack, ref iTrack, VehicleMod.FrontWheel);
             RefreshEnumModMenuFor(ref mRimColor, ref iRimColor, EnumTypes.VehicleColorRim);
             RefreshTiresGroupMenu();
             RefreshTireEnhancementsMenu();
@@ -2171,6 +2172,9 @@ namespace BennysMotorworksRevamped
                         giStreetWheels = new UIMenuItem(GetLocalizedWheelTypeName((VehicleWheelType)11));
                         gmWheelType.AddItem(giStreetWheels);
                         gmWheelType.BindMenuToItem(mStreet, giStreetWheels);
+                        giTrackWheels = new UIMenuItem(GetLocalizedWheelTypeName((VehicleWheelType)12));
+                        gmWheelType.AddItem(giTrackWheels);
+                        gmWheelType.BindMenuToItem(mTrack, giTrackWheels);
                         break;
                 }
 
@@ -2395,7 +2399,7 @@ namespace BennysMotorworksRevamped
                 {
                     addTireItem(Game.GetLocalizedString("CMOD_TYR_0"), 1, 100, !IsCustomWheels());
                 }
-                else if (veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11)
+                else if (veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11 || veh.GetWheelType() == (VehicleWheelType)12)
                 {
                     int currentWheel = veh.GetMod(VehicleMod.FrontWheel);
                     int baseWheel = GetBennysOriginalRim(currentWheel);
@@ -2933,6 +2937,7 @@ namespace BennysMotorworksRevamped
             mBespoke = NewUIMenu(ref mBespoke, GetLocalizedWheelTypeName((VehicleWheelType)9).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mRacing = NewUIMenu(ref mRacing, GetLocalizedWheelTypeName((VehicleWheelType)10).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mStreet = NewUIMenu(ref mStreet, GetLocalizedWheelTypeName((VehicleWheelType)11).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mTrack = NewUIMenu(ref mTrack, GetLocalizedWheelTypeName((VehicleWheelType)12).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mRimColor = NewUIMenu(ref mRimColor, LocalizedModGroupName(GroupName.WheelColor).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             gmTires = NewUIMenu(ref gmTires, GetLocalizedMenuText("CMOD_TYR_T", "Tires"), true, ModsMenuCloseHandler, WheelsMenuItemSelectHandler);
             mTires = NewUIMenu(ref mTires, GetLocalizedMenuText("CMOD_MOD_TYR1", "Tire Design"), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
@@ -4105,7 +4110,7 @@ namespace BennysMotorworksRevamped
                         PlaySpeech("LR_UPGRADE_WHEEL");
                     }
                 }
-                else if ((sender == mSHighEnd) || (sender == mSLowrider) || (sender == mSMuscle) || (sender == mSOffroad) || (sender == mSSport) || (sender == mSSUV) || (sender == mSTuner) || (sender == mCHighEnd) || (sender == mCLowrider) || (sender == mCMuscle) || (sender == mCOffroad) || (sender == mCSport) || (sender == mCSUV) || (sender == mCTuner) || (sender == mBennysOriginals) || (sender == mBespoke) || (sender == mRacing) || (sender == mStreet))
+                else if ((sender == mSHighEnd) || (sender == mSLowrider) || (sender == mSMuscle) || (sender == mSOffroad) || (sender == mSSport) || (sender == mSSUV) || (sender == mSTuner) || (sender == mCHighEnd) || (sender == mCLowrider) || (sender == mCMuscle) || (sender == mCOffroad) || (sender == mCSport) || (sender == mCSUV) || (sender == mCTuner) || (sender == mBennysOriginals) || (sender == mBespoke) || (sender == mRacing) || (sender == mStreet) || (sender == mTrack))
                 {
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
@@ -4126,7 +4131,7 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        bool bennysWheelType = veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11;
+                        bool bennysWheelType = veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11 || veh.GetWheelType() == (VehicleWheelType)12;
 
                         if (bennysWheelType)
                         {
@@ -4231,6 +4236,11 @@ namespace BennysMotorworksRevamped
                         veh.SetWheelType((VehicleWheelType)11);
                         RefreshLowriderDLCWheelsModMenuFor(ref mStreet, ref iStreet, VehicleMod.FrontWheel);
                     }
+                    else if (selectedItem == giTrackWheels)
+                    {
+                        veh.SetWheelType((VehicleWheelType)12);
+                        RefreshLowriderDLCWheelsModMenuFor(ref mTrack, ref iTrack, VehicleMod.FrontWheel);
+                    }
                 }
                 if (sender == gmBikeWheels)
                 {
@@ -4279,6 +4289,10 @@ namespace BennysMotorworksRevamped
                 else if (sender == mStreet)
                 {
                     veh.SetWheelType((VehicleWheelType)11);
+                }
+                else if (sender == mTrack)
+                {
+                    veh.SetWheelType((VehicleWheelType)12);
                 }
 
                 // Color()
@@ -5036,13 +5050,13 @@ namespace BennysMotorworksRevamped
                         veh.SetMod(VehicleMod.FrontWheel, mc.ModID, false);
                         veh.SetMod(VehicleMod.RearWheel, mc.ModID, false);
                     }
-                    else if ((sender == mSHighEnd) || (sender == mSLowrider) || (sender == mSMuscle) || (sender == mSOffroad) || (sender == mSSport) || (sender == mSSUV) || (sender == mSTuner) || (sender == mCHighEnd) || (sender == mCLowrider) || (sender == mCMuscle) || (sender == mCOffroad) || (sender == mCSport) || (sender == mCSUV) || (sender == mCTuner) || (sender == mBennysOriginals) || (sender == mBespoke) || (sender == mRacing) || (sender == mStreet))
+                    else if ((sender == mSHighEnd) || (sender == mSLowrider) || (sender == mSMuscle) || (sender == mSOffroad) || (sender == mSSport) || (sender == mSSUV) || (sender == mSTuner) || (sender == mCHighEnd) || (sender == mCLowrider) || (sender == mCMuscle) || (sender == mCOffroad) || (sender == mCSport) || (sender == mCSUV) || (sender == mCTuner) || (sender == mBennysOriginals) || (sender == mBespoke) || (sender == mRacing) || (sender == mStreet) || (sender == mTrack))
                     {
                         veh.SetMod(VehicleMod.FrontWheel, mc.ModID, false);
                     }
                     if (sender == mTires)
                     {
-                        bool bennysWheelType = veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11;
+                        bool bennysWheelType = veh.GetWheelType() == (VehicleWheelType)8 || veh.GetWheelType() == (VehicleWheelType)9 || veh.GetWheelType() == (VehicleWheelType)10 || veh.GetWheelType() == (VehicleWheelType)11 || veh.GetWheelType() == (VehicleWheelType)12;
                         if (bennysWheelType)
                         {
                             veh.SetMod(VehicleMod.FrontWheel, mc.ModID, false);
