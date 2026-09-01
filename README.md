@@ -10,7 +10,7 @@
 ### Requirements:
 - Latest [**ScriptHookV**](https://www.dev-c.com/gtav/scripthookv/)
 - Latest **ScriptHookVDotNet v3** for [**Enhanced**](https://www.gta5-mods.com/tools/script-hook-v-net-enhanced) or [**Legacy**](https://www.gta5-mods.com/tools/scripthookv-net)
-- Latest [**LemonUI**](https://www.gta5-mods.com/tools/lemonui)
+- Latest [**LemonUI for SHVDN v3**](https://www.gta5-mods.com/tools/lemonui)
 
 ___________________________________
 ### **Features:**
