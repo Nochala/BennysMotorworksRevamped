@@ -54,10 +54,6 @@ ___________________________________
 GTA V/scripts/ folder.
 - Enjoy
 
-#### _Known Issues_ 
-- Cutscene cues can be buggy, sometimes a vehicle will miss the drive cue and teleport
-- The camera position of the entrance cutscene briefly looks at the wall
-- Oversized vehicles have broken cutscene cues 
 
   
 ### Planned Upcoming Features 
