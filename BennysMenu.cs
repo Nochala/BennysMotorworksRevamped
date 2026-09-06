@@ -26,6 +26,7 @@ namespace BennysMotorworksRevamped
         private const int VehicleStatsBarSegments = 5;
         private const float VehicleStatsBarSegmentGap = 4f;
         private const float VehicleStatsBarMaxValue = 200f;
+        private static readonly Color VehicleStatsUpgradePreviewColor = Color.FromArgb(235, 95, 185, 255);
         private const float MenuAreaFallbackWidth = 431f;
         private const float MenuAreaFallbackHeight = 550f;
         private const float MenuAreaEstimatedBaseHeight = 170f;
@@ -36,6 +37,8 @@ namespace BennysMotorworksRevamped
         private const int MenuAreaEstimatedFooterWrapCharacters = 38;
 
         public bool IsScriptLoaded { get; private set; }
+        private bool _menuCreationAttempted;
+        private bool _menuCreationFailureLogged;
 
         public BennysMenu()
         {
@@ -391,11 +394,15 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.END_TEXT_COMMAND_DISPLAY_TEXT, x, y, 0);
         }
 
-        private static void DrawVehicleStatBarNativeStyle(float value, float barLeftScaled, float barTopScaled)
+        private static void DrawVehicleStatBarNativeStyle(float baselineValue, float previewValue, bool showUpgradePreview, float barLeftScaled, float barTopScaled)
         {
-            float clampedRatio = Clamp01(value / VehicleStatsBarMaxValue);
+            float baselineRatio = Clamp01(baselineValue / VehicleStatsBarMaxValue);
+            float previewRatio = Clamp01(previewValue / VehicleStatsBarMaxValue);
+            bool hasUpgrade = showUpgradePreview && previewRatio > baselineRatio + 0.0005f;
+            float normalRatio = hasUpgrade ? baselineRatio : previewRatio;
             float segmentWidthScaled = (VehicleStatsBarWidth - (VehicleStatsBarSegmentGap * (VehicleStatsBarSegments - 1))) / VehicleStatsBarSegments;
-            float activeSegments = clampedRatio * VehicleStatsBarSegments;
+            float normalActiveSegments = normalRatio * VehicleStatsBarSegments;
+            float previewActiveSegments = hasUpgrade ? previewRatio * VehicleStatsBarSegments : normalActiveSegments;
             float barCenterY = ConvertScaledDrawYToNormalized(barTopScaled + (VehicleStatsBarHeight * 0.5f));
             float segmentHeightNormalized = ConvertScaledHeightToNormalized(VehicleStatsBarHeight);
 
@@ -409,18 +416,32 @@ namespace BennysMotorworksRevamped
 
                 DrawRectNormalized(segmentCenterX, barCenterY, segmentWidthNormalized, segmentHeightNormalized, baseColor);
 
-                float segmentFill = Clamp01(activeSegments - i);
-                if (segmentFill > 0f)
+                float normalSegmentFill = Clamp01(normalActiveSegments - i);
+                if (normalSegmentFill > 0f)
                 {
-                    float fillWidthScaled = segmentWidthScaled * segmentFill;
+                    float fillWidthScaled = segmentWidthScaled * normalSegmentFill;
                     float fillCenterX = ConvertScaledDrawXToNormalized(segmentLeftScaled + (fillWidthScaled * 0.5f));
                     float fillWidthNormalized = ConvertScaledWidthToNormalized(fillWidthScaled);
                     DrawRectNormalized(fillCenterX, barCenterY, fillWidthNormalized, segmentHeightNormalized, fillColor);
                 }
+
+                if (hasUpgrade)
+                {
+                    float previewSegmentFill = Clamp01(previewActiveSegments - i);
+                    float upgradeSegmentFill = previewSegmentFill - normalSegmentFill;
+                    if (upgradeSegmentFill > 0f)
+                    {
+                        float upgradeLeftScaled = segmentLeftScaled + (segmentWidthScaled * normalSegmentFill);
+                        float upgradeWidthScaled = segmentWidthScaled * upgradeSegmentFill;
+                        float upgradeCenterX = ConvertScaledDrawXToNormalized(upgradeLeftScaled + (upgradeWidthScaled * 0.5f));
+                        float upgradeWidthNormalized = ConvertScaledWidthToNormalized(upgradeWidthScaled);
+                        DrawRectNormalized(upgradeCenterX, barCenterY, upgradeWidthNormalized, segmentHeightNormalized, VehicleStatsUpgradePreviewColor);
+                    }
+                }
             }
         }
 
-        private static void DrawVehicleStatRow(string label, float value, float rowTopScaled, float panelLeftScaled)
+        private static void DrawVehicleStatRow(string label, float baselineValue, float previewValue, bool showUpgradePreview, float rowTopScaled, float panelLeftScaled)
         {
             float labelX = ConvertScaledDrawXToNormalized(panelLeftScaled + VehicleStatsPanelPaddingLeft);
             float textY = ConvertScaledDrawYToNormalized(rowTopScaled);
@@ -428,7 +449,7 @@ namespace BennysMotorworksRevamped
             float barTopScaled = rowTopScaled + VehicleStatsBarYOffset;
 
             DrawTextNormalized(label, labelX, textY, 0.285f, GTA.UI.Font.ChaletLondon, Color.WhiteSmoke);
-            DrawVehicleStatBarNativeStyle(value, barLeftScaled, barTopScaled);
+            DrawVehicleStatBarNativeStyle(baselineValue, previewValue, showUpgradePreview, barLeftScaled, barTopScaled);
         }
 
         private static void DrawVehicleStatsPanel()
@@ -454,11 +475,15 @@ namespace BennysMotorworksRevamped
                 ConvertScaledHeightToNormalized(panelHeight),
                 Color.FromArgb(120, 0, 0, 0));
 
+            BennysMotorworksRevamped.Compat.UIMenu visibleMenu = BennysMotorworksRevamped.Compat.UIMenu.GetVisibleMenu();
+            bool showUpgradePreview = PerformanceStatsPreviewActive && IsPerformanceStatsPreviewMenu(visibleMenu);
+            VehicleStats baselineStats = showUpgradePreview ? PerformanceStatsBaseline : vehStats;
+
             float firstRowTop = panelTop + VehicleStatsPanelPaddingTop;
-            DrawVehicleStatRow("Top Speed", vehStats.TopSpeed, firstRowTop, panelLeft);
-            DrawVehicleStatRow("Acceleration", vehStats.Acceleration, firstRowTop + VehicleStatsRowSpacing, panelLeft);
-            DrawVehicleStatRow("Braking", vehStats.Braking, firstRowTop + (VehicleStatsRowSpacing * 2f), panelLeft);
-            DrawVehicleStatRow("Traction", vehStats.Traction, firstRowTop + (VehicleStatsRowSpacing * 3f), panelLeft);
+            DrawVehicleStatRow("Top Speed", baselineStats.TopSpeed, vehStats.TopSpeed, showUpgradePreview, firstRowTop, panelLeft);
+            DrawVehicleStatRow("Acceleration", baselineStats.Acceleration, vehStats.Acceleration, showUpgradePreview, firstRowTop + VehicleStatsRowSpacing, panelLeft);
+            DrawVehicleStatRow("Braking", baselineStats.Braking, vehStats.Braking, showUpgradePreview, firstRowTop + (VehicleStatsRowSpacing * 2f), panelLeft);
+            DrawVehicleStatRow("Traction", baselineStats.Traction, vehStats.Traction, showUpgradePreview, firstRowTop + (VehicleStatsRowSpacing * 3f), panelLeft);
         }
 
         private void OnTick(object sender, EventArgs e)
@@ -472,8 +497,30 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
-                CreateMenus();
-                Logger.Log("CreateMenus completed.");
+                if (!_menuCreationAttempted)
+                {
+                    _menuCreationAttempted = true;
+                    try
+                    {
+                        CreateMenus();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("CreateMenus threw an exception: " + ex.Message + " " + ex.StackTrace);
+                    }
+                }
+
+                if (!MenuHelper.IsMenuSystemReady)
+                {
+                    if (!_menuCreationFailureLogged)
+                    {
+                        _menuCreationFailureLogged = true;
+                        Logger.Log("BennysMenu initialization did not complete. Workshop entry will remain disabled until scripts are reloaded.");
+                    }
+                    return;
+                }
+
+                Logger.Log("CreateMenus completed and menu system is ready.");
                 IsScriptLoaded = true;
             }
 

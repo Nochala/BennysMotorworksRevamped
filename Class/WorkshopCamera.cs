@@ -29,6 +29,8 @@ namespace BennysMotorworksRevamped
         BikeExhaust,
         FrontMuguard,
         RearMuguard,
+        BikeBackrest,
+        BikeWindshield,
         RearHood,
         FrontTrunk,
         Boost,
@@ -1082,7 +1084,7 @@ namespace BennysMotorworksRevamped
                     SetAroundCamera(GetBonePosition(_target, "engine"), 3.0f, _targetPos + _target.ForwardVector * 3.0f + _target.UpVector, new Vector3(0f, 0f, -_target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
                     break;
                 case CameraPosition.Hood:
-                    SetAroundCamera(GetBonePosition(_target, "bonnet"), 3.0f, _targetPos + _target.ForwardVector * 3.0f + _target.UpVector, new Vector3(0f, 0f, -_target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
+                    SetAroundCamera(GetBonePosition(_target, "bonnet"), 4.0f, _targetPos + _target.ForwardVector * 4.0f + _target.UpVector, new Vector3(0f, 0f, -_target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
                     break;
                 case CameraPosition.Boost:
                     _targetPos = _target.Position;
@@ -1098,8 +1100,15 @@ namespace BennysMotorworksRevamped
                     SetAroundCamera(_targetPos, 3.0f, _targetPos + _target.ForwardVector * 3.0f + _target.UpVector, new Vector3(0f, 0f, -_target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
                     break;
                 case CameraPosition.FrontMuguard:
-                    _targetPos = _target.Bones.Contains("misc_i") ? GetBonePosition(_target, "misc_i") : GetBonePosition(_target, "forks_l");
-                    SetAroundCamera(_targetPos, 3.0f, _targetPos + _target.ForwardVector * 3.0f + _target.UpVector, new Vector3(0f, 0f, -_target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
+                    if (!TryGetUsableBonePosition(_target, "misc_i", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "forks_l", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "wheel_lf", out _targetPos))
+                    {
+                        _targetPos = _target.Position + _target.ForwardVector * 0.85f + _target.UpVector * 0.25f;
+                    }
+
+                    Vector3 frontMudguardCameraPosition = _targetPos + _target.ForwardVector * 2.35f + _target.RightVector * 0.45f + _target.UpVector * 0.55f;
+                    SetAroundCamera(_targetPos, _targetPos.DistanceTo(frontMudguardCameraPosition), frontMudguardCameraPosition, GetStableLookRotation(_targetPos - frontMudguardCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
                     break;
                 case CameraPosition.Trunk:
                     _targetPos = _target.Bones.Contains("boot") ? GetBonePosition(_target, "boot") : GetBonePosition(_target, "bumper_r");
@@ -1114,8 +1123,45 @@ namespace BennysMotorworksRevamped
                     SetAroundCamera(_targetPos, 3.0f, _targetPos + _target.ForwardVector * -3.0f + _target.UpVector, new Vector3(0f, 0f, _target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;
                 case CameraPosition.RearMuguard:
-                    _targetPos = GetBonePosition(_target, "misc_d");
-                    SetAroundCamera(_targetPos, 3.0f, _targetPos + _target.ForwardVector * -3.0f + _target.UpVector, new Vector3(0f, 0f, _target.Heading), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
+                    if (!TryGetUsableBonePosition(_target, "misc_d", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "wheel_lr", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "wheel_r", out _targetPos))
+                    {
+                        _targetPos = _target.Position - _target.ForwardVector * 0.85f + _target.UpVector * 0.3f;
+                    }
+
+                    Vector3 rearMudguardCameraPosition = _targetPos - _target.ForwardVector * 2.35f - _target.RightVector * 0.35f + _target.UpVector * 0.55f;
+                    SetAroundCamera(_targetPos, _targetPos.DistanceTo(rearMudguardCameraPosition), rearMudguardCameraPosition, GetStableLookRotation(_targetPos - rearMudguardCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
+                    break;
+                case CameraPosition.BikeBackrest:
+                    if (!TryGetUsableBonePosition(_target, "seat_dside_r", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "seat_pside_r", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "seat_dside_f", out _targetPos))
+                    {
+                        _targetPos = _target.Position - _target.ForwardVector * 0.45f + _target.UpVector * 0.75f;
+                    }
+                    else
+                    {
+                        _targetPos += _target.UpVector * 0.3f;
+                    }
+
+                    Vector3 backrestCameraPosition = _targetPos - _target.ForwardVector * 2.45f + _target.RightVector * 0.35f + _target.UpVector * 0.35f;
+                    SetAroundCamera(_targetPos, _targetPos.DistanceTo(backrestCameraPosition), backrestCameraPosition, GetStableLookRotation(_targetPos - backrestCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
+                    break;
+                case CameraPosition.BikeWindshield:
+                    if (!TryGetUsableBonePosition(_target, "windscreen", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "headlight_l", out _targetPos)
+                        && !TryGetUsableBonePosition(_target, "headlight_r", out _targetPos))
+                    {
+                        _targetPos = _target.Position + _target.ForwardVector * 0.55f + _target.UpVector * 0.8f;
+                    }
+                    else
+                    {
+                        _targetPos += _target.UpVector * 0.2f;
+                    }
+
+                    Vector3 windshieldCameraPosition = _targetPos + _target.ForwardVector * 2.25f + _target.RightVector * 0.3f + _target.UpVector * 0.25f;
+                    SetAroundCamera(_targetPos, _targetPos.DistanceTo(windshieldCameraPosition), windshieldCameraPosition, GetStableLookRotation(_targetPos - windshieldCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 250.6141f, RightHorizontalValue = _target.Heading - 105.30705f });
                     break;
                 case CameraPosition.RearWindscreen:
                     _targetPos = _target.Bones.Contains("windscreen_r") ? GetBonePosition(_target, "windscreen_r") : GetBonePosition(_target, "bumper_r");
@@ -1180,7 +1226,23 @@ namespace BennysMotorworksRevamped
                     SetAroundCamera(_targetPos, plaqueCameraZoom, plaqueCameraPosition, GetStableLookRotation(_targetPos - plaqueCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -20.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;
                 case CameraPosition.BackPlate:
-                    _targetPos = _target.Bones.Contains("platelight") ? GetBonePosition(_target, "platelight") : GetBonePosition(_target, "neon_b");
+                    if (_target.Bones.Contains("platelight"))
+                    {
+                        _targetPos = GetBonePosition(_target, "platelight");
+                    }
+                    else if (_target.Bones.Contains("neon_b"))
+                    {
+                        _targetPos = GetBonePosition(_target, "neon_b");
+                    }
+                    else if (_target.Bones.Contains("bumper_r"))
+                    {
+                        _targetPos = GetBonePosition(_target, "bumper_r") + _target.UpVector * 0.15f;
+                    }
+                    else
+                    {
+                        _targetPos = _target.Position - _target.ForwardVector * 0.75f + _target.UpVector * 0.45f;
+                    }
+
                     Vector3 backPlateCameraPosition = _targetPos - _target.ForwardVector * 1.35f + _target.UpVector * 0.05f;
                     SetAroundCamera(_targetPos, _targetPos.DistanceTo(backPlateCameraPosition), backPlateCameraPosition, GetStableLookRotation(_targetPos - backPlateCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;

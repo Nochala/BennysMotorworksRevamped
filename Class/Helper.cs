@@ -129,8 +129,12 @@ namespace BennysMotorworksRevamped
         private const ulong SetVehicleInCarModShopHash = 0x9D44FCCE98450843UL;
         private static int _nextExternalBennysInteriorProbeTime = 0;
         private static bool _bennysSPInteriorRegistrationLogged = false;
+        private const int ShopInitRetryDelayMs = 125;
+        private const int ShopInitTimeoutMs = 4000;
         private static bool _pendingShopInit = false;
         private static int _shopInitDelayTime = 0;
+        private static int _shopInitStartedAt = 0;
+        private static int _shopInitAttempts = 0;
         private static int _carModShopVehicleHandle = 0;
         private static bool _workshopPlayerControlSuppressionActive = false;
         private static bool _workshopOwnsPlayerControlSuppression = false;
@@ -149,7 +153,6 @@ namespace BennysMotorworksRevamped
         public static float vehicleStatsOffsetY = -10f;
         public static string arenaVehImage = "brusier_apoc";
 
-        private static float cachedExitHeading = 0f;
         private const float MaximumWorkshopVehicleWidth = 3.0f;
         private const float MaximumWorkshopVehicleLength = 7.0f;
         private const float MaximumWorkshopVehicleHeight = 3.5f;
@@ -1387,7 +1390,11 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
-                string wheelLabel = Function.Call<string>(Hash.GET_MOD_TEXT_LABEL, veh.Handle, (int)modType, index);
+                VehicleMod labelModType = veh.Model.IsBike && modType == VehicleMod.RearWheel
+                    ? VehicleMod.FrontWheel
+                    : modType;
+
+                string wheelLabel = Function.Call<string>(Hash.GET_MOD_TEXT_LABEL, veh.Handle, (int)labelModType, index);
                 if (!string.IsNullOrWhiteSpace(wheelLabel) && DoesGXTEntryExist(wheelLabel))
                 {
                     string localizedWheelName = Gxt(wheelLabel);
@@ -1397,7 +1404,13 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
-                return LocalizedModTypeName(modType) + " " + (index + 1).ToString();
+                string wheelTypeName = LocalizedModTypeName(labelModType);
+                if (string.IsNullOrWhiteSpace(wheelTypeName) || wheelTypeName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                {
+                    wheelTypeName = "Wheel";
+                }
+
+                return wheelTypeName + " " + (index + 1).ToString();
             }
 
             switch (modType)
@@ -2904,8 +2917,8 @@ namespace BennysMotorworksRevamped
         private static float activeWorkshopCutsceneTargetRadius;
         private static float activeWorkshopCutsceneTargetSpeed;
         private static float activeWorkshopCutsceneLastDistanceSq;
+        private static Vector3 activeWorkshopCutsceneLegStart = Vector3.Zero;
         private const float MinimumCutsceneWaypointRadius = 2.0f;
-        private const float ExitIntermediateHandoffRadius = 3.0f;
         private static int enterCutsceneBlockedUntil;
         private static Vector3 lastGarageTriggerSamplePosition = Vector3.Zero;
         private static bool hasGarageTriggerSample;
@@ -3006,10 +3019,8 @@ namespace BennysMotorworksRevamped
             }
             catch { }
 
-            // Stop the audio scene 
             StopWorkshopAudioScene();
 
-            // Clear cutscene state but leave the camera intact
             activeWorkshopCutscene = WorkshopCutsceneType.None;
             activeWorkshopCutsceneStage = -1;
             activeWorkshopCutsceneLastDriveTaskAt = 0;
@@ -3018,20 +3029,29 @@ namespace BennysMotorworksRevamped
             activeWorkshopCutsceneTarget = Vector3.Zero;
             activeWorkshopCutsceneTargetRadius = 0.0f;
             activeWorkshopCutsceneTargetSpeed = 0.0f;
+            activeWorkshopCutsceneLegStart = Vector3.Zero;
             isExiting = false;
             isCutscene = false;
         }
 
-        private static void StartWorkshopCutsceneCamera(Vector3 position)
+        private static void StartWorkshopCutsceneCamera(Vector3 position, bool enableBlur = true)
         {
             ResetWorkshopCutsceneCamera();
             scriptCam = CreateScriptCamera(position, Vector3.Zero, GameplayCamera.FieldOfView);
             scriptCam.PointAt(veh);
             scriptCam.Shake(CameraShake.Hand, 0.3f);
-            Function.Call(Hash.SET_CAM_MOTION_BLUR_STRENGTH, scriptCam.Handle, 1.0f);
+            Function.Call(Hash.SET_CAM_MOTION_BLUR_STRENGTH, scriptCam.Handle, enableBlur ? 1.0f : 0.0f);
             scriptCam.IsActive = true;
             Function.Call(Hash.RENDER_SCRIPT_CAMS, true, false, 0, true, false, 0);
-            Function.Call(Hash.TRIGGER_SCREENBLUR_FADE_IN, 0.0f);
+
+            if (enableBlur)
+            {
+                Function.Call(Hash.TRIGGER_SCREENBLUR_FADE_IN, 0.0f);
+            }
+            else
+            {
+                Function.Call(Hash.TRIGGER_SCREENBLUR_FADE_OUT, 0.0f);
+            }
         }
 
         private static void ReduceWorkshopCutsceneBlur()
@@ -3082,6 +3102,35 @@ namespace BennysMotorworksRevamped
             return IsNear(veh.Position, activeWorkshopCutsceneTarget, reachRadius);
         }
 
+        private static bool HasPassedActiveCutsceneTarget(float corridorRadius)
+        {
+            if (veh == null || activeWorkshopCutsceneTarget.Length() <= 0.001f || activeWorkshopCutsceneLegStart.Length() <= 0.001f)
+            {
+                return false;
+            }
+
+            Vector3 route3D = activeWorkshopCutsceneTarget - activeWorkshopCutsceneLegStart;
+            Vector3 route = new Vector3(route3D.X, route3D.Y, 0.0f);
+            float routeLengthSq = Dot(route, route);
+            if (routeLengthSq <= 0.01f)
+            {
+                return false;
+            }
+
+            Vector3 travelled3D = veh.Position - activeWorkshopCutsceneLegStart;
+            Vector3 travelled = new Vector3(travelled3D.X, travelled3D.Y, 0.0f);
+            float progress = Dot(travelled, route) / routeLengthSq;
+            if (progress < 1.0f)
+            {
+                return false;
+            }
+
+            Vector3 projected = activeWorkshopCutsceneLegStart + (route * progress);
+            Vector3 lateralOffset3D = veh.Position - projected;
+            Vector3 lateralOffset = new Vector3(lateralOffset3D.X, lateralOffset3D.Y, 0.0f);
+            return lateralOffset.Length() <= corridorRadius;
+        }
+
         private static float Dot(Vector3 left, Vector3 right)
         {
             return (left.X * right.X) + (left.Y * right.Y) + (left.Z * right.Z);
@@ -3116,7 +3165,6 @@ namespace BennysMotorworksRevamped
             veh.Heading = heading;
             Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
             Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
-            // Force ground and freeze briefly to settle
             Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
             Function.Call(Hash.FREEZE_ENTITY_POSITION, veh.Handle, true);
             Script.Wait(50);
@@ -3132,6 +3180,11 @@ namespace BennysMotorworksRevamped
             }
 
             Logger.Log($"QueueCutsceneDrive: target={target}, radius={radius}, speed={speed}");
+
+            if (activeWorkshopCutsceneTarget.Length() <= 0.001f || activeWorkshopCutsceneTarget.DistanceToSquared(target) > 0.01f)
+            {
+                activeWorkshopCutsceneLegStart = veh.Position;
+            }
 
             activeWorkshopCutsceneTarget = target;
             activeWorkshopCutsceneTargetRadius = radius;
@@ -3160,7 +3213,6 @@ namespace BennysMotorworksRevamped
                 drivingStyle,
                 stopRange);
 
-            // Give slow or heavy vehicles enough initial momentum to overcome inertia.
             if (veh.Speed < 0.5f)
             {
                 Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, Math.Min(speed, 1.25f));
@@ -3200,7 +3252,6 @@ namespace BennysMotorworksRevamped
 
             int now = Game.GameTime;
 
-            // Give the task time to start, but recover promptly if a heavy vehicle stalls.
             if (now - activeWorkshopCutsceneLastDriveTaskAt < 1500)
                 return;
 
@@ -3270,6 +3321,7 @@ namespace BennysMotorworksRevamped
             activeWorkshopCutsceneTarget = Vector3.Zero;
             activeWorkshopCutsceneTargetRadius = 0.0f;
             activeWorkshopCutsceneTargetSpeed = 0.0f;
+            activeWorkshopCutsceneLegStart = Vector3.Zero;
             isExiting = false;
             isCutscene = false;
 
@@ -3329,7 +3381,6 @@ namespace BennysMotorworksRevamped
                     break;
 
                 case -1:
-                    // Small settle delay (100ms) then start driving
                     if (IsWorkshopCutsceneStageTimedOut(100))
                     {
                         QueueCutsceneDrive(EnterCutsceneWaypointA, 3.5f, 8.5f);
@@ -3371,8 +3422,6 @@ namespace BennysMotorworksRevamped
 
         private static void ProcessExitCutscene()
         {
-            Vector3 intermediatePoint = new Vector3(-205.714f, -1309.399f, 31.249f);
-
             switch (activeWorkshopCutsceneStage)
             {
                 case 0:
@@ -3381,70 +3430,86 @@ namespace BennysMotorworksRevamped
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
                     camera?.Stop();
                     veh.Repair();
-                    SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 190.3224f);
 
-                    cachedExitHeading = GetHeadingToward(veh.Position, ExitCutsceneLanePosition, 190.3224f);
-                    veh.Heading = cachedExitHeading;
-                    Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
+                    SetCutsceneVehicleTransform(EnterCutsceneWaypointA, GetHeadingToward(EnterCutsceneWaypointA, ExitCutsceneWaypointA, 190.3224f));
 
-                    StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition);
-                    QueueCutsceneDrive(ExitCutsceneLanePosition, 1.8f, 5.5f);
+                    StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition, false);
+                    QueueCutsceneDrive(ExitCutsceneWaypointA, 1.0f, 8.0f);
                     PlaySpeech("SHOP_GOODBYE");
-                    AdvanceWorkshopCutsceneStage(1);
+                    AdvanceWorkshopCutsceneStage(2);
                     break;
 
                 case 1:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (HasReachedActiveCutsceneTarget())
+                    if (HasReachedActiveCutsceneTarget() || HasPassedActiveCutsceneTarget(4.0f))
                     {
                         ReduceWorkshopCutsceneBlur();
                         if (veh.Speed < 1.5f)
                         {
-                            veh.Heading = GetHeadingToward(veh.Position, intermediatePoint, veh.Heading);
+                            veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointA, veh.Heading);
                         }
-                        QueueCutsceneDrive(intermediatePoint, 0.0f, 8.5f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointA, 1.0f, 8.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
-                        float headingToIntermediate = GetHeadingToward(ExitCutsceneLanePosition, intermediatePoint, cachedExitHeading);
-                        SetCutsceneVehicleTransform(ExitCutsceneLanePosition, headingToIntermediate);
                         ReduceWorkshopCutsceneBlur();
-                        QueueCutsceneDrive(intermediatePoint, 0.0f, 8.5f);
+                        veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointA, veh.Heading);
+                        QueueCutsceneDrive(ExitCutsceneWaypointA, 1.5f, 8.0f);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (IsNear(veh.Position, intermediatePoint, ExitIntermediateHandoffRadius))
+                    if (HasReachedActiveCutsceneTarget() || HasPassedActiveCutsceneTarget(4.0f))
                     {
                         if (veh.Speed < 1.5f)
                         {
                             veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
                         }
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 0.5f, 7.5f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 7.5f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
-                        float headingToB = GetHeadingToward(intermediatePoint, ExitCutsceneWaypointB, cachedExitHeading);
-                        SetCutsceneVehicleTransform(intermediatePoint, headingToB);
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 7.75f);
+                        veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 2.0f, 8.0f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     break;
 
                 case 3:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (HasReachedActiveCutsceneTarget())
+                    if (HasReachedActiveCutsceneTarget() || HasPassedActiveCutsceneTarget(4.5f))
                     {
                         CompleteExitCutscene();
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
-                        SetCutsceneVehicleTransform(ExitCutsceneWaypointB, 312.8701f);
+                        veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 2.5f, 8.0f);
+                        AdvanceWorkshopCutsceneStage(4);
+                    }
+                    break;
+
+                case 4:
+                    RefreshCutsceneDriveTaskIfNeeded();
+                    if (HasReachedActiveCutsceneTarget() || HasPassedActiveCutsceneTarget(5.0f))
+                    {
                         CompleteExitCutscene();
+                    }
+                    else if (IsWorkshopCutsceneStageTimedOut(6000))
+                    {
+                        if (veh.Position.DistanceToSquared(ShopVehiclePosition) > 64.0f)
+                        {
+                            CompleteExitCutscene();
+                        }
+                        else
+                        {
+                            SetCutsceneVehicleTransform(ExitCutsceneWaypointB, 312.8701f);
+                            CompleteExitCutscene();
+                        }
                     }
                     break;
             }
@@ -3454,7 +3519,6 @@ namespace BennysMotorworksRevamped
         {
             try
             {
-                // Handle pending shop init (deferred heavy work)
                 if (_pendingShopInit && Game.GameTime >= _shopInitDelayTime)
                 {
                     FinishShopInit();
@@ -3497,6 +3561,11 @@ namespace BennysMotorworksRevamped
             }
 
             if (!IsWorkshopVehicleAllowed(veh))
+            {
+                return false;
+            }
+
+            if (!MenuHelper.IsMenuSystemReady)
             {
                 return false;
             }
@@ -3595,21 +3664,49 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static void FailPendingShopInit(string reason)
+        {
+            _pendingShopInit = false;
+            _shopInitDelayTime = 0;
+            _shopInitStartedAt = 0;
+            _shopInitAttempts = 0;
+
+            try
+            {
+                camera?.Stop();
+            }
+            catch
+            {
+            }
+
+            SetWorkshopPlayerControlSuppressed(false);
+            SetWorkshopCarModShopState(false);
+            SetEnterCutsceneCooldown(3000);
+            Logger.Log("Workshop menu initialization failed safely; workshop camera was released. " + reason);
+        }
+
         public static void PutVehIntoShop()
         {
             try
             {
+                if (!MenuHelper.IsMenuSystemReady)
+                {
+                    FailPendingShopInit("PutVehIntoShop was reached before LemonUI menu initialization completed.");
+                    return;
+                }
+
                 Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, veh.Handle, ShopVehiclePosition.X, ShopVehiclePosition.Y, ShopVehiclePosition.Z, false, false, false);
                 veh.Heading = 150.2801f;
                 Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
                 Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
                 Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
 
-                // switch from the entrance camera to the workshop camera in the same tick as the final positioning snap.
                 ResetWorkshopCutsceneCamera();
                 camera.RepositionFor(veh);
                 _pendingShopInit = true;
                 _shopInitDelayTime = Game.GameTime;
+                _shopInitStartedAt = Game.GameTime;
+                _shopInitAttempts = 0;
             }
             catch (Exception ex)
             {
@@ -3619,12 +3716,32 @@ namespace BennysMotorworksRevamped
 
         private static void FinishShopInit()
         {
+            string initStage = "menu readiness";
+
             try
             {
-                _pendingShopInit = false;
+                if (!_pendingShopInit)
+                {
+                    return;
+                }
 
+                if (!MenuHelper.IsMenuSystemReady)
+                {
+                    throw new InvalidOperationException("LemonUI menu system is not ready.");
+                }
+
+                if (veh == null || !veh.Exists())
+                {
+                    throw new InvalidOperationException("Workshop vehicle is no longer valid.");
+                }
+
+                initStage = "InstallModKit";
                 veh.InstallModKit();
+
+                initStage = "RefreshMenus";
                 MenuHelper.RefreshMenus();
+
+                initStage = "capture vehicle state";
                 VehicleWindowTint currentWindowTint = veh.Mods.WindowTint;
                 if (currentWindowTint == VehicleWindowTint.Invalid)
                 {
@@ -3699,20 +3816,43 @@ namespace BennysMotorworksRevamped
                     BulletProofTires = veh.CanTiresBurst,
                 };
 
-                if (MenuHelper.MainMenu != null)
+                initStage = "show MainMenu";
+                if (MenuHelper.MainMenu == null)
                 {
-                    MenuHelper.MainMenu.Visible = true;
-                }
-                else
-                {
-                    Logger.Log("PutVehIntoShop: MainMenu was null.");
+                    throw new InvalidOperationException("MainMenu was null after RefreshMenus.");
                 }
 
+                MenuHelper.MainMenu.Visible = true;
+                if (!MenuHelper.MainMenu.Visible)
+                {
+                    throw new InvalidOperationException("MainMenu rejected the visibility change.");
+                }
+
+                _pendingShopInit = false;
+                _shopInitDelayTime = 0;
+                _shopInitStartedAt = 0;
+                _shopInitAttempts = 0;
+
                 StartWorkshopAudioScene();
+                Logger.Debug("Workshop menu initialization completed successfully.");
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message + " " + ex.StackTrace);
+                _shopInitAttempts++;
+                int elapsed = _shopInitStartedAt > 0 ? Game.GameTime - _shopInitStartedAt : ShopInitTimeoutMs;
+
+                if (_pendingShopInit && elapsed < ShopInitTimeoutMs)
+                {
+                    _shopInitDelayTime = Game.GameTime + ShopInitRetryDelayMs;
+                    Logger.Debug("Workshop init retry " + _shopInitAttempts
+                        + " at stage '" + initStage + "': " + ex.Message);
+                    return;
+                }
+
+                FailPendingShopInit("stage='" + initStage
+                    + "', attempts=" + _shopInitAttempts
+                    + ", error=" + ex.Message
+                    + " " + ex.StackTrace);
             }
         }
 

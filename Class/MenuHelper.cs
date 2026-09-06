@@ -38,16 +38,438 @@ namespace BennysMotorworksRevamped
             iRespray = null;
         }
 
-        public static UIMenu QuitMenu, MainMenu, gmSpecialUpgrades, gmBodywork, gmBodyworkArena, gmEngine, gmInterior, gmPlate, gmLights, gmRespray, gmWheels, gmBumper, gmWheelType, gmTires, gmNeonKits, gmWeapon;
+        public static UIMenu QuitMenu, MainMenu, gmSpecialUpgrades, gmBodywork, gmBodyworkArena, gmEngine, gmInterior, gmPlate, gmLights, gmRespray, gmWheels, gmBumper, gmWheelType, gmMotorcycleWheelPosition, mMotorcycleFrontWheel, mMotorcycleRearWheel, gmTires, gmNeonKits, gmWeapon;
         public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mSecondaryColor, mSecondaryClassicColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
         public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
-        public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giTrackWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
-        public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank;
-        public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank;
-        public static UIMenu mShifter, mFMudguard, mBSeat, mOilTank, mRMudguard, mFuelTank, mBeltDriveCovers, mBEngineBlock, mBAirFilter, mBTank, gmTrailer;
+        public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giMotorcycleFrontWheel, giMotorcycleRearWheel, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giTrackWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
+        public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank, iBackrests, iWindshields, iMotorcycleSeats;
+        public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank, giBackrests, giWindshields, giMotorcycleSeats;
+        public static UIMenu mShifter, mFMudguard, mBSeat, mOilTank, mRMudguard, mFuelTank, mBeltDriveCovers, mBEngineBlock, mBAirFilter, mBTank, mBackrests, mWindshields, mMotorcycleSeats, gmTrailer;
         public static LemonUI.ObjectPool _menuPool;
         private static bool _suppressMenuRestoreOnClose;
         private static readonly List<UIMenu> _registeredMenus = new List<UIMenu>();
+        private static bool _menuSystemReady;
+        private static int _menuCreationFailures;
+        public static bool IsMenuSystemReady => _menuSystemReady && _menuPool != null && MainMenu != null && QuitMenu != null;
+        private static VehicleWheelType _motorcycleWheelType = VehicleWheelType.BikeWheels;
+        private static VehicleMod? _motorcycleBackrestModType;
+        private static VehicleMod? _motorcycleWindshieldModType;
+        private static VehicleMod? _motorcycleSeatModType;
+        private static VehicleMod? _motorcycleFuelTankModType;
+        public static bool PerformanceStatsPreviewActive { get; private set; }
+        public static VehicleStats PerformanceStatsBaseline { get; private set; }
+
+        public static bool IsPerformanceStatsPreviewMenu(UIMenu menu)
+        {
+            return menu == mSuspension
+                || menu == mArmor
+                || menu == mBrakes
+                || menu == mTransmission
+                || menu == mEngine
+                || menu == mTurbo
+                || menu == mNitro;
+        }
+
+        public static void ClearPerformanceStatsPreview()
+        {
+            PerformanceStatsPreviewActive = false;
+            PerformanceStatsBaseline = new VehicleStats();
+        }
+
+        private static void PreparePerformanceStatsPreview(UIMenu sender, UIMenuItem selectedItem)
+        {
+            ClearPerformanceStatsPreview();
+
+            if (!IsPerformanceStatsPreviewMenu(sender)
+                || selectedItem == null
+                || !sender.Visible
+                || veh == null
+                || !veh.Exists()
+                || lastVehMemory == null)
+            {
+                return;
+            }
+
+            if (sender == mSuspension)
+            {
+                veh.SetMod(VehicleMod.Suspension, lastVehMemory.Suspension, false);
+            }
+            else if (sender == mArmor)
+            {
+                veh.SetMod(VehicleMod.Armor, lastVehMemory.Armor, false);
+            }
+            else if (sender == mBrakes)
+            {
+                veh.SetMod(VehicleMod.Brakes, lastVehMemory.Brakes, false);
+            }
+            else if (sender == mTransmission)
+            {
+                veh.SetMod(VehicleMod.Transmission, lastVehMemory.Transmission, false);
+            }
+            else if (sender == mEngine)
+            {
+                veh.SetMod(VehicleMod.Engine, lastVehMemory.Engine, false);
+            }
+            else if (sender == mTurbo)
+            {
+                veh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
+            }
+            else if (sender == mNitro && IsNitroModInstalled())
+            {
+                veh.SetInt(nitroMod, lastVehMemory.Nitro);
+            }
+
+            PerformanceStatsBaseline = GetVehicleStats(veh);
+            PerformanceStatsPreviewActive = selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car;
+        }
+
+        private static readonly VehicleMod[] MotorcycleSpecialSlotCandidates =
+        {
+            VehicleMod.Spoilers,
+            VehicleMod.SideSkirt,
+            VehicleMod.Frame,
+            VehicleMod.Grille,
+            VehicleMod.Fender,
+            VehicleMod.RightFender,
+            VehicleMod.Roof,
+            VehicleMod.PlateHolder,
+            VehicleMod.VanityPlates,
+            VehicleMod.TrimDesign,
+            VehicleMod.Ornaments,
+            VehicleMod.Dashboard,
+            VehicleMod.DialDesign,
+            VehicleMod.DoorSpeakers,
+            VehicleMod.Seats,
+            VehicleMod.SteeringWheels,
+            VehicleMod.ColumnShifterLevers,
+            VehicleMod.Plaques,
+            VehicleMod.Speakers,
+            VehicleMod.Trunk,
+            VehicleMod.Hydraulics,
+            VehicleMod.EngineBlock,
+            VehicleMod.AirFilter,
+            VehicleMod.Struts,
+            VehicleMod.ArchCover,
+            VehicleMod.Aerials,
+            VehicleMod.Trim,
+            VehicleMod.Tank,
+            VehicleMod.Windows,
+            VehicleMod.Livery,
+        };
+
+        private static string GetNativeMotorcycleSlotText(VehicleMod modType)
+        {
+            if (veh == null || !veh.Exists())
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                string slotName = Function.Call<string>(Hash.GET_MOD_SLOT_NAME, veh.Handle, (int)modType);
+                if (string.IsNullOrWhiteSpace(slotName) || slotName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.Empty;
+                }
+
+                string localized = DoesGXTEntryExist(slotName)
+                    ? Game.GetLocalizedString(slotName)
+                    : slotName;
+
+                return (slotName + " " + (localized ?? string.Empty)).Trim();
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static bool MotorcycleSlotContains(VehicleMod modType, params string[] terms)
+        {
+            if (veh == null || !veh.Exists() || veh.GetModCount(modType) <= 0)
+            {
+                return false;
+            }
+
+            string slotText = GetNativeMotorcycleSlotText(modType);
+            if (string.IsNullOrWhiteSpace(slotText))
+            {
+                return false;
+            }
+
+            foreach (string term in terms)
+            {
+                if (slotText.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static VehicleMod? FindMotorcycleSpecialSlot(params string[] terms)
+        {
+            foreach (VehicleMod modType in MotorcycleSpecialSlotCandidates)
+            {
+                if (MotorcycleSlotContains(modType, terms))
+                {
+                    return modType;
+                }
+            }
+
+            return null;
+        }
+
+        private static void ResolveMotorcycleSpecialCategories()
+        {
+            _motorcycleBackrestModType = null;
+            _motorcycleWindshieldModType = null;
+            _motorcycleSeatModType = null;
+            _motorcycleFuelTankModType = null;
+
+            if (veh == null || !veh.Exists() || veh.ClassType != VehicleClass.Motorcycles)
+            {
+                return;
+            }
+
+            _motorcycleBackrestModType = FindMotorcycleSpecialSlot("backrest", "back rest", "sissy bar");
+            _motorcycleWindshieldModType = FindMotorcycleSpecialSlot("windshield", "windscreen");
+            _motorcycleSeatModType = FindMotorcycleSpecialSlot("seat");
+            _motorcycleFuelTankModType = FindMotorcycleSpecialSlot("fuel tank", "fuel", "gas tank", "petrol tank");
+
+            if (!_motorcycleSeatModType.HasValue && veh.GetModCount(VehicleMod.Seats) > 0)
+            {
+                _motorcycleSeatModType = VehicleMod.Seats;
+            }
+
+            if (!_motorcycleSeatModType.HasValue)
+            {
+                if (veh.GetModCount(VehicleMod.Hood) > 0
+                    && _motorcycleFuelTankModType != VehicleMod.Hood
+                    && _motorcycleBackrestModType != VehicleMod.Hood
+                    && _motorcycleWindshieldModType != VehicleMod.Hood)
+                {
+                    _motorcycleSeatModType = VehicleMod.Hood;
+                }
+                else if (veh.GetModCount(VehicleMod.Roof) > 0
+                    && _motorcycleFuelTankModType != VehicleMod.Roof
+                    && _motorcycleBackrestModType != VehicleMod.Roof
+                    && _motorcycleWindshieldModType != VehicleMod.Roof)
+                {
+                    _motorcycleSeatModType = VehicleMod.Roof;
+                }
+            }
+
+            if (!_motorcycleFuelTankModType.HasValue)
+            {
+                if (veh.GetModCount(VehicleMod.Roof) > 0
+                    && _motorcycleSeatModType != VehicleMod.Roof
+                    && _motorcycleBackrestModType != VehicleMod.Roof
+                    && _motorcycleWindshieldModType != VehicleMod.Roof)
+                {
+                    _motorcycleFuelTankModType = VehicleMod.Roof;
+                }
+                else if (veh.GetModCount(VehicleMod.Hood) > 0
+                    && _motorcycleSeatModType != VehicleMod.Hood
+                    && _motorcycleBackrestModType != VehicleMod.Hood
+                    && _motorcycleWindshieldModType != VehicleMod.Hood)
+                {
+                    _motorcycleFuelTankModType = VehicleMod.Hood;
+                }
+            }
+        }
+
+        private static bool IsPromotedMotorcycleSlot(VehicleMod modType)
+        {
+            return veh != null
+                && veh.Exists()
+                && veh.ClassType == VehicleClass.Motorcycles
+                && ((_motorcycleBackrestModType.HasValue && _motorcycleBackrestModType.Value == modType)
+                    || (_motorcycleWindshieldModType.HasValue && _motorcycleWindshieldModType.Value == modType)
+                    || (_motorcycleSeatModType.HasValue && _motorcycleSeatModType.Value == modType)
+                    || modType == VehicleMod.FrontBumper
+                    || modType == VehicleMod.RearBumper);
+        }
+
+        private static bool HasMotorcycleBodyworkItems()
+        {
+            if (veh == null || !veh.Exists())
+            {
+                return false;
+            }
+
+            VehicleMod[] bodyworkSlots =
+            {
+                VehicleMod.Fender,
+                VehicleMod.FrontBumper,
+                VehicleMod.Hood,
+                VehicleMod.Grille,
+                VehicleMod.RearBumper,
+                VehicleMod.Roof,
+                VehicleMod.Spoilers,
+                VehicleMod.RightFender,
+                VehicleMod.Tank,
+            };
+
+            foreach (VehicleMod modType in bodyworkSlots)
+            {
+                if (veh.GetModCount(modType) > 0 && !IsPromotedMotorcycleSlot(modType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void RefreshMotorcycleSpecialCategoryMenus()
+        {
+            mBackrests.MenuItems.Clear();
+            mWindshields.MenuItems.Clear();
+            mMotorcycleSeats.MenuItems.Clear();
+
+            if (veh == null || !veh.Exists() || veh.ClassType != VehicleClass.Motorcycles)
+            {
+                return;
+            }
+
+            if (_motorcycleBackrestModType.HasValue)
+            {
+                VehicleMod modType = _motorcycleBackrestModType.Value;
+                RefreshModMenuFor(ref mBackrests, ref iBackrests, modType);
+            }
+
+            if (_motorcycleWindshieldModType.HasValue)
+            {
+                VehicleMod modType = _motorcycleWindshieldModType.Value;
+                RefreshModMenuFor(ref mWindshields, ref iWindshields, modType);
+            }
+
+            if (_motorcycleSeatModType.HasValue)
+            {
+                VehicleMod modType = _motorcycleSeatModType.Value;
+                RefreshModMenuFor(ref mMotorcycleSeats, ref iMotorcycleSeats, modType);
+            }
+        }
+
+        private static void AddMotorcycleSpecialCategoriesToMainMenu()
+        {
+            if (veh == null || !veh.Exists() || veh.ClassType != VehicleClass.Motorcycles)
+            {
+                return;
+            }
+
+            if (_motorcycleBackrestModType.HasValue && mBackrests.MenuItems.Count > 0)
+            {
+                giBackrests = new UIMenuItem("Backrests", Game.GetLocalizedString("CMOD_MOD_51_D"));
+                MainMenu.AddItem(giBackrests);
+                MainMenu.BindMenuToItem(mBackrests, giBackrests);
+            }
+
+            if (veh.GetModCount(VehicleMod.FrontBumper) > 0)
+            {
+                giFMudguard = new UIMenuItem("Front Mudguards", Game.GetLocalizedString("CMOD_MOD_43_D"));
+                MainMenu.AddItem(giFMudguard);
+                MainMenu.BindMenuToItem(mFMudguard, giFMudguard);
+            }
+
+            if (veh.GetModCount(VehicleMod.RearBumper) > 0)
+            {
+                giRMudguard = new UIMenuItem("Rear Mudguards", Game.GetLocalizedString("CMOD_MOD_52_D"));
+                MainMenu.AddItem(giRMudguard);
+                MainMenu.BindMenuToItem(mRMudguard, giRMudguard);
+            }
+
+            if (_motorcycleSeatModType.HasValue && mMotorcycleSeats.MenuItems.Count > 0)
+            {
+                giMotorcycleSeats = new UIMenuItem("Seats", Game.GetLocalizedString("CMOD_MOD_44_D"));
+                MainMenu.AddItem(giMotorcycleSeats);
+                MainMenu.BindMenuToItem(mMotorcycleSeats, giMotorcycleSeats);
+            }
+
+            if (_motorcycleWindshieldModType.HasValue && mWindshields.MenuItems.Count > 0)
+            {
+                giWindshields = new UIMenuItem("Windshields", "Customize your motorcycle windshield.");
+                MainMenu.AddItem(giWindshields);
+                MainMenu.BindMenuToItem(mWindshields, giWindshields);
+            }
+        }
+
+        private static void UpdateLastVehicleModMemory(VehicleMod modType, int modIndex)
+        {
+            switch (modType)
+            {
+                case VehicleMod.Aerials: lastVehMemory.Aerials = modIndex; break;
+                case VehicleMod.AirFilter: lastVehMemory.AirFilter = modIndex; break;
+                case VehicleMod.ArchCover: lastVehMemory.ArchCover = modIndex; break;
+                case VehicleMod.ColumnShifterLevers: lastVehMemory.ColumnShifterLevers = modIndex; break;
+                case VehicleMod.Dashboard: lastVehMemory.Dashboard = modIndex; break;
+                case VehicleMod.DialDesign: lastVehMemory.DialDesign = modIndex; break;
+                case VehicleMod.DoorSpeakers: lastVehMemory.DoorSpeakers = modIndex; break;
+                case VehicleMod.EngineBlock: lastVehMemory.EngineBlock = modIndex; break;
+                case VehicleMod.Fender: lastVehMemory.Fender = modIndex; break;
+                case VehicleMod.Frame: lastVehMemory.Frame = modIndex; break;
+                case VehicleMod.Grille: lastVehMemory.Grille = modIndex; break;
+                case VehicleMod.Hood: lastVehMemory.Hood = modIndex; break;
+                case VehicleMod.Hydraulics: lastVehMemory.Hydraulics = modIndex; break;
+                case VehicleMod.Livery: lastVehMemory.Livery = modIndex; break;
+                case VehicleMod.Ornaments: lastVehMemory.Ornaments = modIndex; break;
+                case VehicleMod.Plaques: lastVehMemory.Plaques = modIndex; break;
+                case VehicleMod.PlateHolder: lastVehMemory.PlateHolder = modIndex; break;
+                case VehicleMod.RightFender: lastVehMemory.RightFender = modIndex; break;
+                case VehicleMod.Roof: lastVehMemory.Roof = modIndex; break;
+                case VehicleMod.Seats: lastVehMemory.Seats = modIndex; break;
+                case VehicleMod.SideSkirt: lastVehMemory.SideSkirt = modIndex; break;
+                case VehicleMod.Speakers: lastVehMemory.Speakers = modIndex; break;
+                case VehicleMod.Spoilers: lastVehMemory.Spoilers = modIndex; break;
+                case VehicleMod.SteeringWheels: lastVehMemory.SteeringWheels = modIndex; break;
+                case VehicleMod.Struts: lastVehMemory.Struts = modIndex; break;
+                case VehicleMod.Tank: lastVehMemory.Tank = modIndex; break;
+                case VehicleMod.Trim: lastVehMemory.Trim = modIndex; break;
+                case VehicleMod.TrimDesign: lastVehMemory.TrimDesign = modIndex; break;
+                case VehicleMod.Trunk: lastVehMemory.Trunk = modIndex; break;
+                case VehicleMod.VanityPlates: lastVehMemory.VanityPlates = modIndex; break;
+                case VehicleMod.Windows: lastVehMemory.Windows = modIndex; break;
+            }
+        }
+
+        private static bool TryPurchaseMotorcycleSpecialMod(UIMenu sender, UIMenuItem selectedItem)
+        {
+            VehicleMod? modType = null;
+
+            if (sender == mBackrests)
+            {
+                modType = _motorcycleBackrestModType;
+            }
+            else if (sender == mWindshields)
+            {
+                modType = _motorcycleWindshieldModType;
+            }
+            else if (sender == mMotorcycleSeats)
+            {
+                modType = _motorcycleSeatModType;
+            }
+
+            if (!modType.HasValue)
+            {
+                return false;
+            }
+
+            if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
+            {
+                ModClass mc = (ModClass)selectedItem.Tag;
+                veh.SetMod(modType.Value, mc.ModID, false);
+                selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                selectedItem.SetRightLabel(null);
+                Game.Player.Money = (Game.Player.Money - mc.Price);
+                selectedItem.Tag = new ModClass(mc.ModID, 0);
+                UpdateLastVehicleModMemory(modType.Value, mc.ModID);
+                PlaySpeech("");
+            }
+
+            return true;
+        }
 
         private static void SetHornPreviewMode(bool enabled)
         {
@@ -101,6 +523,56 @@ namespace BennysMotorworksRevamped
                 || menu == mStruts || menu == mBEngineBlock || menu == mBAirFilter;
         }
 
+        private static bool IsFrontFacingSideSkirtItem(UIMenuItem item)
+        {
+            string itemName = item?.Text ?? string.Empty;
+            return itemName.IndexOf("canard", StringComparison.OrdinalIgnoreCase) >= 0
+                || itemName.IndexOf("splitter", StringComparison.OrdinalIgnoreCase) >= 0
+                || itemName.IndexOf("front lip", StringComparison.OrdinalIgnoreCase) >= 0
+                || itemName.IndexOf("air dam", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static UIMenuItem GetCurrentMenuItem(UIMenu menu)
+        {
+            if (menu == null || menu.NativeMenu == null)
+            {
+                return null;
+            }
+
+            int selectedIndex = menu.NativeMenu.SelectedIndex;
+            return selectedIndex >= 0 && selectedIndex < menu.MenuItems.Count
+                ? menu.MenuItems[selectedIndex]
+                : null;
+        }
+
+        private static void UpdateSideSkirtCamera(UIMenuItem item)
+        {
+            if (camera == null || veh == null || !veh.Exists())
+            {
+                return;
+            }
+
+            CameraPosition desiredCameraPosition;
+            if (veh.Model.ToString().Equals("barrage", StringComparison.OrdinalIgnoreCase))
+            {
+                desiredCameraPosition = CameraPosition.Car;
+            }
+            else if (IsFrontFacingSideSkirtItem(item))
+            {
+                desiredCameraPosition = CameraPosition.FrontBumper;
+            }
+            else
+            {
+                desiredCameraPosition = CameraPosition.Wheels;
+            }
+
+
+            if (camera.MainCameraPosition != desiredCameraPosition)
+            {
+                camera.MainCameraPosition = desiredCameraPosition;
+            }
+        }
+
         #region Refresh Menus
         private static int GetIndexedModPrice(int index, int priceStep)
         {
@@ -120,20 +592,404 @@ namespace BennysMotorworksRevamped
             "cognoscenti", "cognoscenti2", "baller3", "baller4", "baller5", "baller6",
         };
 
+        private static readonly List<Model> WheelColorExcludedModels = new()
+        {
+            "sanchez", "sanchez2", "faggio2", "dune", "bfinjection", "enduro",
+            "innovation", "chimera", "dune4", "dune5", "trailerlarge", "halftrack",
+            "trailersmall2", "phantom3", "hauler2", "vigilante", "riot2", "chernobog",
+            "mule4", "pounder2", "oppressor2", "slamvan4", "slamvan5", "slamvan6",
+            "deathbike2", "scarab", "scarab2", "cerberus", "cerberus2", "cerberus3",
+            "rrocket", "zhaba", "stryder", "minitank", "veto", "veto2",
+        };
+
+        private static bool SupportsWheelColor()
+        {
+            if (veh == null || !veh.Exists())
+            {
+                return false;
+            }
+
+            int wheelIndex = veh.GetMod(VehicleMod.FrontWheel);
+            if (wheelIndex < 0 || WheelColorExcludedModels.Contains(veh.Model))
+            {
+                return false;
+            }
+
+            VehicleWheelType wheelType = veh.GetWheelType();
+            int wheelTypeIndex = (int)wheelType;
+
+            if (wheelTypeIndex >= 8 && wheelTypeIndex <= 12)
+            {
+                return true;
+            }
+
+            int wheelCount = veh.GetModCount(VehicleMod.FrontWheel);
+            if (wheelCount <= 0)
+            {
+                return false;
+            }
+
+            if (wheelType == VehicleWheelType.BikeWheels)
+            {
+
+                return (wheelIndex >= 0 && wheelIndex <= 12)
+                    || (wheelIndex >= 26 && wheelIndex <= 48);
+            }
+
+            return wheelIndex < (wheelCount / 2);
+        }
+
+        private static string GetModSlotNameSafely(VehicleMod modType)
+        {
+            try
+            {
+                if (veh == null || !veh.Exists())
+                {
+                    return string.Empty;
+                }
+
+                string slotName = Function.Call<string>(Hash.GET_MOD_SLOT_NAME, veh.Handle, (int)modType);
+                return string.IsNullOrWhiteSpace(slotName) || slotName.Equals("NULL", StringComparison.OrdinalIgnoreCase)
+                    ? string.Empty
+                    : slotName;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static bool HasNativeModSlot(VehicleMod modType)
+        {
+            return veh != null
+                && veh.Exists()
+                && (veh.GetModCount(modType) > 0 || !string.IsNullOrWhiteSpace(GetModSlotNameSafely(modType)));
+        }
+
+        private static bool IsCustomModSlot(VehicleMod modType)
+        {
+            int slot = (int)modType;
+            return modType == VehicleMod.Grille
+                || (slot >= (int)VehicleMod.PlateHolder && slot <= (int)VehicleMod.Livery);
+        }
+
+        private static string GetNativeModCategoryName(VehicleMod modType)
+        {
+            try
+            {
+                string slotName = GetModSlotNameSafely(modType);
+                if (string.IsNullOrWhiteSpace(slotName))
+                {
+                    return string.Empty;
+                }
+
+                string localized = DoesGXTEntryExist(slotName)
+                    ? Game.GetLocalizedString(slotName)
+                    : slotName;
+
+                return string.IsNullOrWhiteSpace(localized) || localized.Equals("NULL", StringComparison.OrdinalIgnoreCase)
+                    ? string.Empty
+                    : localized;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string GetModCategoryName(VehicleMod modType)
+        {
+            string fallback = LocalizedModTypeName(modType);
+            if (!IsCustomModSlot(modType)
+                || veh == null
+                || !veh.Exists()
+                || veh.ClassType == VehicleClass.Motorcycles
+                || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase)
+                || arenavehicle.Contains(veh.Model))
+            {
+                return fallback;
+            }
+
+            string nativeName = GetNativeModCategoryName(modType);
+            return string.IsNullOrWhiteSpace(nativeName) ? fallback : nativeName;
+        }
+
+        private static string NormalizeModCategoryName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            return new string(value.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
+        }
+
+        private static bool IsRepurposedCustomModSlot(VehicleMod modType)
+        {
+            if (veh == null || !veh.Exists()
+                || veh.GetModCount(modType) <= 0
+                || !IsCustomModSlot(modType)
+                || veh.ClassType == VehicleClass.Motorcycles
+                || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase)
+                || arenavehicle.Contains(veh.Model))
+            {
+                return false;
+            }
+
+            string expectedName = NormalizeModCategoryName(LocalizedModTypeName(modType));
+            string nativeName = NormalizeModCategoryName(GetNativeModCategoryName(modType));
+
+            if (string.IsNullOrEmpty(nativeName) || string.IsNullOrEmpty(expectedName))
+            {
+                return false;
+            }
+
+            return !nativeName.Equals(expectedName, StringComparison.OrdinalIgnoreCase)
+                && nativeName.IndexOf(expectedName, StringComparison.OrdinalIgnoreCase) < 0
+                && expectedName.IndexOf(nativeName, StringComparison.OrdinalIgnoreCase) < 0;
+        }
+
+        private static bool HasGroupedModSlot(VehicleMod modType)
+        {
+            return veh != null && veh.Exists() && veh.GetModCount(modType) > 0 && !IsRepurposedCustomModSlot(modType);
+        }
+
+        private static void AddRepurposedModCategoryToMainMenu(ref UIMenuItem item, UIMenu menu, VehicleMod modType)
+        {
+            if (!IsRepurposedCustomModSlot(modType) || menu == null)
+            {
+                return;
+            }
+
+            string categoryName = GetModCategoryName(modType);
+            item = new UIMenuItem(categoryName, "Customize " + categoryName + ".");
+            MainMenu.AddItem(item);
+            MainMenu.BindMenuToItem(menu, item);
+        }
+
+        private static void AddRepurposedCustomModCategoriesToMainMenu()
+        {
+            AddRepurposedModCategoryToMainMenu(ref giPlateHolder, mPlateHolder, VehicleMod.PlateHolder);
+            AddRepurposedModCategoryToMainMenu(ref giVanityPlate, mVanityPlates, VehicleMod.VanityPlates);
+            AddRepurposedModCategoryToMainMenu(ref iTrimDesign, mTrimDesign, VehicleMod.TrimDesign);
+            AddRepurposedModCategoryToMainMenu(ref iOrnaments, mOrnaments, VehicleMod.Ornaments);
+            AddRepurposedModCategoryToMainMenu(ref iDashboard, mDashboard, VehicleMod.Dashboard);
+            AddRepurposedModCategoryToMainMenu(ref iDialDesign, mDialDesign, VehicleMod.DialDesign);
+            AddRepurposedModCategoryToMainMenu(ref giDoor, mDoor, VehicleMod.DoorSpeakers);
+            AddRepurposedModCategoryToMainMenu(ref iSeats, mSeats, VehicleMod.Seats);
+            AddRepurposedModCategoryToMainMenu(ref iSteeringWheels, mSteeringWheels, VehicleMod.SteeringWheels);
+            AddRepurposedModCategoryToMainMenu(ref iColumnShifterLevers, mColumnShifterLevers, VehicleMod.ColumnShifterLevers);
+            AddRepurposedModCategoryToMainMenu(ref iSpeaker, mSpeakers, VehicleMod.Speakers);
+            AddRepurposedModCategoryToMainMenu(ref iEngineBlock, mEngineBlock, VehicleMod.EngineBlock);
+            AddRepurposedModCategoryToMainMenu(ref giAirfilter, mAirFilter, VehicleMod.AirFilter);
+            AddRepurposedModCategoryToMainMenu(ref giStruts, mStruts, VehicleMod.Struts);
+            AddRepurposedModCategoryToMainMenu(ref iArchCover, mArchCover, VehicleMod.ArchCover);
+            AddRepurposedModCategoryToMainMenu(ref iAerials, mAerials, VehicleMod.Aerials);
+            AddRepurposedModCategoryToMainMenu(ref iTrim, mTrim, VehicleMod.Trim);
+            AddRepurposedModCategoryToMainMenu(ref iWindows, mWindow, VehicleMod.Windows);
+        }
+
+        private static bool TryGetMainMenuModType(UIMenuItem selectedItem, out VehicleMod modType)
+        {
+            if (selectedItem == giGrille) { modType = VehicleMod.Grille; return true; }
+            if (selectedItem == giPlateHolder) { modType = VehicleMod.PlateHolder; return true; }
+            if (selectedItem == giVanityPlate) { modType = VehicleMod.VanityPlates; return true; }
+            if (selectedItem == iTrimDesign) { modType = VehicleMod.TrimDesign; return true; }
+            if (selectedItem == iOrnaments) { modType = VehicleMod.Ornaments; return true; }
+            if (selectedItem == iDashboard) { modType = VehicleMod.Dashboard; return true; }
+            if (selectedItem == iDialDesign) { modType = VehicleMod.DialDesign; return true; }
+            if (selectedItem == giDoor) { modType = VehicleMod.DoorSpeakers; return true; }
+            if (selectedItem == iSeats) { modType = VehicleMod.Seats; return true; }
+            if (selectedItem == iSteeringWheels) { modType = VehicleMod.SteeringWheels; return true; }
+            if (selectedItem == iColumnShifterLevers) { modType = VehicleMod.ColumnShifterLevers; return true; }
+            if (selectedItem == giPlaques) { modType = VehicleMod.Plaques; return true; }
+            if (selectedItem == iSpeaker) { modType = VehicleMod.Speakers; return true; }
+            if (selectedItem == giTrunk) { modType = VehicleMod.Trunk; return true; }
+            if (selectedItem == giHydraulics) { modType = VehicleMod.Hydraulics; return true; }
+            if (selectedItem == iEngineBlock) { modType = VehicleMod.EngineBlock; return true; }
+            if (selectedItem == giAirfilter) { modType = VehicleMod.AirFilter; return true; }
+            if (selectedItem == giStruts) { modType = VehicleMod.Struts; return true; }
+            if (selectedItem == iArchCover) { modType = VehicleMod.ArchCover; return true; }
+            if (selectedItem == iAerials) { modType = VehicleMod.Aerials; return true; }
+            if (selectedItem == iTrim) { modType = VehicleMod.Trim; return true; }
+            if (selectedItem == giTank) { modType = VehicleMod.Tank; return true; }
+            if (selectedItem == iWindows) { modType = VehicleMod.Windows; return true; }
+            if (selectedItem == iLivery) { modType = VehicleMod.Livery; return true; }
+
+            modType = default(VehicleMod);
+            return false;
+        }
+
+        private static bool IsPromotedCustomModMenu(UIMenu menu)
+        {
+            return menu != null
+                && menu.ParentMenu == MainMenu
+                && (menu == mPlateHolder
+                    || menu == mVanityPlates
+                    || menu == mTrimDesign
+                    || menu == mOrnaments
+                    || menu == mDashboard
+                    || menu == mDialDesign
+                    || menu == mDoor
+                    || menu == mSeats
+                    || menu == mSteeringWheels
+                    || menu == mColumnShifterLevers
+                    || menu == mSpeakers
+                    || menu == mEngineBlock
+                    || menu == mAirFilter
+                    || menu == mStruts
+                    || menu == mArchCover
+                    || menu == mAerials
+                    || menu == mTrim
+                    || menu == mWindow);
+        }
+
+        private static bool CategoryContains(string categoryName, params string[] terms)
+        {
+            if (string.IsNullOrWhiteSpace(categoryName))
+            {
+                return false;
+            }
+
+            foreach (string term in terms)
+            {
+                if (categoryName.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryApplyRepurposedModCamera(UIMenuItem selectedItem)
+        {
+            if (!TryGetMainMenuModType(selectedItem, out VehicleMod modType) || !IsRepurposedCustomModSlot(modType))
+            {
+                return false;
+            }
+
+            string categoryName = GetNativeModCategoryName(modType);
+
+            if (CategoryContains(categoryName, "rear diffuser", "rear splitter", "rear bumper"))
+            {
+                camera.MainCameraPosition = CameraPosition.RearBumper;
+            }
+            else if (CategoryContains(categoryName, "front splitter", "splitter", "front lip", "canard", "front bumper"))
+            {
+                camera.MainCameraPosition = CameraPosition.FrontBumper;
+            }
+            else if (CategoryContains(categoryName, "windshield", "windscreen", "wind screen", "windshield decal", "window banner", "sunstrip", "sun strip"))
+            {
+                camera.MainCameraPosition = CameraPosition.BikeWindshield;
+            }
+            else if (CategoryContains(categoryName, "grille", "grill"))
+            {
+                camera.MainCameraPosition = CameraPosition.Grille;
+            }
+            else if (CategoryContains(categoryName, "hood", "bonnet"))
+            {
+                HoodCamera(false);
+            }
+            else if (CategoryContains(categoryName, "trunk", "boot"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.Trunk, false, false);
+                camera.MainCameraPosition = CameraPosition.Trunk;
+            }
+            else if (CategoryContains(categoryName, "exhaust"))
+            {
+                camera.MainCameraPosition = CameraPosition.Exhaust;
+            }
+            else if (CategoryContains(categoryName, "side skirt", "skirt", "fender", "mudguard", "wheel arch", "widebody"))
+            {
+                camera.MainCameraPosition = CameraPosition.Wheels;
+            }
+            else if (CategoryContains(categoryName, "front plate"))
+            {
+                camera.MainCameraPosition = CameraPosition.FrontPlate;
+            }
+            else if (CategoryContains(categoryName, "plate"))
+            {
+                camera.MainCameraPosition = CameraPosition.BackPlate;
+            }
+            else if (CategoryContains(categoryName, "dashboard", "dash", "dial", "gauge", "cluster"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.FrontLeftDoor, false, false);
+                veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
+                camera.MainCameraPosition = CameraPosition.Interior;
+                camera.FocusInteriorComponent(InteriorCameraFocus.Dashboard);
+            }
+            else if (CategoryContains(categoryName, "steering"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.FrontLeftDoor, false, false);
+                veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
+                camera.MainCameraPosition = CameraPosition.Interior;
+                camera.FocusInteriorComponent(InteriorCameraFocus.SteeringWheel);
+            }
+            else if (CategoryContains(categoryName, "seat"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.FrontLeftDoor, false, false);
+                veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
+                camera.MainCameraPosition = CameraPosition.Interior;
+                camera.FocusInteriorComponent(InteriorCameraFocus.Seats);
+            }
+            else if (CategoryContains(categoryName, "ornament"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.FrontLeftDoor, false, false);
+                veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
+                camera.MainCameraPosition = CameraPosition.Interior;
+                camera.FocusInteriorComponent(InteriorCameraFocus.Ornaments);
+            }
+            else if (CategoryContains(categoryName, "door speaker"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.FrontLeftDoor, false, false);
+                veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
+                camera.MainCameraPosition = CameraPosition.Interior;
+                camera.FocusInteriorComponent(InteriorCameraFocus.DoorSpeaker);
+            }
+            else if (CategoryContains(categoryName, "speaker", "audio", "subwoofer"))
+            {
+                camera.MainCameraPosition = CameraPosition.Interior;
+                camera.FocusInteriorComponent(InteriorCameraFocus.RearSpeakers);
+            }
+            else if (CategoryContains(categoryName, "interior", "trim", "shifter", "lever", "console"))
+            {
+                veh.OpenDoor(VehicleDoorIndex.FrontLeftDoor, false, false);
+                veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
+                camera.MainCameraPosition = CameraPosition.Interior;
+            }
+            else if (CategoryContains(categoryName, "engine", "air filter", "filter", "intake", "strut", "brace"))
+            {
+                HoodCamera(true);
+            }
+            else if (CategoryContains(categoryName, "tank"))
+            {
+                camera.MainCameraPosition = CameraPosition.Tank;
+            }
+            else if (CategoryContains(categoryName, "spoiler", "wing", "diffuser"))
+            {
+                camera.MainCameraPosition = CameraPosition.RearBumper;
+            }
+            else
+            {
+                camera.MainCameraPosition = CameraPosition.Car;
+            }
+
+            return true;
+        }
+
         private static bool SupportsResprayAccentColor()
         {
             return veh != null
                 && veh.Exists()
-                && !bennysvehicle.Contains(veh.Model)
-                && veh.GetModCount(VehicleMod.Dashboard) > 0;
+                && !bennysvehicle.Contains(veh.Model);
         }
 
         private static bool SupportsResprayTrimColor()
         {
             return veh != null
                 && veh.Exists()
-                && !bennysvehicle.Contains(veh.Model)
-                && (veh.GetModCount(VehicleMod.TrimDesign) > 0 || FactoryTrimColorModels.Contains(veh.Model));
+                && !bennysvehicle.Contains(veh.Model);
         }
 
         private static string GetLocalizedMenuText(string gxt, string fallback)
@@ -190,6 +1046,38 @@ namespace BennysMotorworksRevamped
             return priceIndex >= 0 && priceIndex < prices.Length
                 ? prices[priceIndex]
                 : GetIndexedModPrice(index, 2000);
+        }
+
+
+        private static int GetTurboPrice()
+        {
+            const int baseTurboPrice = 2500;
+
+            try
+            {
+                if (veh == null || !veh.Exists())
+                {
+                    return baseTurboPrice;
+                }
+
+                int modKitType = Function.Call<int>((Hash)0xFC058F5121E54C32UL, veh.Handle);
+                switch (modKitType)
+                {
+                    case 3:
+                        return 12500;
+                    case 1:
+                        return 8125;
+                    case 2:
+                        return 6250;
+                    case 0:
+                    default:
+                        return baseTurboPrice;
+                }
+            }
+            catch
+            {
+                return baseTurboPrice;
+            }
         }
 
         private static int GetPurchasePrice(UIMenuItem item)
@@ -263,7 +1151,9 @@ namespace BennysMotorworksRevamped
 
         public static void RefreshMenus()
         {
+            ClearPerformanceStatsPreview();
             bool chameleonColorsAvailable = AreChameleonColorsAvailable();
+            ResolveMotorcycleSpecialCategories();
 
             if (arenavehicle.Contains(veh.Model))
             {
@@ -308,6 +1198,13 @@ namespace BennysMotorworksRevamped
             RefreshModMenuFor(ref mSSkirt, ref iSideSkirt, VehicleMod.SideSkirt);
             RefreshWheelsMenu();
             RefreshWheelTypeMenu();
+            RefreshMotorcycleWheelPositionMenu();
+            if (veh.ClassType == VehicleClass.Motorcycles)
+            {
+                veh.SetWheelType(_motorcycleWheelType);
+                RefreshMotorcycleWheelModMenuFor(ref mMotorcycleFrontWheel, VehicleMod.FrontWheel);
+                RefreshMotorcycleWheelModMenuFor(ref mMotorcycleRearWheel, VehicleMod.RearWheel);
+            }
 
             RefreshWheelRimMenu(ref gmBikeWheels, ref mSBikeWheels, ref mCBikeWheels, ref iSBikeWheels, ref iCBikeWheels);
             RefreshBikeWheelsModMenuFor(ref mSBikeWheels, ref iSBikeWheels, VehicleMod.RearWheel, false);
@@ -411,11 +1308,24 @@ namespace BennysMotorworksRevamped
             RefreshModMenuFor(ref mBSeat, ref iBSeat, VehicleMod.Hood);
             RefreshModMenuFor(ref mOilTank, ref iOilTank, VehicleMod.Grille);
             RefreshModMenuFor(ref mRMudguard, ref iRMudguard, VehicleMod.RearBumper);
-            RefreshModMenuFor(ref mFuelTank, ref iFuelTank, VehicleMod.Roof);
+            if (veh.ClassType == VehicleClass.Motorcycles)
+            {
+                mFuelTank.MenuItems.Clear();
+                if (_motorcycleFuelTankModType.HasValue)
+                {
+                    VehicleMod fuelTankModType = _motorcycleFuelTankModType.Value;
+                    RefreshModMenuFor(ref mFuelTank, ref iFuelTank, fuelTankModType);
+                }
+            }
+            else
+            {
+                RefreshModMenuFor(ref mFuelTank, ref iFuelTank, VehicleMod.Roof);
+            }
             RefreshModMenuFor(ref mBeltDriveCovers, ref iBeltDriveCovers, VehicleMod.Spoilers);
             RefreshModMenuFor(ref mBEngineBlock, ref iBEngineBlock, VehicleMod.Frame);
             RefreshModMenuFor(ref mBAirFilter, ref iBAirFilter, VehicleMod.SideSkirt);
             RefreshModMenuFor(ref mBTank, ref iBTank, VehicleMod.Tank);
+            RefreshMotorcycleSpecialCategoryMenus();
             RefreshInteriorMenu();
             RefreshMainMenu();
         }
@@ -425,8 +1335,9 @@ namespace BennysMotorworksRevamped
             bool hasEngineUpgrade = veh.GetModCount(VehicleMod.Engine) != 0;
             bool hasNitro = veh.CanInstallNitroMod();
             bool hasBennysEngineOptions = motorcycle
-                ? veh.GetModCount(VehicleMod.Frame) != 0 || veh.GetModCount(VehicleMod.SideSkirt) != 0
-                : veh.GetModCount(VehicleMod.EngineBlock) != 0 || veh.GetModCount(VehicleMod.AirFilter) != 0 || veh.GetModCount(VehicleMod.Struts) != 0;
+                ? (veh.GetModCount(VehicleMod.Frame) != 0 && !IsPromotedMotorcycleSlot(VehicleMod.Frame))
+                    || (veh.GetModCount(VehicleMod.SideSkirt) != 0 && !IsPromotedMotorcycleSlot(VehicleMod.SideSkirt))
+                : HasGroupedModSlot(VehicleMod.EngineBlock) || HasGroupedModSlot(VehicleMod.AirFilter) || HasGroupedModSlot(VehicleMod.Struts);
 
             if (!hasEngineUpgrade && !hasNitro && !hasBennysEngineOptions)
             {
@@ -450,13 +1361,13 @@ namespace BennysMotorworksRevamped
 
             if (motorcycle)
             {
-                if (veh.GetModCount(VehicleMod.Frame) != 0)
+                if (veh.GetModCount(VehicleMod.Frame) != 0 && !IsPromotedMotorcycleSlot(VehicleMod.Frame))
                 {
                     giBEngineBlock = new UIMenuItem(LocalizedModTypeName(VehicleMod.Frame), Game.GetLocalizedString("SMOD_ENGINE_1"));
                     MainMenu.AddItem(giBEngineBlock);
                     MainMenu.BindMenuToItem(mBEngineBlock, giBEngineBlock);
                 }
-                if (veh.GetModCount(VehicleMod.SideSkirt) != 0)
+                if (veh.GetModCount(VehicleMod.SideSkirt) != 0 && !IsPromotedMotorcycleSlot(VehicleMod.SideSkirt))
                 {
                     giBAirFilter = new UIMenuItem(LocalizedModTypeName(VehicleMod.SideSkirt), Game.GetLocalizedString("CMOD_SMOD_2_D"));
                     MainMenu.AddItem(giBAirFilter);
@@ -465,19 +1376,19 @@ namespace BennysMotorworksRevamped
             }
             else
             {
-                if (veh.GetModCount(VehicleMod.EngineBlock) != 0)
+                if (HasGroupedModSlot(VehicleMod.EngineBlock))
                 {
                     iEngineBlock = new UIMenuItem(LocalizedModTypeName(VehicleMod.EngineBlock), Game.GetLocalizedString("SMOD_ENGINE_1"));
                     MainMenu.AddItem(iEngineBlock);
                     MainMenu.BindMenuToItem(mEngineBlock, iEngineBlock);
                 }
-                if (veh.GetModCount(VehicleMod.AirFilter) != 0)
+                if (HasGroupedModSlot(VehicleMod.AirFilter))
                 {
                     giAirfilter = new UIMenuItem(LocalizedModTypeName(VehicleMod.AirFilter), Game.GetLocalizedString("SMOD_ENGINE_2"));
                     MainMenu.AddItem(giAirfilter);
                     MainMenu.BindMenuToItem(mAirFilter, giAirfilter);
                 }
-                if (veh.GetModCount(VehicleMod.Struts) != 0)
+                if (HasGroupedModSlot(VehicleMod.Struts))
                 {
                     giStruts = new UIMenuItem(LocalizedModTypeName(VehicleMod.Struts), Game.GetLocalizedString("SMOD_ENGINE_3b"));
                     MainMenu.AddItem(giStruts);
@@ -553,6 +1464,15 @@ namespace BennysMotorworksRevamped
             MoveMainMenuItemToEnd(iArmor);
             MoveMainMenuItemToEnd(giBodywork);
             MoveMainMenuItemToEnd(giBodyworkArena);
+            MoveMainMenuItemToEnd(iArchCover);
+            MoveMainMenuItemToEnd(iAerials);
+            MoveMainMenuItemToEnd(iTrim);
+            MoveMainMenuItemToEnd(iWindows);
+            MoveMainMenuItemToEnd(giBackrests);
+            MoveMainMenuItemToEnd(giFMudguard);
+            MoveMainMenuItemToEnd(giRMudguard);
+            MoveMainMenuItemToEnd(giMotorcycleSeats);
+            MoveMainMenuItemToEnd(giWindshields);
             MoveMainMenuItemToEnd(giBumper);
             MoveMainMenuItemToEnd(giEngine);
             MoveMainMenuItemToEnd(iEngineBlock);
@@ -570,6 +1490,14 @@ namespace BennysMotorworksRevamped
             MoveMainMenuItemToEnd(iHorn);
             MoveMainMenuItemToEnd(giHydraulics);
             MoveMainMenuItemToEnd(giInterior);
+            MoveMainMenuItemToEnd(iColumnShifterLevers);
+            MoveMainMenuItemToEnd(iDashboard);
+            MoveMainMenuItemToEnd(iDialDesign);
+            MoveMainMenuItemToEnd(iOrnaments);
+            MoveMainMenuItemToEnd(iSeats);
+            MoveMainMenuItemToEnd(iSteeringWheels);
+            MoveMainMenuItemToEnd(iTrimDesign);
+            MoveMainMenuItemToEnd(giDoor);
             MoveMainMenuItemToEnd(iSpeaker);
             MoveMainMenuItemToEnd(giPlaques);
             MoveMainMenuItemToEnd(giLights);
@@ -578,6 +1506,7 @@ namespace BennysMotorworksRevamped
             MoveMainMenuItemToEnd(giPlate);
             MoveMainMenuItemToEnd(giNumberPlate);
             MoveMainMenuItemToEnd(giPlateHolder);
+            MoveMainMenuItemToEnd(giVanityPlate);
             MoveMainMenuItemToEnd(giRespray);
             MoveMainMenuItemToEnd(giBrakes);
             MoveMainMenuItemToEnd(iRoof);
@@ -668,13 +1597,20 @@ namespace BennysMotorworksRevamped
                     else
                     {
                         // Groups
-                        if ((veh.GetModCount(VehicleMod.Fender) != 0 || veh.GetModCount(VehicleMod.FrontBumper) != 0 || veh.GetModCount(VehicleMod.Hood) != 0 || veh.GetModCount(VehicleMod.Grille) != 0 || veh.GetModCount(VehicleMod.RearBumper) != 0 || veh.GetModCount(VehicleMod.Roof) != 0 || veh.GetModCount(VehicleMod.Spoilers) != 0))
+                        bool hasBodywork = veh.ClassType == VehicleClass.Motorcycles
+                            ? HasMotorcycleBodyworkItems()
+                            : (veh.GetModCount(VehicleMod.Fender) != 0 || veh.GetModCount(VehicleMod.FrontBumper) != 0 || veh.GetModCount(VehicleMod.Hood) != 0 || veh.GetModCount(VehicleMod.Grille) != 0 || veh.GetModCount(VehicleMod.RearBumper) != 0 || veh.GetModCount(VehicleMod.Roof) != 0 || veh.GetModCount(VehicleMod.Spoilers) != 0);
+
+                        if (hasBodywork)
                         {
                             giBodywork = new UIMenuItem(LocalizedModGroupName(GroupName.Bodyworks), Game.GetLocalizedString("IE_BO_DT1"));
                             MainMenu.AddItem(giBodywork);
                             MainMenu.BindMenuToItem(gmBodywork, giBodywork);
                         }
+
                         AddEngineItemsToMainMenu(true);
+                        AddMotorcycleSpecialCategoriesToMainMenu();
+
                         giPlate = new UIMenuItem(LocalizedModGroupName(GroupName.Plate), Game.GetLocalizedString("CMOD_MOD_18_D"));
                         MainMenu.AddItem(giPlate);
                         MainMenu.BindMenuToItem(gmPlate, giPlate);
@@ -717,13 +1653,13 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Hydraulics) != 0)
                     {
-                        giHydraulics = new UIMenuItem(LocalizedModTypeName(VehicleMod.Hydraulics), Game.GetLocalizedString("CMOD_SMOD_5_D"));
+                        giHydraulics = new UIMenuItem(GetModCategoryName(VehicleMod.Hydraulics), Game.GetLocalizedString("CMOD_SMOD_5_D"));
                         MainMenu.AddItem(giHydraulics);
                         MainMenu.BindMenuToItem(mHydraulics, giHydraulics);
                     }
                     if (veh.GetModCount(VehicleMod.Livery) != 0)
                     {
-                        iLivery = new UIMenuItem(LocalizedModTypeName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
+                        iLivery = new UIMenuItem(GetModCategoryName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iLivery);
                         MainMenu.BindMenuToItem(mLivery, iLivery);
                     }
@@ -735,7 +1671,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Plaques) != 0)
                     {
-                        giPlaques = new UIMenuItem(LocalizedModTypeName(VehicleMod.Plaques), Game.GetLocalizedString("SMOD_IN_PLAQUE"));
+                        giPlaques = new UIMenuItem(GetModCategoryName(VehicleMod.Plaques), Game.GetLocalizedString("SMOD_IN_PLAQUE"));
                         MainMenu.AddItem(giPlaques);
                         MainMenu.BindMenuToItem(mPlaques, giPlaques);
                     }
@@ -753,7 +1689,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Trunk) != 0)
                     {
-                        giTrunk = new UIMenuItem(LocalizedModTypeName(VehicleMod.Trunk), Game.GetLocalizedString("CMOD_MOD_62_D"));
+                        giTrunk = new UIMenuItem(GetModCategoryName(VehicleMod.Trunk), Game.GetLocalizedString("CMOD_MOD_62_D"));
                         MainMenu.AddItem(giTrunk);
                         MainMenu.BindMenuToItem(mTrunk, giTrunk);
                     }
@@ -820,14 +1756,26 @@ namespace BennysMotorworksRevamped
                     else
                     {
                         // Groups
-                        if ((veh.GetModCount(VehicleMod.Aerials) != 0 || veh.GetModCount(VehicleMod.Trim) != 0 || veh.GetModCount(VehicleMod.Windows) != 0 || veh.GetModCount(VehicleMod.ArchCover) != 0))
+                        if (HasGroupedModSlot(VehicleMod.Aerials)
+                            || HasGroupedModSlot(VehicleMod.Trim)
+                            || HasGroupedModSlot(VehicleMod.Windows)
+                            || HasGroupedModSlot(VehicleMod.ArchCover))
                         {
                             giBodywork = new UIMenuItem(LocalizedModGroupName(GroupName.Bodyworks), Game.GetLocalizedString("IE_BO_DT1"));
                             MainMenu.AddItem(giBodywork);
                             MainMenu.BindMenuToItem(gmBodywork, giBodywork);
                         }
                         AddEngineItemsToMainMenu(false);
-                        if ((veh.GetModCount(VehicleMod.ColumnShifterLevers) != 0 || veh.GetModCount(VehicleMod.Dashboard) != 0 || veh.GetModCount(VehicleMod.DialDesign) != 0 || veh.GetModCount(VehicleMod.Ornaments) != 0 || veh.GetModCount(VehicleMod.Seats) != 0 || veh.GetModCount(VehicleMod.SteeringWheels) != 0 || veh.GetModCount(VehicleMod.TrimDesign) != 0 || veh.GetModCount(VehicleMod.DoorSpeakers) != 0 || veh.GetModCount(VehicleMod.Speakers) != 0))
+                        if (HasGroupedModSlot(VehicleMod.ColumnShifterLevers)
+                            || HasGroupedModSlot(VehicleMod.Dashboard)
+                            || HasGroupedModSlot(VehicleMod.DialDesign)
+                            || HasGroupedModSlot(VehicleMod.Ornaments)
+                            || HasGroupedModSlot(VehicleMod.Seats)
+                            || HasGroupedModSlot(VehicleMod.SteeringWheels)
+                            || HasGroupedModSlot(VehicleMod.TrimDesign)
+                            || HasGroupedModSlot(VehicleMod.DoorSpeakers)
+                            || HasGroupedModSlot(VehicleMod.Speakers)
+                            || bennysvehicle.Contains(veh.Model))
                         {
                             giInterior = new UIMenuItem(LocalizedModGroupName(GroupName.Interior), Game.GetLocalizedString("SMOD_IN_1"));
                             MainMenu.AddItem(giInterior);
@@ -836,6 +1784,8 @@ namespace BennysMotorworksRevamped
                         giPlate = new UIMenuItem(LocalizedModGroupName(GroupName.Plate), Game.GetLocalizedString("CMOD_MOD_18_D"));
                         MainMenu.AddItem(giPlate);
                         MainMenu.BindMenuToItem(gmPlate, giPlate);
+
+                        AddRepurposedCustomModCategoriesToMainMenu();
 
                         // Single Item
                         if (veh.GetModCount(VehicleMod.Frame) != 0)
@@ -858,13 +1808,13 @@ namespace BennysMotorworksRevamped
                         }
                         if (veh.GetModCount(VehicleMod.Tank) != 0)
                         {
-                            giTank = new UIMenuItem(LocalizedModTypeName(VehicleMod.Tank), Game.GetLocalizedString("CMOD_MOD_45_D"));
+                            giTank = new UIMenuItem(GetModCategoryName(VehicleMod.Tank), Game.GetLocalizedString("CMOD_MOD_45_D"));
                             MainMenu.AddItem(giTank);
                             MainMenu.BindMenuToItem(mTank, giTank);
                         }
                         if (veh.GetModCount(VehicleMod.Plaques) != 0)
                         {
-                            giPlaques = new UIMenuItem(LocalizedModTypeName(VehicleMod.Plaques), Game.GetLocalizedString("SMOD_IN_PLAQUE"));
+                            giPlaques = new UIMenuItem(GetModCategoryName(VehicleMod.Plaques), Game.GetLocalizedString("SMOD_IN_PLAQUE"));
                             MainMenu.AddItem(giPlaques);
                             MainMenu.BindMenuToItem(mPlaques, giPlaques);
                         }
@@ -921,7 +1871,11 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Grille) != 0)
                     {
-                        giGrille = new UIMenuItem(LocalizedModTypeName(VehicleMod.Grille), Game.GetLocalizedString("SMOD_CHASS_2c"));
+                        string grilleCategoryName = GetModCategoryName(VehicleMod.Grille);
+                        string grilleDescription = IsRepurposedCustomModSlot(VehicleMod.Grille)
+                            ? "Customize " + grilleCategoryName + "."
+                            : Game.GetLocalizedString("SMOD_CHASS_2c");
+                        giGrille = new UIMenuItem(grilleCategoryName, grilleDescription);
                         MainMenu.AddItem(giGrille);
                         MainMenu.BindMenuToItem(mGrille, giGrille);
                     }
@@ -939,13 +1893,13 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Hydraulics) != 0)
                     {
-                        giHydraulics = new UIMenuItem(LocalizedModTypeName(VehicleMod.Hydraulics), Game.GetLocalizedString("CMOD_SMOD_5_D"));
+                        giHydraulics = new UIMenuItem(GetModCategoryName(VehicleMod.Hydraulics), Game.GetLocalizedString("CMOD_SMOD_5_D"));
                         MainMenu.AddItem(giHydraulics);
                         MainMenu.BindMenuToItem(mHydraulics, giHydraulics);
                     }
                     if (veh.GetModCount(VehicleMod.Livery) != 0)
                     {
-                        iLivery = new UIMenuItem(LocalizedModTypeName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
+                        iLivery = new UIMenuItem(GetModCategoryName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iLivery);
                         MainMenu.BindMenuToItem(mLivery, iLivery);
                     }
@@ -977,7 +1931,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Trunk) != 0)
                     {
-                        giTrunk = new UIMenuItem(LocalizedModTypeName(VehicleMod.Trunk), Game.GetLocalizedString("CMOD_MOD_62_D"));
+                        giTrunk = new UIMenuItem(GetModCategoryName(VehicleMod.Trunk), Game.GetLocalizedString("CMOD_MOD_62_D"));
                         MainMenu.AddItem(giTrunk);
                         MainMenu.BindMenuToItem(mTrunk, giTrunk);
                     }
@@ -1013,7 +1967,7 @@ namespace BennysMotorworksRevamped
                 {
                     if (veh.GetModCount(VehicleMod.Plaques) != 0)
                     {
-                        iPlaques = new UIMenuItem(LocalizedModTypeName(VehicleMod.Plaques), Game.GetLocalizedString("collision_di2ru"));
+                        iPlaques = new UIMenuItem(GetModCategoryName(VehicleMod.Plaques), Game.GetLocalizedString("collision_di2ru"));
                         gmBodyworkArena.AddItem(iPlaques);
                         gmBodyworkArena.BindMenuToItem(mPlaques, iPlaques);
                     }
@@ -1046,7 +2000,7 @@ namespace BennysMotorworksRevamped
                 {
                     if (veh.GetModCount(VehicleMod.Plaques) != 0)
                     {
-                        iPlaques = new UIMenuItem(LocalizedModTypeName(VehicleMod.Plaques), Game.GetLocalizedString("collision_di2ru"));
+                        iPlaques = new UIMenuItem(GetModCategoryName(VehicleMod.Plaques), Game.GetLocalizedString("collision_di2ru"));
                         gmBodyworkArena.AddItem(iPlaques);
                         gmBodyworkArena.BindMenuToItem(mPlaques, iPlaques);
                     }
@@ -1100,7 +2054,7 @@ namespace BennysMotorworksRevamped
                 {
                     if (veh.GetModCount(VehicleMod.Tank) != 0)
                     {
-                        giTank = new UIMenuItem(LocalizedModTypeName(VehicleMod.Tank), Game.GetLocalizedString("collision_255bdwf"));
+                        giTank = new UIMenuItem(GetModCategoryName(VehicleMod.Tank), Game.GetLocalizedString("collision_255bdwf"));
                         gmWeapon.AddItem(giTank);
                         gmWeapon.BindMenuToItem(mTank, giTank);
                     }
@@ -1121,7 +2075,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (veh.GetModCount(VehicleMod.Tank) != 0)
                     {
-                        giTank = new UIMenuItem(LocalizedModTypeName(VehicleMod.Tank), Game.GetLocalizedString("collision_255bdwf"));
+                        giTank = new UIMenuItem(GetModCategoryName(VehicleMod.Tank), Game.GetLocalizedString("collision_255bdwf"));
                         gmWeapon.AddItem(giTank);
                         gmWeapon.BindMenuToItem(mTank, giTank);
                     }
@@ -1220,82 +2174,92 @@ namespace BennysMotorworksRevamped
 
                 if (veh.ClassType == VehicleClass.Motorcycles || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (veh.GetModCount(VehicleMod.Fender) != 0)
+                    if (veh.GetModCount(VehicleMod.Fender) != 0 && (veh.ClassType != VehicleClass.Motorcycles || !IsPromotedMotorcycleSlot(VehicleMod.Fender)))
                     {
                         giShifter = new UIMenuItem(LocalizedModTypeName(VehicleMod.Fender), Game.GetLocalizedString("CMOD_MOD_SHI_D"));
                         gmBodywork.AddItem(giShifter);
                         gmBodywork.BindMenuToItem(mShifter, giShifter);
                     }
-                    if (veh.GetModCount(VehicleMod.FrontBumper) != 0)
+                    if (veh.GetModCount(VehicleMod.FrontBumper) != 0 && veh.ClassType != VehicleClass.Motorcycles)
                     {
                         giFMudguard = new UIMenuItem(LocalizedModTypeName(VehicleMod.FrontBumper), Game.GetLocalizedString("CMOD_MOD_43_D"));
                         gmBodywork.AddItem(giFMudguard);
                         gmBodywork.BindMenuToItem(mFMudguard, giFMudguard);
                     }
-                    if (veh.GetModCount(VehicleMod.Hood) != 0)
+                    if (veh.GetModCount(VehicleMod.Hood) != 0 && veh.ClassType != VehicleClass.Motorcycles)
                     {
                         iBSeat = new UIMenuItem(LocalizedModTypeName(VehicleMod.Hood), Game.GetLocalizedString("CMOD_MOD_44_D"));
                         gmBodywork.AddItem(iBSeat);
                         gmBodywork.BindMenuToItem(mBSeat, iBSeat);
                     }
-                    if (veh.GetModCount(VehicleMod.Grille) != 0)
+                    if (veh.GetModCount(VehicleMod.Grille) != 0 && (veh.ClassType != VehicleClass.Motorcycles || !IsPromotedMotorcycleSlot(VehicleMod.Grille)))
                     {
                         giOilTank = new UIMenuItem(LocalizedModTypeName(VehicleMod.Grille), Game.GetLocalizedString("CMOD_MOD_OT_D"));
                         gmBodywork.AddItem(giOilTank);
                         gmBodywork.BindMenuToItem(mOilTank, giOilTank);
                     }
-                    if (veh.GetModCount(VehicleMod.RearBumper) != 0)
+                    if (veh.GetModCount(VehicleMod.RearBumper) != 0 && veh.ClassType != VehicleClass.Motorcycles)
                     {
                         giRMudguard = new UIMenuItem(LocalizedModTypeName(VehicleMod.RearBumper), Game.GetLocalizedString("CMOD_MOD_43_D"));
                         gmBodywork.AddItem(giRMudguard);
                         gmBodywork.BindMenuToItem(mRMudguard, giRMudguard);
                     }
-                    if (veh.GetModCount(VehicleMod.Roof) != 0)
+                    if (veh.ClassType == VehicleClass.Motorcycles)
+                    {
+                        if (_motorcycleFuelTankModType.HasValue
+                            && veh.GetModCount(_motorcycleFuelTankModType.Value) > 0)
+                        {
+                            giFuelTank = new UIMenuItem("Fuel Tanks", Game.GetLocalizedString("CMOD_MOD_FUT_D"));
+                            gmBodywork.AddItem(giFuelTank);
+                            gmBodywork.BindMenuToItem(mFuelTank, giFuelTank);
+                        }
+                    }
+                    else if (veh.GetModCount(VehicleMod.Roof) != 0)
                     {
                         giFuelTank = new UIMenuItem(LocalizedModTypeName(VehicleMod.Roof), Game.GetLocalizedString("CMOD_MOD_FUT_D"));
                         gmBodywork.AddItem(giFuelTank);
                         gmBodywork.BindMenuToItem(mFuelTank, giFuelTank);
                     }
-                    if (veh.GetModCount(VehicleMod.Spoilers) != 0)
+                    if (veh.GetModCount(VehicleMod.Spoilers) != 0 && (veh.ClassType != VehicleClass.Motorcycles || !IsPromotedMotorcycleSlot(VehicleMod.Spoilers)))
                     {
                         giBeltDriveCovers = new UIMenuItem(LocalizedModTypeName(VehicleMod.Spoilers), Game.GetLocalizedString("CMOD_MOD_BEC_D"));
                         gmBodywork.AddItem(giBeltDriveCovers);
                         gmBodywork.BindMenuToItem(mBeltDriveCovers, giBeltDriveCovers);
                     }
-                    if (veh.GetModCount(VehicleMod.RightFender) != 0)
+                    if (veh.GetModCount(VehicleMod.RightFender) != 0 && (veh.ClassType != VehicleClass.Motorcycles || !IsPromotedMotorcycleSlot(VehicleMod.RightFender)))
                     {
                         iRFender = new UIMenuItem(LocalizedModTypeName(VehicleMod.RightFender), Game.GetLocalizedString("CMOD_MOD_41_D"));
                         gmBodywork.AddItem(iRFender);
                         gmBodywork.BindMenuToItem(mRFender, iRFender);
                     }
-                    if (veh.GetModCount(VehicleMod.Tank) != 0)
+                    if (veh.GetModCount(VehicleMod.Tank) != 0 && (veh.ClassType != VehicleClass.Motorcycles || !IsPromotedMotorcycleSlot(VehicleMod.Tank)))
                     {
-                        giBTank = new UIMenuItem(LocalizedModTypeName(VehicleMod.Tank), Game.GetLocalizedString("CMOD_MOD_45_D"));
+                        giBTank = new UIMenuItem(GetModCategoryName(VehicleMod.Tank), Game.GetLocalizedString("CMOD_MOD_45_D"));
                         gmBodywork.AddItem(giBTank);
                         gmBodywork.BindMenuToItem(mBTank, giBTank);
                     }
                 }
                 else
                 {
-                    if (veh.GetModCount(VehicleMod.Aerials) != 0)
+                    if (HasGroupedModSlot(VehicleMod.Aerials))
                     {
                         iAerials = new UIMenuItem(LocalizedModTypeName(VehicleMod.Aerials), Game.GetLocalizedString("SMOD_CHASS_6"));
                         gmBodywork.AddItem(iAerials);
                         gmBodywork.BindMenuToItem(mAerials, iAerials);
                     }
-                    if (veh.GetModCount(VehicleMod.Trim) != 0)
+                    if (HasGroupedModSlot(VehicleMod.Trim))
                     {
                         iTrim = new UIMenuItem(LocalizedModTypeName(VehicleMod.Trim), Game.GetLocalizedString("SMOD_CHASS_1b"));
                         gmBodywork.AddItem(iTrim);
                         gmBodywork.BindMenuToItem(mTrim, iTrim);
                     }
-                    if (veh.GetModCount(VehicleMod.Windows) != 0)
+                    if (HasGroupedModSlot(VehicleMod.Windows))
                     {
                         iWindows = new UIMenuItem(LocalizedModTypeName(VehicleMod.Windows), Game.GetLocalizedString("SMOD_CHASS_5"));
                         gmBodywork.AddItem(iWindows);
                         gmBodywork.BindMenuToItem(mWindow, iWindows);
                     }
-                    if (veh.GetModCount(VehicleMod.ArchCover) != 0)
+                    if (HasGroupedModSlot(VehicleMod.ArchCover))
                     {
                         iArchCover = new UIMenuItem(LocalizedModTypeName(VehicleMod.ArchCover), Game.GetLocalizedString("SMOD_CHASS_1c"));
                         gmBodywork.AddItem(iArchCover);
@@ -1352,6 +2316,15 @@ namespace BennysMotorworksRevamped
         {
             try
             {
+                if (menu != null && menu.NativeMenu != null)
+                {
+                    string categoryName = GetModCategoryName(vehmod);
+                    if (!string.IsNullOrWhiteSpace(categoryName))
+                    {
+                        menu.NativeMenu.Name = categoryName;
+                    }
+                }
+
                 menu.MenuItems.Clear();
                 int count = veh.GetModCount(vehmod);
                 int equippedMod = veh.GetMod(vehmod);
@@ -1409,6 +2382,9 @@ namespace BennysMotorworksRevamped
             {
                 menu.MenuItems.Clear();
 
+                int disabledPrice = vehmod == VehicleToggleMod.Turbo ? 500 : 1000;
+                int enabledPrice = vehmod == VehicleToggleMod.Turbo ? GetTurboPrice() : 1000;
+
                 item = new UIMenuItem(LocalizedModTypeName(vehmod, true));
                 if (!veh.IsToggleModOn(vehmod))
                 {
@@ -1417,8 +2393,8 @@ namespace BennysMotorworksRevamped
                 }
                 else
                 {
-                    item.SetRightLabel("$1000");
-                    item.Tag = new ModClass(0, 1000);
+                    item.SetRightLabel("$" + disabledPrice);
+                    item.Tag = new ModClass(0, disabledPrice);
                 }
                 menu.AddItem(item);
 
@@ -1430,8 +2406,8 @@ namespace BennysMotorworksRevamped
                 }
                 else
                 {
-                    item.SetRightLabel("$1000");
-                    item.Tag = new ModClass(1, 1000);
+                    item.SetRightLabel("$" + enabledPrice);
+                    item.Tag = new ModClass(1, enabledPrice);
                 }
                 menu.AddItem(item);
 
@@ -1574,7 +2550,7 @@ namespace BennysMotorworksRevamped
                         gmEngine.AddItem(iEngine);
                         gmEngine.BindMenuToItem(mEngine, iEngine);
                     }
-                    if (veh.GetModCount(VehicleMod.EngineBlock) != 0)
+                    if (HasGroupedModSlot(VehicleMod.EngineBlock))
                     {
                         iEngineBlock = new UIMenuItem(LocalizedModTypeName(VehicleMod.EngineBlock), Game.GetLocalizedString("SMOD_ENGINE_1"));
                         gmEngine.AddItem(iEngineBlock);
@@ -1588,13 +2564,13 @@ namespace BennysMotorworksRevamped
                     }
                     if (!arenavehicle.Contains(veh.Model))
                     {
-                        if (veh.GetModCount(VehicleMod.AirFilter) != 0)
+                        if (HasGroupedModSlot(VehicleMod.AirFilter))
                         {
                             giAirfilter = new UIMenuItem(LocalizedModTypeName(VehicleMod.AirFilter), Game.GetLocalizedString("SMOD_ENGINE_2"));
                             gmEngine.AddItem(giAirfilter);
                             gmEngine.BindMenuToItem(mAirFilter, giAirfilter);
                         }
-                        if (veh.GetModCount(VehicleMod.Struts) != 0)
+                        if (HasGroupedModSlot(VehicleMod.Struts))
                         {
                             giStruts = new UIMenuItem(LocalizedModTypeName(VehicleMod.Struts), Game.GetLocalizedString("SMOD_ENGINE_3b"));
                             gmEngine.AddItem(giStruts);
@@ -1716,19 +2692,19 @@ namespace BennysMotorworksRevamped
             try
             {
                 gmInterior.MenuItems.Clear();
-                if (veh.GetModCount(VehicleMod.ColumnShifterLevers) != 0)
+                if (HasGroupedModSlot(VehicleMod.ColumnShifterLevers))
                 {
                     iColumnShifterLevers = new UIMenuItem(LocalizedModTypeName(VehicleMod.ColumnShifterLevers), Game.GetLocalizedString("SMOD_IN_KNOB"));
                     gmInterior.AddItem(iColumnShifterLevers);
                     gmInterior.BindMenuToItem(mColumnShifterLevers, iColumnShifterLevers);
                 }
-                if (veh.GetModCount(VehicleMod.Dashboard) != 0)
+                if (HasGroupedModSlot(VehicleMod.Dashboard))
                 {
                     iDashboard = new UIMenuItem(LocalizedModTypeName(VehicleMod.Dashboard), Game.GetLocalizedString("SMOD_IN_2"));
                     gmInterior.AddItem(iDashboard);
                     gmInterior.BindMenuToItem(mDashboard, iDashboard);
                 }
-                if (veh.GetModCount(VehicleMod.DialDesign) != 0)
+                if (HasGroupedModSlot(VehicleMod.DialDesign))
                 {
                     iDialDesign = new UIMenuItem(LocalizedModTypeName(VehicleMod.DialDesign), Game.GetLocalizedString("SMOD_IN_4"));
                     gmInterior.AddItem(iDialDesign);
@@ -1736,38 +2712,38 @@ namespace BennysMotorworksRevamped
                 }
                 if (!arenavehicle.Contains(veh.Model))
                 {
-                    if (veh.GetModCount(VehicleMod.Ornaments) != 0)
+                    if (HasGroupedModSlot(VehicleMod.Ornaments))
                     {
                         iOrnaments = new UIMenuItem(LocalizedModTypeName(VehicleMod.Ornaments), Game.GetLocalizedString("CMOD_MOD_64_D"));
                         gmInterior.AddItem(iOrnaments);
                         gmInterior.BindMenuToItem(mOrnaments, iOrnaments);
                     }
                 }
-                if (veh.GetModCount(VehicleMod.Seats) != 0)
+                if (HasGroupedModSlot(VehicleMod.Seats))
                 {
                     iSeats = new UIMenuItem(LocalizedModTypeName(VehicleMod.Seats), Game.GetLocalizedString("SMOD_IN_SEAT"));
                     gmInterior.AddItem(iSeats);
                     gmInterior.BindMenuToItem(mSeats, iSeats);
                 }
-                if (veh.GetModCount(VehicleMod.SteeringWheels) != 0)
+                if (HasGroupedModSlot(VehicleMod.SteeringWheels))
                 {
                     iSteeringWheels = new UIMenuItem(LocalizedModTypeName(VehicleMod.SteeringWheels), Game.GetLocalizedString("SMOD_IN_STEER"));
                     gmInterior.AddItem(iSteeringWheels);
                     gmInterior.BindMenuToItem(mSteeringWheels, iSteeringWheels);
                 }
-                if (veh.GetModCount(VehicleMod.TrimDesign) != 0)
+                if (HasGroupedModSlot(VehicleMod.TrimDesign))
                 {
                     iTrimDesign = new UIMenuItem(LocalizedModTypeName(VehicleMod.TrimDesign), Game.GetLocalizedString("SMOD_IN_3"));
                     gmInterior.AddItem(iTrimDesign);
                     gmInterior.BindMenuToItem(mTrimDesign, iTrimDesign);
                 }
-                if (veh.GetModCount(VehicleMod.DoorSpeakers) != 0)
+                if (HasGroupedModSlot(VehicleMod.DoorSpeakers))
                 {
                     giDoor = new UIMenuItem(LocalizedModTypeName(VehicleMod.DoorSpeakers), Game.GetLocalizedString("SMOD_IN_5b"));
                     gmInterior.AddItem(giDoor);
                     gmInterior.BindMenuToItem(mDoor, giDoor);
                 }
-                if (veh.GetModCount(VehicleMod.Speakers) != 0)
+                if (HasGroupedModSlot(VehicleMod.Speakers))
                 {
                     iSpeaker = new UIMenuItem(LocalizedModTypeName(VehicleMod.Speakers), Game.GetLocalizedString("CMOD_MOD_23_D"));
                     gmInterior.AddItem(iSpeaker);
@@ -2041,7 +3017,7 @@ namespace BennysMotorworksRevamped
                 giWheelType = new UIMenuItem(LocalizedModGroupName(GroupName.WheelType), Game.GetLocalizedString("CMOD_MOD_28_D"));
                 gmWheels.AddItem(giWheelType);
                 gmWheels.BindMenuToItem(gmWheelType, giWheelType);
-                if (veh.GetMod(VehicleMod.FrontWheel) != -1)
+                if (SupportsWheelColor())
                 {
                     iRimColor = new UIMenuItem(LocalizedModGroupName(GroupName.WheelColor), Game.GetLocalizedString("CMOD_MOD_59_D"));
                     gmWheels.AddItem(iRimColor);
@@ -2122,6 +3098,91 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static void AddMotorcycleWheelTypeItem(ref UIMenuItem item, VehicleWheelType wheelType)
+        {
+            item = new UIMenuItem(GetLocalizedWheelTypeName(wheelType));
+            item.Tag = new ModClass((int)wheelType, 0);
+            gmWheelType.AddItem(item);
+            gmWheelType.BindMenuToItem(gmMotorcycleWheelPosition, item);
+        }
+
+        private static void RefreshMotorcycleWheelPositionMenu()
+        {
+            gmMotorcycleWheelPosition.MenuItems.Clear();
+
+            giMotorcycleFrontWheel = new UIMenuItem("Front Wheel");
+            gmMotorcycleWheelPosition.AddItem(giMotorcycleFrontWheel);
+            gmMotorcycleWheelPosition.BindMenuToItem(mMotorcycleFrontWheel, giMotorcycleFrontWheel);
+
+            giMotorcycleRearWheel = new UIMenuItem("Rear Wheel");
+            gmMotorcycleWheelPosition.AddItem(giMotorcycleRearWheel);
+            gmMotorcycleWheelPosition.BindMenuToItem(mMotorcycleRearWheel, giMotorcycleRearWheel);
+
+            gmMotorcycleWheelPosition.RefreshIndex();
+        }
+
+        private static void RefreshMotorcycleWheelModMenuFor(ref UIMenu menu, VehicleMod vehmod)
+        {
+            try
+            {
+                menu.MenuItems.Clear();
+
+                if (veh == null || !veh.Exists())
+                {
+                    return;
+                }
+
+                VehicleMod catalogModType = vehmod == VehicleMod.RearWheel
+                    ? VehicleMod.FrontWheel
+                    : vehmod;
+
+                int count = veh.GetModCount(catalogModType);
+                int end = count;
+
+                int wheelTypeIndex = (int)_motorcycleWheelType;
+                if (wheelTypeIndex >= 8 && wheelTypeIndex <= 12)
+                {
+                    end = count / 7;
+                }
+
+                for (int i = -1; i < end; i++)
+                {
+                    string wheelName = GetLocalizedModName(i, count, catalogModType);
+                    if (string.IsNullOrWhiteSpace(wheelName) || wheelName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        wheelName = i == -1
+                            ? Game.GetLocalizedString("CMOD_WHE_B_0")
+                            : "Wheel " + (i + 1).ToString();
+                    }
+
+                    UIMenuItem item = new UIMenuItem(wheelName);
+
+                    if (veh.GetMod(vehmod) == i)
+                    {
+                        item.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                        item.Tag = new ModClass(i, 0);
+                    }
+                    else
+                    {
+                        int price = GetIndexedModPrice(i, 200);
+                        if (price > 0)
+                        {
+                            item.SetRightLabel($"${price}");
+                        }
+                        item.Tag = new ModClass(i, price);
+                    }
+
+                    menu.AddItem(item);
+                }
+
+                menu.RefreshIndex();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message + " " + ex.StackTrace);
+            }
+        }
+
         public static void RefreshWheelTypeMenu()
         {
             try
@@ -2131,6 +3192,20 @@ namespace BennysMotorworksRevamped
                 switch (veh.ClassType)
                 {
                     case VehicleClass.Motorcycles:
+                        _motorcycleWheelType = veh.GetWheelType();
+                        AddMotorcycleWheelTypeItem(ref giBikeWheels, VehicleWheelType.BikeWheels);
+                        AddMotorcycleWheelTypeItem(ref giHighEndWheels, VehicleWheelType.HighEnd);
+                        AddMotorcycleWheelTypeItem(ref giLowriderWheels, VehicleWheelType.Lowrider);
+                        AddMotorcycleWheelTypeItem(ref giMuscleWheels, VehicleWheelType.Muscle);
+                        AddMotorcycleWheelTypeItem(ref giOffroadWheels, VehicleWheelType.Offroad);
+                        AddMotorcycleWheelTypeItem(ref giSportWheels, VehicleWheelType.Sport);
+                        AddMotorcycleWheelTypeItem(ref giSUVWheels, VehicleWheelType.SUV);
+                        AddMotorcycleWheelTypeItem(ref giTunerWheels, VehicleWheelType.Tuner);
+                        AddMotorcycleWheelTypeItem(ref giBennysWheels, (VehicleWheelType)8);
+                        AddMotorcycleWheelTypeItem(ref giBespokeWheels, (VehicleWheelType)9);
+                        AddMotorcycleWheelTypeItem(ref giRacingWheels, (VehicleWheelType)10);
+                        AddMotorcycleWheelTypeItem(ref giStreetWheels, (VehicleWheelType)11);
+                        AddMotorcycleWheelTypeItem(ref giTrackWheels, (VehicleWheelType)12);
                         break;
                     case VehicleClass.Cycles:
                         giBikeWheels = new UIMenuItem(GetLocalizedWheelTypeName(VehicleWheelType.BikeWheels));
@@ -2441,7 +3516,7 @@ namespace BennysMotorworksRevamped
             try
             {
                 gmPlate.MenuItems.Clear();
-                if (veh.GetModCount(VehicleMod.PlateHolder) != 0)
+                if (HasGroupedModSlot(VehicleMod.PlateHolder))
                 {
                     giPlateHolder = new UIMenuItem(LocalizedModTypeName(VehicleMod.PlateHolder), Game.GetLocalizedString("CMOD_MOD_49_D"));
                     gmPlate.AddItem(giPlateHolder);
@@ -2449,7 +3524,7 @@ namespace BennysMotorworksRevamped
                 }
                 if (!arenavehicle.Contains(veh.Model))
                 {
-                    if (veh.GetModCount(VehicleMod.VanityPlates) != 0)
+                    if (HasGroupedModSlot(VehicleMod.VanityPlates))
                     {
                         giVanityPlate = new UIMenuItem(LocalizedModTypeName(VehicleMod.VanityPlates), Game.GetLocalizedString("CMOD_SMOD_4_D"));
                         gmPlate.AddItem(giVanityPlate);
@@ -2875,6 +3950,9 @@ namespace BennysMotorworksRevamped
 
         public static void CreateMenus()
         {
+            _menuSystemReady = false;
+            _menuCreationFailures = 0;
+
             QuitMenu = NewUIMenu(ref QuitMenu, "CMOD_MOD_E", false, false, MainMenuCloseHandler, MainMenuItemSelectHandler, itemName: Game.GetLocalizedString("ITEM_EXIT"), itemDesc: Game.GetLocalizedString("collision_6p1r1v"));
             MainMenu = NewUIMenu(ref MainMenu, "CMOD_MOD_T", false, true, MainMenuCloseHandler, MainMenuItemSelectHandler);
             gmSpecialUpgrades = NewUIMenu(ref gmSpecialUpgrades, "SPECIAL UPGRADES", false, selectHandler: MainMenuItemSelectHandler);
@@ -2909,6 +3987,9 @@ namespace BennysMotorworksRevamped
             mSSkirt = NewUIMenu(ref mSSkirt, "CMOD_SS_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             gmWheels = NewUIMenu(ref gmWheels, "CMOD_WHE0_T", false, true, ModsMenuCloseHandler, WheelsMenuItemSelectHandler);
             gmWheelType = NewUIMenu(ref gmWheelType, "CMOD_WHE1_T", false, true, selectHandler: ModsMenuItemSelectHandler);
+            gmMotorcycleWheelPosition = NewUIMenu(ref gmMotorcycleWheelPosition, "WHEEL POSITION", true, selectHandler: ModsMenuItemSelectHandler);
+            mMotorcycleFrontWheel = NewUIMenu(ref mMotorcycleFrontWheel, "FRONT WHEEL", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mMotorcycleRearWheel = NewUIMenu(ref mMotorcycleRearWheel, "REAR WHEEL", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             gmBikeWheels = NewUIMenu(ref gmBikeWheels, GetLocalizedWheelTypeName(VehicleWheelType.BikeWheels).ToUpper(), true, selectHandler: ModsMenuItemSelectHandler);
             mSBikeWheels = NewUIMenu(ref mSBikeWheels, GetLocalizedWheelTypeName(VehicleWheelType.BikeWheels).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mCBikeWheels = NewUIMenu(ref mCBikeWheels, GetLocalizedWheelTypeName(VehicleWheelType.BikeWheels).ToUpper(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
@@ -3001,6 +4082,22 @@ namespace BennysMotorworksRevamped
             mBEngineBlock = NewUIMenu(ref mBEngineBlock, "CMOD_EB_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mBAirFilter = NewUIMenu(ref mBAirFilter, "CMM_MOD_ST15", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mBTank = NewUIMenu(ref mBTank, "CMM_MOD_ST20", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mBackrests = NewUIMenu(ref mBackrests, "BACKRESTS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mWindshields = NewUIMenu(ref mWindshields, "WINDSHIELDS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mMotorcycleSeats = NewUIMenu(ref mMotorcycleSeats, "SEATS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+
+            _menuSystemReady = _menuCreationFailures == 0
+                && _menuPool != null
+                && MainMenu != null
+                && QuitMenu != null;
+
+            if (!_menuSystemReady)
+            {
+                Logger.Log("CreateMenus incomplete. failures=" + _menuCreationFailures
+                    + ", pool=" + (_menuPool != null)
+                    + ", mainMenu=" + (MainMenu != null)
+                    + ", quitMenu=" + (QuitMenu != null));
+            }
         }
 
 
@@ -3802,8 +4899,12 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
+                // Motorcycle promoted categories
+                if (TryPurchaseMotorcycleSpecialMod(sender, selectedItem))
+                {
+                }
                 // Bike Mods
-                if (sender == mShifter)
+                else if (sender == mShifter)
                 {
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
@@ -3878,12 +4979,16 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        veh.SetMod(VehicleMod.Roof, mc.ModID, false);
+                        VehicleMod fuelTankModType = veh.ClassType == VehicleClass.Motorcycles && _motorcycleFuelTankModType.HasValue
+                            ? _motorcycleFuelTankModType.Value
+                            : VehicleMod.Roof;
+
+                        veh.SetMod(fuelTankModType, mc.ModID, false);
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
                         selectedItem.Tag = new ModClass(mc.ModID, 0);
-                        lastVehMemory.Roof = mc.ModID;
+                        UpdateLastVehicleModMemory(fuelTankModType, mc.ModID);
                         PlaySpeech("");
                     }
                 }
@@ -4092,7 +5197,29 @@ namespace BennysMotorworksRevamped
                     RefreshNeonKitsMenu();
                 }
                 // Wheels Mods
-                if ((sender == mSBikeWheels) || (sender == mCBikeWheels))
+                if ((sender == mMotorcycleFrontWheel) || (sender == mMotorcycleRearWheel))
+                {
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
+                    {
+                        ModClass mc = (ModClass)selectedItem.Tag;
+                        VehicleMod wheelSlot = sender == mMotorcycleFrontWheel ? VehicleMod.FrontWheel : VehicleMod.RearWheel;
+
+                        veh.SetWheelType(_motorcycleWheelType);
+                        veh.SetMod(wheelSlot, mc.ModID, false);
+                        selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                        selectedItem.SetRightLabel(null);
+                        Game.Player.Money = (Game.Player.Money - mc.Price);
+                        selectedItem.Tag = new ModClass(mc.ModID, 0);
+
+                        lastVehMemory.WheelType = veh.GetWheelType();
+                        lastVehMemory.FrontWheels = veh.GetMod(VehicleMod.FrontWheel);
+                        lastVehMemory.BackWheels = veh.GetMod(VehicleMod.RearWheel);
+
+                        RefreshWheelsMenu();
+                        PlaySpeech("LR_UPGRADE_WHEEL");
+                    }
+                }
+                else if ((sender == mSBikeWheels) || (sender == mCBikeWheels))
                 {
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
@@ -4168,7 +5295,15 @@ namespace BennysMotorworksRevamped
                 // Wheel Type
                 if (sender == gmWheelType)
                 {
-                    if (selectedItem == giBikeWheels)
+                    if (veh.ClassType == VehicleClass.Motorcycles && selectedItem.Tag is ModClass motorcycleWheelType)
+                    {
+                        _motorcycleWheelType = (VehicleWheelType)motorcycleWheelType.ModID;
+                        veh.SetWheelType(_motorcycleWheelType);
+                        RefreshMotorcycleWheelPositionMenu();
+                        RefreshMotorcycleWheelModMenuFor(ref mMotorcycleFrontWheel, VehicleMod.FrontWheel);
+                        RefreshMotorcycleWheelModMenuFor(ref mMotorcycleRearWheel, VehicleMod.RearWheel);
+                    }
+                    else if (selectedItem == giBikeWheels)
                     {
                         veh.SetWheelType(VehicleWheelType.BikeWheels);
                         RefreshBikeWheelsModMenuFor(ref mSBikeWheels, ref iSBikeWheels, VehicleMod.RearWheel, false);
@@ -4242,6 +5377,19 @@ namespace BennysMotorworksRevamped
                         RefreshLowriderDLCWheelsModMenuFor(ref mTrack, ref iTrack, VehicleMod.FrontWheel);
                     }
                 }
+                if (sender == gmMotorcycleWheelPosition)
+                {
+                    veh.SetWheelType(_motorcycleWheelType);
+                    if (selectedItem == giMotorcycleFrontWheel)
+                    {
+                        RefreshMotorcycleWheelModMenuFor(ref mMotorcycleFrontWheel, VehicleMod.FrontWheel);
+                    }
+                    else if (selectedItem == giMotorcycleRearWheel)
+                    {
+                        RefreshMotorcycleWheelModMenuFor(ref mMotorcycleRearWheel, VehicleMod.RearWheel);
+                    }
+                }
+
                 if (sender == gmBikeWheels)
                 {
                     veh.SetWheelType(VehicleWheelType.BikeWheels);
@@ -4426,6 +5574,11 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
+                if (IsPerformanceStatsPreviewMenu(sender) && selectedItem.RightBadge == UIMenuItem.BadgeStyle.Car)
+                {
+                    ClearPerformanceStatsPreview();
+                }
+
                 // Camera
                 if (sender == gmBumper)
                 {
@@ -4498,9 +5651,13 @@ namespace BennysMotorworksRevamped
                 {
                     if (selectedItem == giNumberPlate)
                     {
-                        if (veh.HasBone("platelight") || veh.HasBone("neon_b"))
+                        if (veh.ClassType == VehicleClass.Motorcycles)
                         {
-                            if (veh.ClassType == VehicleClass.Motorcycles || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
+                            camera.MainCameraPosition = CameraPosition.BackPlate;
+                        }
+                        else if (veh.HasBone("platelight") || veh.HasBone("neon_b"))
+                        {
+                            if (veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
                             {
                                 camera.MainCameraPosition = CameraPosition.Car;
                             }
@@ -4735,6 +5892,8 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
+                PreparePerformanceStatsPreview(sender, selectedItem);
+
                 if (sender == mHeadlights)
                 {
                     // Headlights color
@@ -4798,6 +5957,7 @@ namespace BennysMotorworksRevamped
                     else if (sender == mSSkirt)
                     {
                         veh.SetMod(VehicleMod.SideSkirt, mc.ModID, false);
+                        UpdateSideSkirtCamera(selectedItem);
                     }
                     else if (sender == mNumberPlate)
                     {
@@ -4946,8 +6106,21 @@ namespace BennysMotorworksRevamped
                         veh.Mods.WindowTint = (VehicleWindowTint)mc.ModID;
                     }
 
+                    // Motorcycle promoted categories
+                    if (sender == mBackrests && _motorcycleBackrestModType.HasValue)
+                    {
+                        veh.SetMod(_motorcycleBackrestModType.Value, mc.ModID, false);
+                    }
+                    else if (sender == mWindshields && _motorcycleWindshieldModType.HasValue)
+                    {
+                        veh.SetMod(_motorcycleWindshieldModType.Value, mc.ModID, false);
+                    }
+                    else if (sender == mMotorcycleSeats && _motorcycleSeatModType.HasValue)
+                    {
+                        veh.SetMod(_motorcycleSeatModType.Value, mc.ModID, false);
+                    }
                     // Bike Mods
-                    if (sender == mShifter)
+                    else if (sender == mShifter)
                     {
                         veh.SetMod(VehicleMod.Fender, mc.ModID, false);
                     }
@@ -4969,7 +6142,10 @@ namespace BennysMotorworksRevamped
                     }
                     else if (sender == mFuelTank)
                     {
-                        veh.SetMod(VehicleMod.Roof, mc.ModID, false);
+                        VehicleMod fuelTankModType = veh.ClassType == VehicleClass.Motorcycles && _motorcycleFuelTankModType.HasValue
+                            ? _motorcycleFuelTankModType.Value
+                            : VehicleMod.Roof;
+                        veh.SetMod(fuelTankModType, mc.ModID, false);
                     }
                     else if (sender == mBeltDriveCovers)
                     {
@@ -5045,7 +6221,12 @@ namespace BennysMotorworksRevamped
                     }
 
                     // Wheels Mods
-                    if ((sender == mSBikeWheels) || (sender == mCBikeWheels))
+                    if ((sender == mMotorcycleFrontWheel) || (sender == mMotorcycleRearWheel))
+                    {
+                        veh.SetWheelType(_motorcycleWheelType);
+                        veh.SetMod(sender == mMotorcycleFrontWheel ? VehicleMod.FrontWheel : VehicleMod.RearWheel, mc.ModID, false);
+                    }
+                    else if ((sender == mSBikeWheels) || (sender == mCBikeWheels))
                     {
                         veh.SetMod(VehicleMod.FrontWheel, mc.ModID, false);
                         veh.SetMod(VehicleMod.RearWheel, mc.ModID, false);
@@ -5342,6 +6523,9 @@ namespace BennysMotorworksRevamped
                         var sitem = mUpgradeAW.MenuItems.First();
                         arenaVehImage = ((ArenaWarVehicle)(sitem.Tag)).Image;
                     }
+                    else if (TryApplyRepurposedModCamera(selectedItem))
+                    {
+                    }
                     else if (selectedItem == giEngine)
                     {
                         switch (veh.Model.ToString().ToLowerInvariant())
@@ -5442,15 +6626,27 @@ namespace BennysMotorworksRevamped
                     }
                     else if (selectedItem == giSSkirt)
                     {
-                        switch (veh.Model.ToString().ToLowerInvariant())
-                        {
-                            case "barrage":
-                                camera.MainCameraPosition = CameraPosition.Car;
-                                break;
-                            default:
-                                camera.MainCameraPosition = CameraPosition.Wheels;
-                                break;
-                        }
+                        UpdateSideSkirtCamera(GetCurrentMenuItem(mSSkirt));
+                    }
+                    else if (selectedItem == giBackrests)
+                    {
+                        camera.MainCameraPosition = CameraPosition.BikeBackrest;
+                    }
+                    else if (selectedItem == giFMudguard && veh.ClassType == VehicleClass.Motorcycles)
+                    {
+                        camera.MainCameraPosition = CameraPosition.FrontMuguard;
+                    }
+                    else if (selectedItem == giRMudguard && veh.ClassType == VehicleClass.Motorcycles)
+                    {
+                        camera.MainCameraPosition = CameraPosition.RearMuguard;
+                    }
+                    else if (selectedItem == giWindshields)
+                    {
+                        camera.MainCameraPosition = CameraPosition.BikeWindshield;
+                    }
+                    else if (selectedItem == giMotorcycleSeats)
+                    {
+                        camera.MainCameraPosition = CameraPosition.Wheels;
                     }
                     else if (selectedItem == giGrille)
                     {
@@ -5642,9 +6838,13 @@ namespace BennysMotorworksRevamped
                     }
                     else if (selectedItem == giNumberPlate)
                     {
-                        if (veh.HasBone("platelight") || veh.HasBone("neon_b"))
+                        if (veh.ClassType == VehicleClass.Motorcycles)
                         {
-                            if (veh.ClassType == VehicleClass.Motorcycles || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
+                            camera.MainCameraPosition = CameraPosition.BackPlate;
+                        }
+                        else if (veh.HasBone("platelight") || veh.HasBone("neon_b"))
+                        {
+                            if (veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
                             {
                                 camera.MainCameraPosition = CameraPosition.Car;
                             }
@@ -5705,6 +6905,7 @@ namespace BennysMotorworksRevamped
                 veh.SetMod(VehicleMod.Transmission, lastVehMemory.Transmission, false);
                 veh.SetMod(VehicleMod.Engine, lastVehMemory.Engine, false);
                 if (IsNitroModInstalled()) { veh.SetInt(nitroMod, lastVehMemory.Nitro); }
+                ClearPerformanceStatsPreview();
 
                 // Mods
                 veh.SetMod(VehicleMod.FrontBumper, lastVehMemory.FrontBumper, false);
@@ -5799,13 +7000,19 @@ namespace BennysMotorworksRevamped
                     veh.SetHighBeamsState(false);
                 }
                 // Reset Camera Position
-                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
+                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
                 {
                     camera.MainCameraPosition = CameraPosition.Car;
                 }
                 if (sender.ParentMenu != gmEngine && IsEnginePreviewMenu(sender))
                 {
                     Function.Call(Hash.SET_VEHICLE_DOORS_SHUT, veh, false);
+                    camera.MainCameraPosition = CameraPosition.Car;
+                }
+                if (IsPromotedCustomModMenu(sender))
+                {
+                    Function.Call(Hash.SET_VEHICLE_DOORS_SHUT, veh, false);
+                    veh.CloseDoor(VehicleDoorIndex.Trunk, false);
                     camera.MainCameraPosition = CameraPosition.Car;
                 }
                 if (sender.ParentMenu != gmInterior)
@@ -5846,29 +7053,75 @@ namespace BennysMotorworksRevamped
             try
             {
                 menu = new UIMenu(string.Empty, title ?? string.Empty, showStats);
-                menu.SetBannerType(new ScaledTexture(PointF.Empty, new SizeF(0f, 108f), "shopui_title_supermod", "shopui_title_supermod"));
+            }
+            catch (Exception ex)
+            {
+                _menuCreationFailures++;
+                Logger.Log("NewUIMenu construction failed for '" + (title ?? string.Empty) + "': " + ex.Message + " " + ex.StackTrace);
+                return menu;
+            }
 
-                menu.NativeMenu.Buttons.Add(BtnDoor);
-                menu.NativeMenu.Buttons.Add(BtnZoom);
-                menu.NativeMenu.Buttons.Add(BtnZoomOut);
+            // feature cannot leave a valid menu invisible/unprocessed.
+            if (_menuPool == null)
+            {
+                _menuCreationFailures++;
+                Logger.Log("NewUIMenu: menu pool was null while creating '" + (title ?? string.Empty) + "'.");
+                return menu;
+            }
 
+            try
+            {
+                _menuPool.Add(menu.NativeMenu);
                 _registeredMenus.Add(menu);
-                menu.MouseEdgeEnabled = false;
-                UIMenu createdMenu = menu;
+            }
+            catch (Exception ex)
+            {
+                _menuCreationFailures++;
+                Logger.Log("NewUIMenu pool registration failed for '" + (title ?? string.Empty) + "': " + ex.Message + " " + ex.StackTrace);
+                return menu;
+            }
 
+            menu.MouseEdgeEnabled = false;
+            UIMenu createdMenu = menu;
 
+            try
+            {
+                menu.SetBannerType(new ScaledTexture(PointF.Empty, new SizeF(0f, 108f), "shopui_title_supermod", "shopui_title_supermod"));
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("NewUIMenu banner setup failed for '" + (title ?? string.Empty) + "': " + ex.Message);
+            }
+
+            try { menu.NativeMenu.Buttons.Add(BtnDoor); }
+            catch (Exception ex) { Logger.Log("Door instructional button unavailable: " + ex.Message); }
+
+            try { menu.NativeMenu.Buttons.Add(BtnZoom); }
+            catch (Exception ex) { Logger.Log("Zoom instructional button unavailable: " + ex.Message); }
+
+            try { menu.NativeMenu.Buttons.Add(BtnZoomOut); }
+            catch (Exception ex) { Logger.Log("Zoom-out instructional button unavailable: " + ex.Message); }
+
+            try
+            {
                 if (!string.IsNullOrWhiteSpace(itemName) && !string.Equals(itemName, "null", StringComparison.OrdinalIgnoreCase))
                 {
                     menu.AddItem(new UIMenuItem(itemName, itemDesc));
                     menu.RefreshIndex();
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("NewUIMenu initial item setup failed for '" + (title ?? string.Empty) + "': " + ex.Message + " " + ex.StackTrace);
+            }
 
-                if (_menuPool != null)
-                    _menuPool.Add(menu.NativeMenu);
-                else
-                    Logger.Log($"NewUIMenu: menu pool was null while creating '{title ?? string.Empty}'.");
+            try
+            {
+                if (closeHandler != null)
+                {
+                    menu.OnMenuClose += closeHandler;
+                }
 
-                if (closeHandler != null) menu.OnMenuClose += closeHandler;
                 if (selectHandler != null)
                 {
                     menu.OnItemSelect += selectHandler;
@@ -5886,11 +7139,15 @@ namespace BennysMotorworksRevamped
                         }
                     };
                 }
-                if (indexChangeHandler != null) menu.OnIndexChange += indexChangeHandler;
+
+                if (indexChangeHandler != null)
+                {
+                    menu.OnIndexChange += indexChangeHandler;
+                }
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message + " " + ex.StackTrace);
+                Logger.Log("NewUIMenu event setup failed for '" + (title ?? string.Empty) + "': " + ex.Message + " " + ex.StackTrace);
             }
 
             return menu;
