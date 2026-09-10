@@ -59,6 +59,441 @@ namespace BennysMotorworksRevamped
         public static bool PerformanceStatsPreviewActive { get; private set; }
         public static VehicleStats PerformanceStatsBaseline { get; private set; }
 
+        private const string StoryVehiclePersistenceFile = "scripts\\BennysMotorworksRevampedStoryVehicles.ini";
+        private const int StoryVehiclePersistenceVersion = 1;
+        private const int StoryVehiclePersistenceProbeIntervalMs = 1000;
+        private const float StoryVehiclePersistenceProbeRadius = 120.0f;
+        private static readonly string[] StoryVehiclePersistenceSections =
+        {
+            "Michael_Tailgater",
+            "Franklin_BuffaloS",
+            "Franklin_Bagger",
+            "Trevor_Bodhi",
+        };
+        private static readonly Model[] StoryVehicleModels =
+        {
+            new Model("tailgater"),
+            new Model("buffalo2"),
+            new Model("bagger"),
+            new Model("bodhi2"),
+        };
+        private static readonly Dictionary<string, Memory> StoryVehicleSavedStates = new Dictionary<string, Memory>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<int, string> StoryVehicleAppliedHandles = new Dictionary<int, string>();
+        private static bool _storyVehicleStatesLoaded;
+        private static int _nextStoryVehiclePersistenceProbeTime;
+
+        private static string NormalizeStoryVehiclePlate(string plate)
+        {
+            if (string.IsNullOrWhiteSpace(plate))
+            {
+                return string.Empty;
+            }
+
+            return new string(plate.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+        }
+
+        private static string GetStoryVehiclePersistenceSection(Vehicle vehicle)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return null;
+            }
+
+            string modelName = vehicle.Model.ToString().ToLowerInvariant();
+            string plate = NormalizeStoryVehiclePlate(vehicle.Mods.LicensePlate);
+
+            if (modelName == "tailgater" && plate == "5MDS003")
+            {
+                return "Michael_Tailgater";
+            }
+
+            if (modelName == "buffalo2" && plate == "FC1988")
+            {
+                return "Franklin_BuffaloS";
+            }
+
+            if (modelName == "bagger" && plate == "FC88")
+            {
+                return "Franklin_Bagger";
+            }
+
+            if (modelName == "bodhi2" && plate == "BETTY32")
+            {
+                return "Trevor_Bodhi";
+            }
+
+            return null;
+        }
+
+        private static string SerializeStoryVehicleMemoryValue(Type type, object value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            if (type == typeof(Color))
+            {
+                return ((Color)value).ToArgb().ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            if (type.IsEnum)
+            {
+                return Convert.ToInt32(value, System.Globalization.CultureInfo.InvariantCulture)
+                    .ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            if (type == typeof(bool))
+            {
+                return (bool)value ? "1" : "0";
+            }
+
+            return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        private static bool TryDeserializeStoryVehicleMemoryValue(Type type, string value, out object result)
+        {
+            result = null;
+
+            if (type == typeof(string))
+            {
+                result = value ?? string.Empty;
+                return true;
+            }
+
+            if (type == typeof(int))
+            {
+                int intValue;
+                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out intValue))
+                {
+                    result = intValue;
+                    return true;
+                }
+                return false;
+            }
+
+            if (type == typeof(bool))
+            {
+                if (value == "1")
+                {
+                    result = true;
+                    return true;
+                }
+
+                if (value == "0")
+                {
+                    result = false;
+                    return true;
+                }
+
+                bool boolValue;
+                if (bool.TryParse(value, out boolValue))
+                {
+                    result = boolValue;
+                    return true;
+                }
+                return false;
+            }
+
+            if (type == typeof(Color))
+            {
+                int argb;
+                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out argb))
+                {
+                    result = Color.FromArgb(argb);
+                    return true;
+                }
+                return false;
+            }
+
+            if (type.IsEnum)
+            {
+                int enumValue;
+                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out enumValue))
+                {
+                    result = Enum.ToObject(type, enumValue);
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+        private static Memory CloneStoryVehicleMemory(Memory source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            Memory clone = new Memory();
+            foreach (Reflection.PropertyInfo property in typeof(Memory).GetProperties())
+            {
+                if (property.CanRead && property.CanWrite)
+                {
+                    property.SetValue(clone, property.GetValue(source, null), null);
+                }
+            }
+
+            return clone;
+        }
+
+        private static bool TryLoadStoryVehicleMemory(ScriptSettings config, string section, out Memory memory)
+        {
+            memory = null;
+            if (config == null || config.GetValue<int>(section, "Version", 0) != StoryVehiclePersistenceVersion)
+            {
+                return false;
+            }
+
+            Memory loaded = new Memory();
+            foreach (Reflection.PropertyInfo property in typeof(Memory).GetProperties())
+            {
+                if (!property.CanWrite)
+                {
+                    continue;
+                }
+
+                string rawValue = config.GetValue<string>(section, property.Name, null);
+                if (rawValue == null)
+                {
+                    continue;
+                }
+
+                object parsedValue;
+                if (TryDeserializeStoryVehicleMemoryValue(property.PropertyType, rawValue, out parsedValue))
+                {
+                    property.SetValue(loaded, parsedValue, null);
+                }
+            }
+
+            memory = loaded;
+            return true;
+        }
+
+        private static void EnsureStoryVehicleStatesLoaded()
+        {
+            if (_storyVehicleStatesLoaded)
+            {
+                return;
+            }
+
+            _storyVehicleStatesLoaded = true;
+            StoryVehicleSavedStates.Clear();
+
+            try
+            {
+                ScriptSettings config = ScriptSettings.Load(StoryVehiclePersistenceFile);
+                foreach (string section in StoryVehiclePersistenceSections)
+                {
+                    Memory memory;
+                    if (TryLoadStoryVehicleMemory(config, section, out memory))
+                    {
+                        StoryVehicleSavedStates[section] = memory;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("Story vehicle persistence load failed. " + ex.Message);
+            }
+        }
+
+        public static void SaveStoryVehicleStateIfNeeded()
+        {
+            if (veh == null || !veh.Exists() || lastVehMemory == null)
+            {
+                return;
+            }
+
+            string section = GetStoryVehiclePersistenceSection(veh);
+            if (section == null)
+            {
+                return;
+            }
+
+            try
+            {
+                ScriptSettings config = ScriptSettings.Load(StoryVehiclePersistenceFile);
+                config.SetValue(section, "Version", StoryVehiclePersistenceVersion);
+
+                foreach (Reflection.PropertyInfo property in typeof(Memory).GetProperties())
+                {
+                    if (!property.CanRead)
+                    {
+                        continue;
+                    }
+
+                    object value = property.GetValue(lastVehMemory, null);
+                    config.SetValue(section, property.Name, SerializeStoryVehicleMemoryValue(property.PropertyType, value));
+                }
+
+                config.Save();
+
+                StoryVehicleSavedStates[section] = CloneStoryVehicleMemory(lastVehMemory);
+                _storyVehicleStatesLoaded = true;
+                StoryVehicleAppliedHandles[veh.Handle] = section;
+                Logger.Log("Saved Benny's customization state for story vehicle " + section + ".");
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Failed to save Benny's story vehicle customization state. " + ex.Message);
+            }
+        }
+
+        private static void ApplyStoryVehicleMemory(Vehicle target, Memory memory)
+        {
+            if (target == null || !target.Exists() || memory == null)
+            {
+                return;
+            }
+
+            target.InstallModKit();
+
+            target.Mods.PrimaryColor = memory.PrimaryColor;
+            target.Mods.SecondaryColor = memory.SecondaryColor;
+            target.Mods.PearlescentColor = memory.PearlescentColor;
+            target.Mods.RimColor = memory.RimColor;
+            target.Mods.DashboardColor = memory.LightsColor;
+            target.Mods.TrimColor = memory.TrimColor;
+            target.Mods.NeonLightsColor = memory.NeonLightsColor;
+            target.Mods.TireSmokeColor = memory.TireSmokeColor;
+
+            target.SetWheelType(memory.WheelType);
+            target.SetMod(VehicleMod.Spoilers, memory.Spoilers, false);
+            target.SetMod(VehicleMod.FrontBumper, memory.FrontBumper, false);
+            target.SetMod(VehicleMod.RearBumper, memory.RearBumper, false);
+            target.SetMod(VehicleMod.SideSkirt, memory.SideSkirt, false);
+            target.SetMod(VehicleMod.Exhaust, memory.Exhaust, false);
+            target.SetMod(VehicleMod.Frame, memory.Frame, false);
+            target.SetMod(VehicleMod.Grille, memory.Grille, false);
+            target.SetMod(VehicleMod.Hood, memory.Hood, false);
+            target.SetMod(VehicleMod.Fender, memory.Fender, false);
+            target.SetMod(VehicleMod.RightFender, memory.RightFender, false);
+            target.SetMod(VehicleMod.Roof, memory.Roof, false);
+            target.SetMod(VehicleMod.Engine, memory.Engine, false);
+            target.SetMod(VehicleMod.Brakes, memory.Brakes, false);
+            target.SetMod(VehicleMod.Transmission, memory.Transmission, false);
+            target.SetMod(VehicleMod.Horns, memory.Horns, false);
+            target.SetMod(VehicleMod.Suspension, memory.Suspension, false);
+            target.SetMod(VehicleMod.Armor, memory.Armor, false);
+            target.SetMod(VehicleMod.FrontWheel, memory.FrontWheels, memory.WheelsVariation);
+            target.SetMod(VehicleMod.RearWheel, memory.BackWheels, memory.WheelsVariation);
+            target.SetMod(VehicleMod.PlateHolder, memory.PlateHolder, false);
+            target.SetMod(VehicleMod.VanityPlates, memory.VanityPlates, false);
+            target.SetMod(VehicleMod.TrimDesign, memory.TrimDesign, false);
+            target.SetMod(VehicleMod.Ornaments, memory.Ornaments, false);
+            target.SetMod(VehicleMod.Dashboard, memory.Dashboard, false);
+            target.SetMod(VehicleMod.DialDesign, memory.DialDesign, false);
+            target.SetMod(VehicleMod.DoorSpeakers, memory.DoorSpeakers, false);
+            target.SetMod(VehicleMod.Seats, memory.Seats, false);
+            target.SetMod(VehicleMod.SteeringWheels, memory.SteeringWheels, false);
+            target.SetMod(VehicleMod.ColumnShifterLevers, memory.ColumnShifterLevers, false);
+            target.SetMod(VehicleMod.Plaques, memory.Plaques, false);
+            target.SetMod(VehicleMod.Speakers, memory.Speakers, false);
+            target.SetMod(VehicleMod.Trunk, memory.Trunk, false);
+            target.SetMod(VehicleMod.Hydraulics, memory.Hydraulics, false);
+            target.SetMod(VehicleMod.EngineBlock, memory.EngineBlock, false);
+            target.SetMod(VehicleMod.AirFilter, memory.AirFilter, false);
+            target.SetMod(VehicleMod.Struts, memory.Struts, false);
+            target.SetMod(VehicleMod.ArchCover, memory.ArchCover, false);
+            target.SetMod(VehicleMod.Aerials, memory.Aerials, false);
+            target.SetMod(VehicleMod.Trim, memory.Trim, false);
+            target.SetMod(VehicleMod.Tank, memory.Tank, false);
+            target.SetMod(VehicleMod.Windows, memory.Windows, false);
+            target.SetMod(VehicleMod.Livery, memory.Livery, false);
+            target.SetLivery2(memory.Livery2);
+
+            target.ToggleMod(VehicleToggleMod.Turbo, memory.Turbo);
+            target.ToggleMod(VehicleToggleMod.XenonHeadlights, memory.Headlights);
+            target.SetXenonHeadlightsColor(memory.HeadlightsColor, target.IsToggleModOn(VehicleToggleMod.XenonHeadlights));
+            target.SetNeonLightsOn(VehicleNeonLight.Back, memory.BackNeon);
+            target.SetNeonLightsOn(VehicleNeonLight.Front, memory.FrontNeon);
+            target.SetNeonLightsOn(VehicleNeonLight.Left, memory.LeftNeon);
+            target.SetNeonLightsOn(VehicleNeonLight.Right, memory.RightNeon);
+
+            target.Mods.WindowTint = memory.Tint;
+            target.Mods.LicensePlateStyle = memory.NumberPlate;
+            if (!string.IsNullOrWhiteSpace(memory.PlateNumbers))
+            {
+                target.Mods.LicensePlate = memory.PlateNumbers;
+            }
+
+            target.CanTiresBurst = memory.BulletProofTires;
+            if (IsNitroModInstalled())
+            {
+                target.SetInt(nitroMod, memory.Nitro);
+            }
+        }
+
+        public static void ProcessStoryVehiclePersistence(Ped player)
+        {
+            if (player == null
+                || !player.Exists()
+                || isCutscene
+                || (_menuPool != null && _menuPool.AreAnyVisible)
+                || Game.GameTime < _nextStoryVehiclePersistenceProbeTime)
+            {
+                return;
+            }
+
+            _nextStoryVehiclePersistenceProbeTime = Game.GameTime + StoryVehiclePersistenceProbeIntervalMs;
+            EnsureStoryVehicleStatesLoaded();
+
+            if (StoryVehicleSavedStates.Count == 0)
+            {
+                return;
+            }
+
+            foreach (int handle in StoryVehicleAppliedHandles.Keys.ToArray())
+            {
+                if (!Function.Call<bool>(Hash.DOES_ENTITY_EXIST, handle))
+                {
+                    StoryVehicleAppliedHandles.Remove(handle);
+                }
+            }
+
+            Vehicle[] nearbyVehicles = World.GetNearbyVehicles(player.Position, StoryVehiclePersistenceProbeRadius, StoryVehicleModels);
+            foreach (Vehicle candidate in nearbyVehicles)
+            {
+                if (candidate == null || !candidate.Exists())
+                {
+                    continue;
+                }
+
+                string section = GetStoryVehiclePersistenceSection(candidate);
+                if (section == null)
+                {
+                    continue;
+                }
+
+                string appliedSection;
+                if (StoryVehicleAppliedHandles.TryGetValue(candidate.Handle, out appliedSection)
+                    && string.Equals(appliedSection, section, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                Memory memory;
+                if (!StoryVehicleSavedStates.TryGetValue(section, out memory))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    ApplyStoryVehicleMemory(candidate, memory);
+                    StoryVehicleAppliedHandles[candidate.Handle] = section;
+                    Logger.Log("Reapplied Benny's customization state to respawned story vehicle " + section + ".");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug("Story vehicle persistence apply failed for " + section + ". " + ex.Message);
+                }
+            }
+        }
+
         public static bool IsPerformanceStatsPreviewMenu(UIMenu menu)
         {
             return menu == mSuspension
@@ -523,6 +958,44 @@ namespace BennysMotorworksRevamped
                 || menu == mStruts || menu == mBEngineBlock || menu == mBAirFilter;
         }
 
+        private static void ApplyEnginePreviewCamera(bool openCover)
+        {
+            if (camera == null || veh == null || !veh.Exists())
+            {
+                return;
+            }
+
+            if (veh.GetVehEnginePos() != EngineLoc.rear)
+            {
+                HoodCamera(openCover);
+                return;
+            }
+
+            if (openCover)
+            {
+                GTA.Math.Vector3 enginePosition = veh.GetBoneCoord("engine");
+                bool hasHood = veh.HasBone("bonnet");
+                bool hasTrunk = veh.HasBone("boot");
+
+                if (hasHood || hasTrunk)
+                {
+                    float hoodDistance = hasHood ? GTA.Math.Vector3.Distance(enginePosition, veh.GetBoneCoord("bonnet")) : float.MaxValue;
+                    float trunkDistance = hasTrunk ? GTA.Math.Vector3.Distance(enginePosition, veh.GetBoneCoord("boot")) : float.MaxValue;
+
+                    if (trunkDistance < hoodDistance)
+                    {
+                        veh.OpenDoor(VehicleDoorIndex.Trunk, false, false);
+                    }
+                    else
+                    {
+                        veh.OpenDoor(VehicleDoorIndex.Hood, false, false);
+                    }
+                }
+            }
+
+            camera.MainCameraPosition = CameraPosition.RearEngine;
+        }
+
         private static bool IsFrontFacingSideSkirtItem(UIMenuItem item)
         {
             string itemName = item?.Text ?? string.Empty;
@@ -697,8 +1170,37 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static bool IsDecalModSlot()
+        {
+            if (veh == null || !veh.Exists() || veh.GetModCount(VehicleMod.Livery) <= 0)
+            {
+                return false;
+            }
+
+            string nativeName = GetNativeModCategoryName(VehicleMod.Livery);
+            if (CategoryContains(nativeName, "decal"))
+            {
+                return true;
+            }
+
+            // Vehicles that expose both slot 48 and the native livery system use
+            // the two layers independently. Treat slot 48 as decals so both
+            // customization groups remain available instead of being merged.
+            return GetLivery2CountSafely() > 0;
+        }
+
+        private static string GetNativeLiveryCategoryName()
+        {
+            return GetLocalizedMenuText("CMM_MOD_ST23", "Liveries");
+        }
+
         private static string GetModCategoryName(VehicleMod modType)
         {
+            if (modType == VehicleMod.Livery && IsDecalModSlot())
+            {
+                return "Decals";
+            }
+
             string fallback = LocalizedModTypeName(modType);
             if (!IsCustomModSlot(modType)
                 || veh == null
@@ -960,7 +1462,7 @@ namespace BennysMotorworksRevamped
             }
             else if (CategoryContains(categoryName, "engine", "air filter", "filter", "intake", "strut", "brace"))
             {
-                HoodCamera(true);
+                ApplyEnginePreviewCamera(true);
             }
             else if (CategoryContains(categoryName, "tank"))
             {
@@ -1015,6 +1517,37 @@ namespace BennysMotorworksRevamped
             {
                 return 0;
             }
+        }
+
+        private static string GetLivery2NameSafely(int index)
+        {
+            try
+            {
+                if (veh == null || !veh.Exists())
+                {
+                    return "Livery " + (index + 1).ToString();
+                }
+
+                string label = Function.Call<string>((Hash)0xB4C7A93837C91A1FUL, veh.Handle, index);
+                if (!string.IsNullOrWhiteSpace(label) && !label.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DoesGXTEntryExist(label))
+                    {
+                        string localized = Game.GetLocalizedString(label);
+                        if (!string.IsNullOrWhiteSpace(localized) && !localized.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return localized;
+                        }
+                    }
+
+                    return label;
+                }
+            }
+            catch
+            {
+            }
+
+            return "Livery " + (index + 1).ToString();
         }
 
         private static int GetPerformanceModPrice(VehicleMod modType, int index)
@@ -1665,7 +2198,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (GetLivery2CountSafely() != 0)
                     {
-                        iTornadoC = new UIMenuItem(LocalizedModTypeName(VehicleMod.Roof), Game.GetLocalizedString("CMOD_SMOD_6_D"));
+                        iTornadoC = new UIMenuItem(GetNativeLiveryCategoryName(), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iTornadoC);
                         MainMenu.BindMenuToItem(mTornadoC, iTornadoC);
                     }
@@ -1905,7 +2438,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (GetLivery2CountSafely() != 0)
                     {
-                        iTornadoC = new UIMenuItem(LocalizedModTypeName(VehicleMod.Roof), Game.GetLocalizedString("CMOD_MOD_73_D"));
+                        iTornadoC = new UIMenuItem(GetNativeLiveryCategoryName(), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iTornadoC);
                         MainMenu.BindMenuToItem(mTornadoC, iTornadoC);
                     }
@@ -2279,15 +2812,16 @@ namespace BennysMotorworksRevamped
         {
             try
             {
+                if (menu != null && menu.NativeMenu != null)
+                {
+                    menu.NativeMenu.Name = GetNativeLiveryCategoryName();
+                }
+
                 menu.MenuItems.Clear();
                 int count = GetLivery2CountSafely();
                 for (int i = 0; i < count; i++)
                 {
-                    item = new UIMenuItem(LocalizedT5RoofName(i));
-                    if (item.Text == "NULL")
-                    {
-                        item.Text = Game.GetLocalizedString("CMOD_ARM_0");
-                    }
+                    item = new UIMenuItem(GetLivery2NameSafely(i));
 
                     if (veh.GetLivery2() == i)
                     {
@@ -4058,7 +4592,7 @@ namespace BennysMotorworksRevamped
             mHorn = NewUIMenu(ref mHorn, "CMOD_HRN_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mHydraulics = NewUIMenu(ref mHydraulics, "CMM_MOD_ST13", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mLivery = NewUIMenu(ref mLivery, "CMM_MOD_ST23", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
-            mTornadoC = NewUIMenu(ref mTornadoC, "CMOD_ROF_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mTornadoC = NewUIMenu(ref mTornadoC, GetNativeLiveryCategoryName(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mPlaques = NewUIMenu(ref mPlaques, "CMM_MOD_ST10", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mRoof = NewUIMenu(ref mRoof, "CMOD_ROF_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mSpeakers = NewUIMenu(ref mSpeakers, "CMM_MOD_S11", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
@@ -5790,7 +6324,7 @@ namespace BennysMotorworksRevamped
                     }
                     else
                     {
-                        HoodCamera(true);
+                        ApplyEnginePreviewCamera(true);
                     }
                 }
                 else if (sender == gmBodyworkArena)
@@ -6546,7 +7080,7 @@ namespace BennysMotorworksRevamped
                             default:
                                 if (veh.ClassType != VehicleClass.Motorcycles || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    HoodCamera(true);
+                                    ApplyEnginePreviewCamera(true);
                                     break;
                                 }
                                 else
@@ -6832,7 +7366,7 @@ namespace BennysMotorworksRevamped
                                 HoodCamera(false);
                                 break;
                             default:
-                                HoodCamera(true);
+                                ApplyEnginePreviewCamera(true);
                                 break;
                         }
                     }
@@ -6879,6 +7413,7 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == QuitMenu)
                 {
+                    SaveStoryVehicleStateIfNeeded();
                     HideAllMenus();
                     PlayExitCutScene();
                 }

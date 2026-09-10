@@ -156,6 +156,9 @@ namespace BennysMotorworksRevamped
         private const float MaximumWorkshopVehicleWidth = 3.0f;
         private const float MaximumWorkshopVehicleLength = 7.0f;
         private const float MaximumWorkshopVehicleHeight = 3.5f;
+        private const float AbsoluteMaximumWorkshopVehicleWidth = 4.0f;
+        private const float AbsoluteMaximumWorkshopVehicleLength = 8.5f;
+        private const float AbsoluteMaximumWorkshopVehicleHeight = 4.25f;
         private static readonly Dictionary<int, bool> oversizedVehicleModels = new Dictionary<int, bool>();
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
@@ -2840,19 +2843,31 @@ namespace BennysMotorworksRevamped
 
             try
             {
-                OutputArgument minimumArgument = new OutputArgument();
-                OutputArgument maximumArgument = new OutputArgument();
-                Function.Call(Hash.GET_MODEL_DIMENSIONS, modelHash, minimumArgument, maximumArgument);
+                Vector3 minimum;
+                Vector3 maximum;
+                vehicle.Model.GetDimensions(out minimum, out maximum);
 
-                Vector3 minimum = minimumArgument.GetResult<Vector3>();
-                Vector3 maximum = maximumArgument.GetResult<Vector3>();
                 float width = Math.Abs(maximum.X - minimum.X);
                 float length = Math.Abs(maximum.Y - minimum.Y);
                 float height = Math.Abs(maximum.Z - minimum.Z);
 
-                isOversized = width > MaximumWorkshopVehicleWidth
-                    || length > MaximumWorkshopVehicleLength
-                    || height > MaximumWorkshopVehicleHeight;
+                if (float.IsNaN(width) || float.IsInfinity(width)
+                    || float.IsNaN(length) || float.IsInfinity(length)
+                    || float.IsNaN(height) || float.IsInfinity(height)
+                    || width <= 0.0f || length <= 0.0f || height <= 0.0f)
+                {
+                    return false;
+                }
+
+                int exceededWorkshopDimensions = 0;
+                if (width > MaximumWorkshopVehicleWidth) exceededWorkshopDimensions++;
+                if (length > MaximumWorkshopVehicleLength) exceededWorkshopDimensions++;
+                if (height > MaximumWorkshopVehicleHeight) exceededWorkshopDimensions++;
+
+                isOversized = width > AbsoluteMaximumWorkshopVehicleWidth
+                    || length > AbsoluteMaximumWorkshopVehicleLength
+                    || height > AbsoluteMaximumWorkshopVehicleHeight
+                    || exceededWorkshopDimensions >= 2;
                 oversizedVehicleModels[modelHash] = isOversized;
                 return isOversized;
             }
@@ -2901,10 +2916,13 @@ namespace BennysMotorworksRevamped
 
         private static readonly Vector3 EnterTriggerPosition = new Vector3(-205.553f, -1316.169f, 30.890f);
         private static readonly Vector3 EnterCutsceneStartPosition = new Vector3(-205.698f, -1312.353f, 31.203f);
-        private static readonly Vector3 EnterCutsceneWaypointA = new Vector3(-207.155f, -1320.521f, 30.8904f);
+        private static readonly Vector3 EnterCutsceneWaypointA = new Vector3(-205.7440f, -1320.521f, 30.8904f);
+        private static readonly Vector3 EnterCutsceneWaypointADriveThroughTarget = new Vector3(-205.7510f, -1321.7764f, 30.71885f);
         private static readonly Vector3 ShopVehiclePosition = new Vector3(-211.801f, -1324.290f, 30.37535f);
+        private static readonly Vector3 EnterCutsceneShopDriveThroughTarget = new Vector3(-213.4947f, -1325.3439f, 30.23133f);
         private static readonly Vector3 ExitCutsceneLanePosition = new Vector3(-205.8678f, -1321.805f, 30.41191f);
         private static readonly Vector3 ExitCutsceneWaypointA = new Vector3(-205.714f, -1309.399f, 31.249f);
+        private static readonly Vector3 ExitCutsceneWaypointADriveThroughTarget = new Vector3(-205.6892f, -1307.3992f, 31.3840f);
         private static readonly Vector3 ExitCutsceneWaypointB = new Vector3(-200.2561f, -1303.021f, 30.66544f);
         private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-200.7804f, -1316.474f, 32.08001f);
         private static readonly Vector3 ExitCutsceneCameraPosition = new Vector3(-197.5533f, -1297.754f, 32.29234f);
@@ -2914,11 +2932,15 @@ namespace BennysMotorworksRevamped
         private static int activeWorkshopCutsceneLastDriveTaskAt;
         private static int activeWorkshopCutsceneLastProgressAt;
         private static Vector3 activeWorkshopCutsceneTarget;
+        private static Vector3 activeWorkshopCutsceneDriveTarget;
         private static float activeWorkshopCutsceneTargetRadius;
         private static float activeWorkshopCutsceneTargetSpeed;
         private static float activeWorkshopCutsceneLastDistanceSq;
         private static Vector3 activeWorkshopCutsceneLegStart = Vector3.Zero;
         private const float MinimumCutsceneWaypointRadius = 2.0f;
+        private const float EnterCutsceneStallRecoveryRadius = 5.5f;
+        private const float EnterCutsceneStallRecoverySpeed = 1.25f;
+        private const float ExitCutsceneRolloverRecoveryAngle = 32.0f;
         private static int enterCutsceneBlockedUntil;
         private static Vector3 lastGarageTriggerSamplePosition = Vector3.Zero;
         private static bool hasGarageTriggerSample;
@@ -3027,6 +3049,7 @@ namespace BennysMotorworksRevamped
             activeWorkshopCutsceneLastProgressAt = 0;
             activeWorkshopCutsceneLastDistanceSq = float.MaxValue;
             activeWorkshopCutsceneTarget = Vector3.Zero;
+            activeWorkshopCutsceneDriveTarget = Vector3.Zero;
             activeWorkshopCutsceneTargetRadius = 0.0f;
             activeWorkshopCutsceneTargetSpeed = 0.0f;
             activeWorkshopCutsceneLegStart = Vector3.Zero;
@@ -3102,6 +3125,13 @@ namespace BennysMotorworksRevamped
             return IsNear(veh.Position, activeWorkshopCutsceneTarget, reachRadius);
         }
 
+        private static bool HasStalledNearEnterCutsceneWaypoint()
+        {
+            return veh != null
+                && IsNear(veh.Position, EnterCutsceneWaypointA, EnterCutsceneStallRecoveryRadius)
+                && veh.Speed < EnterCutsceneStallRecoverySpeed;
+        }
+
         private static bool HasPassedActiveCutsceneTarget(float corridorRadius)
         {
             if (veh == null || activeWorkshopCutsceneTarget.Length() <= 0.001f || activeWorkshopCutsceneLegStart.Length() <= 0.001f)
@@ -3173,13 +3203,18 @@ namespace BennysMotorworksRevamped
 
         private static void QueueCutsceneDrive(Vector3 target, float radius, float speed)
         {
+            QueueCutsceneDrive(target, radius, speed, target);
+        }
+
+        private static void QueueCutsceneDrive(Vector3 target, float radius, float speed, Vector3 driveTarget)
+        {
             if (ply == null || veh == null)
             {
                 Logger.Log("QueueCutsceneDrive: ply or veh is null");
                 return;
             }
 
-            Logger.Log($"QueueCutsceneDrive: target={target}, radius={radius}, speed={speed}");
+            Logger.Log($"QueueCutsceneDrive: target={target}, driveTarget={driveTarget}, radius={radius}, speed={speed}");
 
             if (activeWorkshopCutsceneTarget.Length() <= 0.001f || activeWorkshopCutsceneTarget.DistanceToSquared(target) > 0.01f)
             {
@@ -3187,6 +3222,7 @@ namespace BennysMotorworksRevamped
             }
 
             activeWorkshopCutsceneTarget = target;
+            activeWorkshopCutsceneDriveTarget = driveTarget;
             activeWorkshopCutsceneTargetRadius = radius;
             activeWorkshopCutsceneTargetSpeed = speed;
             activeWorkshopCutsceneLastDriveTaskAt = Game.GameTime;
@@ -3201,14 +3237,16 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.SET_DRIVER_AGGRESSIVENESS, ply.Handle, 0.0f);
 
             uint drivingStyle = 786603;
-            float stopRange = Math.Max(radius, MinimumCutsceneWaypointRadius - 0.5f);
+            float stopRange = driveTarget.DistanceToSquared(target) > 0.01f
+                ? 0.5f
+                : Math.Max(radius, MinimumCutsceneWaypointRadius - 0.5f);
 
             Logger.Log($"Issuing TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE with style {drivingStyle:X}");
 
             Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE,
                 ply.Handle,
                 veh.Handle,
-                target.X, target.Y, target.Z,
+                driveTarget.X, driveTarget.Y, driveTarget.Z,
                 speed,
                 drivingStyle,
                 stopRange);
@@ -3262,7 +3300,39 @@ namespace BennysMotorworksRevamped
             {
                 Logger.Log($"Refresh: re-issuing drive, stuck={isStuck}, noProgress={noProgress}");
                 float boostedSpeed = Math.Min(activeWorkshopCutsceneTargetSpeed * 1.2f, 8.0f);
-                QueueCutsceneDrive(activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius, boostedSpeed);
+                Vector3 driveTarget = activeWorkshopCutsceneDriveTarget.Length() > 0.001f
+                    ? activeWorkshopCutsceneDriveTarget
+                    : activeWorkshopCutsceneTarget;
+                QueueCutsceneDrive(activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius, boostedSpeed, driveTarget);
+            }
+        }
+
+        private static void StabilizeExitCutsceneVehicle()
+        {
+            if (veh == null || !veh.Exists())
+            {
+                return;
+            }
+
+            float roll = Function.Call<float>(Hash.GET_ENTITY_ROLL, veh.Handle);
+            if (Math.Abs(roll) < ExitCutsceneRolloverRecoveryAngle)
+            {
+                return;
+            }
+
+            Logger.Log($"Exit cutscene rollover recovery: roll={roll:0.0}");
+
+            Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
+            Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
+            Function.Call(Hash.SET_ENTITY_ROTATION, veh.Handle, 0.0f, 0.0f, veh.Heading, 2, true);
+            Function.Call(Hash.SET_VEHICLE_ON_GROUND_PROPERLY, veh.Handle);
+
+            if (activeWorkshopCutsceneTarget.Length() > 0.001f)
+            {
+                Vector3 driveTarget = activeWorkshopCutsceneDriveTarget.Length() > 0.001f
+                    ? activeWorkshopCutsceneDriveTarget
+                    : activeWorkshopCutsceneTarget;
+                QueueCutsceneDrive(activeWorkshopCutsceneTarget, activeWorkshopCutsceneTargetRadius, activeWorkshopCutsceneTargetSpeed, driveTarget);
             }
         }
 
@@ -3319,6 +3389,7 @@ namespace BennysMotorworksRevamped
             activeWorkshopCutsceneLastProgressAt = 0;
             activeWorkshopCutsceneLastDistanceSq = float.MaxValue;
             activeWorkshopCutsceneTarget = Vector3.Zero;
+            activeWorkshopCutsceneDriveTarget = Vector3.Zero;
             activeWorkshopCutsceneTargetRadius = 0.0f;
             activeWorkshopCutsceneTargetSpeed = 0.0f;
             activeWorkshopCutsceneLegStart = Vector3.Zero;
@@ -3383,7 +3454,7 @@ namespace BennysMotorworksRevamped
                 case -1:
                     if (IsWorkshopCutsceneStageTimedOut(100))
                     {
-                        QueueCutsceneDrive(EnterCutsceneWaypointA, 3.5f, 8.5f);
+                        QueueCutsceneDrive(EnterCutsceneWaypointA, 1.5f, 8.5f, EnterCutsceneWaypointADriveThroughTarget);
                         PlaySpeech("SHOP_NICE_VEHICLE");
                         AdvanceWorkshopCutsceneStage(1);
                     }
@@ -3391,24 +3462,32 @@ namespace BennysMotorworksRevamped
 
                 case 1:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (HasReachedActiveCutsceneTarget())
+                    if (IsNear(veh.Position, EnterCutsceneWaypointA, 5.0f) || HasPassedActiveCutsceneTarget(2.0f))
                     {
                         ReduceWorkshopCutsceneBlur();
-                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 6.0f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 6.0f, EnterCutsceneShopDriveThroughTarget);
+                        if (veh.Speed < EnterCutsceneStallRecoverySpeed)
+                        {
+                            Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, EnterCutsceneStallRecoverySpeed);
+                        }
                         AdvanceWorkshopCutsceneStage(2);
+                    }
+                    else if (HasStalledNearEnterCutsceneWaypoint())
+                    {
+                        Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, EnterCutsceneStallRecoverySpeed);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         SetCutsceneVehicleTransform(EnterCutsceneWaypointA, 180.3224f);
                         ReduceWorkshopCutsceneBlur();
-                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 6.0f);
+                        QueueCutsceneDrive(ShopVehiclePosition, 0.5f, 6.0f, EnterCutsceneShopDriveThroughTarget);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (HasReachedActiveCutsceneTarget())
+                    if (IsNear(veh.Position, ShopVehiclePosition, 0.75f) || HasPassedActiveCutsceneTarget(1.5f))
                     {
                         CompleteEnterCutscene();
                     }
@@ -3422,6 +3501,8 @@ namespace BennysMotorworksRevamped
 
         private static void ProcessExitCutscene()
         {
+            StabilizeExitCutsceneVehicle();
+
             switch (activeWorkshopCutsceneStage)
             {
                 case 0:
@@ -3431,10 +3512,10 @@ namespace BennysMotorworksRevamped
                     camera?.Stop();
                     veh.Repair();
 
-                    SetCutsceneVehicleTransform(EnterCutsceneWaypointA, GetHeadingToward(EnterCutsceneWaypointA, ExitCutsceneWaypointA, 190.3224f));
+                    SetCutsceneVehicleTransform(ExitCutsceneLanePosition, GetHeadingToward(ExitCutsceneLanePosition, ExitCutsceneWaypointA, 190.3224f));
 
                     StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition, false);
-                    QueueCutsceneDrive(ExitCutsceneWaypointA, 1.0f, 8.0f);
+                    QueueCutsceneDrive(ExitCutsceneWaypointA, 0.5f, 6.0f, ExitCutsceneWaypointADriveThroughTarget);
                     PlaySpeech("SHOP_GOODBYE");
                     AdvanceWorkshopCutsceneStage(2);
                     break;
@@ -3448,33 +3529,33 @@ namespace BennysMotorworksRevamped
                         {
                             veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointA, veh.Heading);
                         }
-                        QueueCutsceneDrive(ExitCutsceneWaypointA, 1.0f, 8.0f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointA, 0.5f, 6.0f, ExitCutsceneWaypointADriveThroughTarget);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         ReduceWorkshopCutsceneBlur();
                         veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointA, veh.Heading);
-                        QueueCutsceneDrive(ExitCutsceneWaypointA, 1.5f, 8.0f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointA, 0.5f, 6.0f, ExitCutsceneWaypointADriveThroughTarget);
                         AdvanceWorkshopCutsceneStage(2);
                     }
                     break;
 
                 case 2:
                     RefreshCutsceneDriveTaskIfNeeded();
-                    if (HasReachedActiveCutsceneTarget() || HasPassedActiveCutsceneTarget(4.0f))
+                    if (IsNear(veh.Position, ExitCutsceneWaypointA, 0.75f) || HasPassedActiveCutsceneTarget(4.0f))
                     {
                         if (veh.Speed < 1.5f)
                         {
                             veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
                         }
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 7.5f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 1.5f, 5.5f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 2.0f, 8.0f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 2.0f, 5.5f);
                         AdvanceWorkshopCutsceneStage(3);
                     }
                     break;
@@ -3488,7 +3569,7 @@ namespace BennysMotorworksRevamped
                     else if (IsWorkshopCutsceneStageTimedOut(10000))
                     {
                         veh.Heading = GetHeadingToward(veh.Position, ExitCutsceneWaypointB, veh.Heading);
-                        QueueCutsceneDrive(ExitCutsceneWaypointB, 2.5f, 8.0f);
+                        QueueCutsceneDrive(ExitCutsceneWaypointB, 2.5f, 5.5f);
                         AdvanceWorkshopCutsceneStage(4);
                     }
                     break;

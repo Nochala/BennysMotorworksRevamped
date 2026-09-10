@@ -128,6 +128,7 @@ namespace BennysMotorworksRevamped
 
                 ProcessPendingMPDLCMapLoad();
                 ply = Game.Player.Character;
+                ProcessStoryVehiclePersistence(ply);
                 veh = ply?.LastVehicle;
 
                 if (veh != null && veh.IsVehicleAttachedToTrailer())
