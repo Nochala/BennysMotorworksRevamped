@@ -369,11 +369,39 @@ namespace BennysMotorworksRevamped
             return HasUsableMainCamera();
         }
 
+        private static bool IsControlJustPressedIncludingDisabled(Control control)
+        {
+            return Game.IsControlJustPressed(control)
+                || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_PRESSED, 0, (int)control);
+        }
+
+        private static bool IsControlJustReleasedIncludingDisabled(Control control)
+        {
+            return Game.IsControlJustReleased(control)
+                || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_RELEASED, 0, (int)control);
+        }
+
+        private static float GetControlNormalIncludingDisabled(Control control)
+        {
+            if (Function.Call<bool>(Hash.IS_PLAYER_CONTROL_ON, Game.Player.Handle))
+            {
+                return Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)control);
+            }
+
+            return Function.Call<float>(Hash.GET_DISABLED_CONTROL_NORMAL, 0, (int)control);
+        }
+
         public bool IsMouseInMenu()
         {
             PointF topLeft = SafeZone.GetSafePosition(new PointF(0f, 0f));
             SizeF size = new SizeF(431f, 550f);
-            return GameScreen.IsCursorInArea(topLeft, size);
+            float cursorX = GetControlNormalIncludingDisabled(Control.CursorX) * (1080f * Function.Call<float>(Hash.GET_ASPECT_RATIO, false));
+            float cursorY = GetControlNormalIncludingDisabled(Control.CursorY) * 1080f;
+
+            return cursorX >= topLeft.X
+                && cursorX <= topLeft.X + size.Width
+                && cursorY > topLeft.Y
+                && cursorY < topLeft.Y + size.Height;
         }
 
         private static bool IsFinite(float value)
@@ -508,18 +536,29 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
-            if (Game.IsControlJustPressed(Control.Attack) && !_isDragging && !IsMouseInMenu())
+            if (!Helper.optEnableMouse && _isDragging)
+            {
+                _isDragging = false;
+                _dragOffset = PointF.Empty;
+                Function.Call((Hash)0x8DB8CFFD58B62552UL, 0);
+            }
+
+            if (Helper.optEnableMouse && IsControlJustPressedIncludingDisabled(Control.Attack) && !_isDragging && !IsMouseInMenu())
             {
                 _isDragging = true;
-                float mouseX = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.CursorX);
-                float mouseY = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.CursorY);
+                float mouseX = GetControlNormalIncludingDisabled(Control.CursorX);
+                float mouseY = GetControlNormalIncludingDisabled(Control.CursorY);
                 Function.Call((Hash)0x8DB8CFFD58B62552UL, 4);
                 mouseX = (mouseX * 2f) - 1f;
                 mouseY = (mouseY * 2f) - 1f;
+                if (RotationMode == CameraRotationMode.FirstPerson)
+                {
+                    mouseY *= -1f;
+                }
                 _dragOffset = new PointF(mouseX, mouseY);
             }
 
-            if (Game.IsControlJustReleased(Control.Attack) && _isDragging)
+            if (IsControlJustReleasedIncludingDisabled(Control.Attack) && _isDragging)
             {
                 _isDragging = false;
                 _dragOffset = PointF.Empty;
@@ -558,8 +597,8 @@ namespace BennysMotorworksRevamped
                 Vector3 rotDown = _mainCamera.Rotation + new Vector3(20f, 0f, 0f);
                 Vector3 up = CutsceneManager.RotationToDirection(rotUp) - CutsceneManager.RotationToDirection(rotDown);
 
-                float mouseX = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.CursorX);
-                float mouseY = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.CursorY);
+                float mouseX = GetControlNormalIncludingDisabled(Control.CursorX);
+                float mouseY = GetControlNormalIncludingDisabled(Control.CursorY);
                 mouseX = (mouseX * 2f) - 1f;
                 mouseY = (mouseY * 2f) - 1f;
 
@@ -590,8 +629,8 @@ namespace BennysMotorworksRevamped
                 Vector3 rotDown = _mainCamera.Rotation + new Vector3(20f, 0f, 0f);
                 Vector3 up = CutsceneManager.RotationToDirection(rotUp) - CutsceneManager.RotationToDirection(rotDown);
 
-                float mouseX = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.LookLeftRight);
-                float mouseY = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.LookUpDown);
+                float mouseX = GetControlNormalIncludingDisabled(Control.LookLeftRight);
+                float mouseY = GetControlNormalIncludingDisabled(Control.LookUpDown);
                 Vector3 rotation = Vector3.Zero;
 
                 if (!IsCameraClamped(true, mouseX))
@@ -615,8 +654,8 @@ namespace BennysMotorworksRevamped
                 {
                     GTA.UI.Hud.ShowCursorThisFrame();
                 }
-                float mouseX = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.CursorX);
-                float mouseY = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.CursorY);
+                float mouseX = GetControlNormalIncludingDisabled(Control.CursorX);
+                float mouseY = GetControlNormalIncludingDisabled(Control.CursorY);
                 mouseX = (mouseX * 2f) - 1f;
                 mouseY = ((mouseY * 2f) - 1f) * -1f;
 
@@ -638,8 +677,8 @@ namespace BennysMotorworksRevamped
 
             if (Game.LastInputMethod == InputMethod.GamePad)
             {
-                float mouseX = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.LookLeftRight) * -1f;
-                float mouseY = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)Control.LookUpDown);
+                float mouseX = GetControlNormalIncludingDisabled(Control.LookLeftRight) * -1f;
+                float mouseY = GetControlNormalIncludingDisabled(Control.LookUpDown);
                 Vector3 right = new Vector3(0f, 0f, 1f);
                 Vector3 up = new Vector3(1f, 0f, 0f);
                 Vector3 rotation = Vector3.Zero;

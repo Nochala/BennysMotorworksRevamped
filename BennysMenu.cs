@@ -56,6 +56,13 @@ namespace BennysMotorworksRevamped
                 doorLabel = "Doors";
             }
             BtnDoor = new LemonUI.Scaleform.InstructionalButton(doorLabel, doorKey);
+            string roofLabel = Game.GetLocalizedString("CMOD_MOD_ROF");
+            if (string.IsNullOrWhiteSpace(roofLabel) || string.Equals(roofLabel, "NULL", StringComparison.OrdinalIgnoreCase))
+            {
+                roofLabel = "Roof";
+            }
+            BtnRoof = new LemonUI.Scaleform.InstructionalButton(roofLabel, roofKey);
+            BtnFirstPerson = new LemonUI.Scaleform.InstructionalButton(Game.GetLocalizedString("MO_ZOOM_FIRST"), fpcKey);
             BtnZoom = new LemonUI.Scaleform.InstructionalButton(Game.GetLocalizedString("INPUT_CREATOR_ZOOM_IN_DISPLAYONLY"), zinKey);
             BtnZoomOut = new LemonUI.Scaleform.InstructionalButton(Game.GetLocalizedString("INPUT_CREATOR_ZOOM_OUT_DISPLAYONLY"), zoutKey);
 
@@ -527,20 +534,36 @@ namespace BennysMotorworksRevamped
             try
             {
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
-                if (optEnableMouse && MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible)
+
+                bool isMenuVisibleBeforeProcess = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
+                SetWorkshopPlayerControlSuppressed(isMenuVisibleBeforeProcess);
+
+                bool menuMouseInputPassthrough = isMenuVisibleBeforeProcess && optEnableMouse;
+                try
                 {
-                    EnableWorkshopMenuMouseControls();
+                    if (menuMouseInputPassthrough)
+                    {
+                        SetWorkshopMenuMouseInputPassthrough(true);
+                        EnableWorkshopMenuMouseControls();
+                    }
+
+                    MenuHelper.RefreshMenuMouseBehavior();
+                    MenuHelper.RefreshInstructionalButtons();
+                    MenuHelper._menuPool?.Process();
                 }
-                MenuHelper.RefreshMenuMouseBehavior();
-                MenuHelper._menuPool?.Process();
+                finally
+                {
+                    if (menuMouseInputPassthrough)
+                    {
+                        SetWorkshopMenuMouseInputPassthrough(false);
+                    }
+                }
+
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
+                MenuHelper.UpdateLightColorPreviewLighting();
 
                 bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
-                SetWorkshopPlayerControlSuppressed(isMenuVisible && !optEnableMouse);
-                if (isMenuVisible && optEnableMouse)
-                {
-                    EnableWorkshopMenuMouseControls();
-                }
+                SetWorkshopPlayerControlSuppressed(isMenuVisible);
 
                 if (veh != null)
                 {
@@ -586,6 +609,7 @@ namespace BennysMotorworksRevamped
 
         private void OnAborted(object sender, EventArgs e)
         {
+            MenuHelper.RestoreLightColorPreviewLighting();
             SetWorkshopPlayerControlSuppressed(false);
         }
     }

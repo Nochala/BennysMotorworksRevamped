@@ -67,6 +67,10 @@ namespace BennysMotorworksRevamped
                 {
                     bennyIntID = detectedInteriorId;
                 }
+                else
+                {
+                    Helper.LogMissingBennysInteriorOnce();
+                }
 
                 if (BennysBlip == null || !BennysBlip.Exists())
                 {
@@ -156,6 +160,8 @@ namespace BennysMotorworksRevamped
                     || isMenuVisible
                     || (isWorkshopVehicleAllowed && isInBennysInterior);
 
+                SetWorkshopPlayerControlSuppressed(isMenuVisible);
+
                 SetWorkshopCarModShopState(
                     isInsideWorkshop
                     && isWorkshopVehicleAllowed
@@ -236,6 +242,10 @@ namespace BennysMotorworksRevamped
                 {
                     if (veh.Doors[VehicleDoorIndex.FrontLeftDoor].IsOpen)
                     {
+                        for (int doorIndex = 0; doorIndex <= 5; doorIndex++)
+                        {
+                            Function.Call((Hash)0x62A456AA4769EF34UL, veh.Handle, doorIndex);
+                        }
                         Function.Call(Hash.SET_VEHICLE_DOORS_SHUT, veh, false);
                     }
                     else
@@ -246,6 +256,23 @@ namespace BennysMotorworksRevamped
                         veh.OpenDoor(VehicleDoorIndex.FrontRightDoor, false, false);
                         veh.OpenDoor(VehicleDoorIndex.Hood, false, false);
                         veh.OpenDoor(VehicleDoorIndex.Trunk, false, false);
+                        for (int doorIndex = 0; doorIndex <= 5; doorIndex++)
+                        {
+                            Function.Call((Hash)0x3A539D52857EA82DUL, veh.Handle, doorIndex);
+                        }
+                    }
+                }
+                else if ((Game.IsControlJustPressed(roofKey)
+                    || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_PRESSED, 0, (int)roofKey))
+                    && MenuHelper.IsWorkshopVehicleConvertible())
+                {
+                    if (veh.RoofState == VehicleRoofState.Closed)
+                    {
+                        Function.Call(Hash.LOWER_CONVERTIBLE_ROOF, veh, false);
+                    }
+                    else
+                    {
+                        Function.Call(Hash.RAISE_CONVERTIBLE_ROOF, veh, false);
                     }
                 }
 
@@ -276,6 +303,26 @@ namespace BennysMotorworksRevamped
                     else
                     {
                         camera.CameraZoom = max.X;
+                    }
+                }
+
+                bool firstPersonControlReleased = Game.IsControlJustReleased(fpcKey)
+                    || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_RELEASED, 0, (int)fpcKey);
+
+                if (firstPersonControlReleased && camera != null)
+                {
+                    CameraPosition previousCameraPosition = lastCameraPos;
+                    lastCameraPos = camera.MainCameraPosition;
+
+                    if (camera.MainCameraPosition == CameraPosition.Interior)
+                    {
+                        camera.MainCameraPosition = previousCameraPosition == CameraPosition.Interior
+                            ? CameraPosition.Car
+                            : previousCameraPosition;
+                    }
+                    else
+                    {
+                        camera.MainCameraPosition = CameraPosition.Interior;
                     }
                 }
 

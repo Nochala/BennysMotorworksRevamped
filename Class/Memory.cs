@@ -61,6 +61,10 @@ namespace BennysMotorworksRevamped
         public VehicleWindowTint Tint { get; set; }
         public VehicleColor PrimaryColor { get; set; }
         public VehicleColor SecondaryColor { get; set; }
+        public Color CustomPrimaryColor { get; set; }
+        public Color CustomSecondaryColor { get; set; }
+        public bool IsPrimaryColorCustom { get; set; }
+        public bool IsSecondaryColorCustom { get; set; }
         public VehicleColor PearlescentColor { get; set; }
         public VehicleColor RimColor { get; set; }
         public VehicleColor LightsColor { get; set; }

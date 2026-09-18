@@ -126,9 +126,12 @@ namespace BennysMotorworksRevamped
         public static bool optDebugLogging = true;
         public static bool optEnableMouse = false;
         private const int ExternalBennysInteriorProbeDelayMs = 1000;
+        private const int ExternalBennysInteriorFailureLogDelayMs = 5000;
         private const ulong SetVehicleInCarModShopHash = 0x9D44FCCE98450843UL;
         private static int _nextExternalBennysInteriorProbeTime = 0;
+        private static int _externalBennysInteriorMissingSince = 0;
         private static bool _bennysSPInteriorRegistrationLogged = false;
+        private static bool _bennysInteriorMissingLogged = false;
         private const int ShopInitRetryDelayMs = 125;
         private const int ShopInitTimeoutMs = 4000;
         private static bool _pendingShopInit = false;
@@ -138,13 +141,15 @@ namespace BennysMotorworksRevamped
         private static int _carModShopVehicleHandle = 0;
         private static bool _workshopPlayerControlSuppressionActive = false;
         private static bool _workshopOwnsPlayerControlSuppression = false;
+        private static bool _workshopMenuMouseInputPassthroughActive = false;
         public static Camera scriptCam; // ScriptedCamera
         public static List<VehicleClass> unWelcome = new() { VehicleClass.Boats, VehicleClass.Cycles, VehicleClass.Helicopters, VehicleClass.Planes };
         public static GTA.Control fpcKey, zoutKey, zinKey;
         public static GTA.Control doorKey = GTA.Control.ParachuteBrakeLeft;
+        public static GTA.Control roofKey = GTA.Control.ParachuteBrakeRight;
         public static CameraPosition lastCameraPos;
 
-        public static InstructionalButton BtnDoor, BtnZoom, BtnZoomOut, BtnFirstPerson;
+        public static InstructionalButton BtnDoor, BtnRoof, BtnZoom, BtnZoomOut, BtnFirstPerson;
         public static MenuPool _menuPool;
         public static WorkshopCamera camera;
         public static bool isRepairing = false;
@@ -470,6 +475,17 @@ namespace BennysMotorworksRevamped
         {
         }
 
+        internal static void LogMissingBennysInteriorOnce()
+        {
+            if (_bennysInteriorMissingLogged)
+            {
+                return;
+            }
+
+            _bennysInteriorMissingLogged = true;
+            Logger.Log("Benny's interior not found. Please install Benny's Map Loader.");
+        }
+
         private static void ProcessExternallyLoadedBennysInterior()
         {
             if (Game.GameTime < _nextExternalBennysInteriorProbeTime)
@@ -488,9 +504,20 @@ namespace BennysMotorworksRevamped
                 if (externalInteriorId == 0
                     || !Function.Call<bool>(Hash.IS_VALID_INTERIOR, externalInteriorId))
                 {
+                    if (_externalBennysInteriorMissingSince == 0)
+                    {
+                        _externalBennysInteriorMissingSince = Game.GameTime;
+                    }
+                    else if (!_bennysInteriorMissingLogged
+                        && Game.GameTime - _externalBennysInteriorMissingSince >= ExternalBennysInteriorFailureLogDelayMs)
+                    {
+                        LogMissingBennysInteriorOnce();
+                    }
+
                     return;
                 }
 
+                _externalBennysInteriorMissingSince = 0;
                 bool interiorReady = Function.Call<bool>(Hash.IS_INTERIOR_READY, externalInteriorId);
                 bennyIntID = externalInteriorId;
 
@@ -1267,6 +1294,9 @@ namespace BennysMotorworksRevamped
         {
             Chrome,
             Classic,
+            Utility,
+            Worn,
+            SpecialSolid,
             Chameleon,
             Metallic,
             Metals,
@@ -1290,6 +1320,15 @@ namespace BennysMotorworksRevamped
                     break;
                 case ColorType.Classic:
                     cur = Gxt("CMOD_COL1_1");
+                    break;
+                case ColorType.Utility:
+                    cur = "Utility";
+                    break;
+                case ColorType.Worn:
+                    cur = "Worn";
+                    break;
+                case ColorType.SpecialSolid:
+                    cur = "Special Solid";
                     break;
                 case ColorType.Chameleon:
                     cur = Gxt("CMOD_COL1_7");
@@ -1632,30 +1671,35 @@ namespace BennysMotorworksRevamped
             return "Color " + ((int)vehColor).ToString();
         }
 
-        public static readonly List<VehicleColor> ClassicColor = new List<VehicleColor>
+        internal static string GetColorSortName(VehicleColor vehColor)
         {
-            (VehicleColor)0, (VehicleColor)147, (VehicleColor)1, (VehicleColor)11, (VehicleColor)2, (VehicleColor)3, (VehicleColor)4, (VehicleColor)5, (VehicleColor)6, (VehicleColor)7, (VehicleColor)8, (VehicleColor)9, (VehicleColor)10, (VehicleColor)27, (VehicleColor)28, (VehicleColor)29, (VehicleColor)150, (VehicleColor)30, (VehicleColor)31, (VehicleColor)32, (VehicleColor)33, (VehicleColor)34, (VehicleColor)143, (VehicleColor)35, (VehicleColor)135, (VehicleColor)137, (VehicleColor)136, (VehicleColor)36, (VehicleColor)38, (VehicleColor)138, (VehicleColor)99, (VehicleColor)90, (VehicleColor)88, (VehicleColor)89, (VehicleColor)91, (VehicleColor)49, (VehicleColor)50, (VehicleColor)51, (VehicleColor)52, (VehicleColor)53, (VehicleColor)54, (VehicleColor)92, (VehicleColor)141, (VehicleColor)61, (VehicleColor)62, (VehicleColor)63, (VehicleColor)64, (VehicleColor)65, (VehicleColor)66, (VehicleColor)67, (VehicleColor)68, (VehicleColor)69, (VehicleColor)73, (VehicleColor)70, (VehicleColor)74, (VehicleColor)96, (VehicleColor)101, (VehicleColor)95, (VehicleColor)94, (VehicleColor)97, (VehicleColor)103, (VehicleColor)104, (VehicleColor)98, (VehicleColor)100, (VehicleColor)102, (VehicleColor)99, (VehicleColor)105, (VehicleColor)106, (VehicleColor)71, (VehicleColor)72, (VehicleColor)142, (VehicleColor)145, (VehicleColor)107, (VehicleColor)111, (VehicleColor)112
-        };
+            if (_colorNames.TryGetValue(vehColor, out Tuple<string, string> colorName))
+            {
+                return colorName.Item2 ?? string.Empty;
+            }
 
-        public static readonly List<VehicleColor> MatteColor = new List<VehicleColor>
-        {
-            (VehicleColor)12, (VehicleColor)13, (VehicleColor)14, (VehicleColor)131, (VehicleColor)83, (VehicleColor)82, (VehicleColor)84, (VehicleColor)149, (VehicleColor)148, (VehicleColor)39, (VehicleColor)40, (VehicleColor)41, (VehicleColor)42, (VehicleColor)55, (VehicleColor)128, (VehicleColor)151, (VehicleColor)155, (VehicleColor)152, (VehicleColor)153, (VehicleColor)154
-        };
+            if (_chameleonColorNames.TryGetValue(vehColor, out string chameleonName))
+            {
+                return chameleonName ?? string.Empty;
+            }
 
-        public static readonly List<VehicleColor> MetalColor = new List<VehicleColor>
-        {
-            (VehicleColor)117, (VehicleColor)118, (VehicleColor)119, (VehicleColor)158, (VehicleColor)159, (VehicleColor)160
-        };
+            return vehColor.ToString();
+        }
+
+        public static readonly List<VehicleColor> ClassicColor = CreateClassicColors();
+        public static readonly List<VehicleColor> UtilityColor = CreateUtilityColors();
+        public static readonly List<VehicleColor> WornColor = CreateWornColors();
+        public static readonly List<VehicleColor> SpecialSolidColor = CreateSpecialSolidColors();
+        public static readonly List<VehicleColor> MetallicColor = CreateMetallicColors();
+        public static readonly List<VehicleColor> MatteColor = CreateMatteColors();
+        public static readonly List<VehicleColor> MetalColor = CreateMetalColors();
 
         public static readonly List<VehicleColor> ChromeColor = new List<VehicleColor>
         {
             (VehicleColor)120
         };
 
-        public static readonly List<VehicleColor> PearlescentColor = new List<VehicleColor>
-        {
-            (VehicleColor)0, (VehicleColor)147, (VehicleColor)1, (VehicleColor)11, (VehicleColor)2, (VehicleColor)3, (VehicleColor)4, (VehicleColor)5, (VehicleColor)6, (VehicleColor)7, (VehicleColor)8, (VehicleColor)9, (VehicleColor)10, (VehicleColor)27, (VehicleColor)28, (VehicleColor)29, (VehicleColor)150, (VehicleColor)30, (VehicleColor)31, (VehicleColor)32, (VehicleColor)33, (VehicleColor)34, (VehicleColor)143, (VehicleColor)35, (VehicleColor)135, (VehicleColor)137, (VehicleColor)136, (VehicleColor)36, (VehicleColor)38, (VehicleColor)138, (VehicleColor)99, (VehicleColor)90, (VehicleColor)88, (VehicleColor)89, (VehicleColor)91, (VehicleColor)49, (VehicleColor)50, (VehicleColor)51, (VehicleColor)52, (VehicleColor)53, (VehicleColor)54, (VehicleColor)92, (VehicleColor)141, (VehicleColor)61, (VehicleColor)62, (VehicleColor)63, (VehicleColor)64, (VehicleColor)65, (VehicleColor)66, (VehicleColor)67, (VehicleColor)68, (VehicleColor)69, (VehicleColor)73, (VehicleColor)70, (VehicleColor)74, (VehicleColor)96, (VehicleColor)101, (VehicleColor)95, (VehicleColor)94, (VehicleColor)97, (VehicleColor)103, (VehicleColor)104, (VehicleColor)98, (VehicleColor)100, (VehicleColor)102, (VehicleColor)99, (VehicleColor)105, (VehicleColor)106, (VehicleColor)71, (VehicleColor)72, (VehicleColor)142, (VehicleColor)145, (VehicleColor)107, (VehicleColor)111, (VehicleColor)112, (VehicleColor)117, (VehicleColor)118, (VehicleColor)119, (VehicleColor)158, (VehicleColor)159, (VehicleColor)160
-        };
+        public static readonly List<VehicleColor> PearlescentColor = CreatePearlescentColors();
 
         public static readonly List<VehicleColor> ChameleonColor = CreateVehicleColorRange(161, 222);
         public static readonly List<VehicleColor> AllVehicleColors = CreateAllVehicleColors();
@@ -1675,6 +1719,162 @@ namespace BennysMotorworksRevamped
             {
                 return false;
             }
+        }
+
+        private static bool IsMetallicColorName(string name)
+        {
+            return name.StartsWith("Metallic", StringComparison.OrdinalIgnoreCase)
+                || name.StartsWith("Mettalic", StringComparison.OrdinalIgnoreCase)
+                || name.StartsWith("Metaillic", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsMatteColorName(string name)
+        {
+            return name.StartsWith("Matte", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsMetalColorName(string name)
+        {
+            return string.Equals(name, "BrushedSteel", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "BrushedBlackSteel", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "BrushedAluminium", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "DefaultAlloyColor", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "PureGold", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "BrushedGold", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "MP100GoldSpecular", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "SecretGold", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static List<VehicleColor> CreateColorList(params int[] colorIds)
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            foreach (int colorId in colorIds)
+            {
+                VehicleColor color = (VehicleColor)colorId;
+                if (!colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+            return colors;
+        }
+
+        private static List<VehicleColor> CreateClassicColors()
+        {
+            return CreateColorList(
+                0, 147, 1, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                27, 28, 29, 150, 30, 31, 32, 33, 34, 143, 35,
+                135, 137, 136, 36, 38, 138, 99, 90, 88, 89, 91,
+                49, 50, 51, 52, 53, 54, 92, 141, 61, 62, 63, 64,
+                65, 66, 67, 68, 69, 73, 70, 74, 96, 101, 95, 94,
+                97, 103, 104, 98, 100, 102, 105, 106, 71, 72, 142,
+                145, 107, 111, 112);
+        }
+
+        private static List<VehicleColor> CreateUtilityColors()
+        {
+            return CreateColorList(
+                15, 16, 17, 18, 19, 20,
+                43, 44, 45,
+                56, 57,
+                75, 76, 77, 78, 79, 80, 81,
+                108, 109, 110, 122, 127, 134);
+        }
+
+        private static List<VehicleColor> CreateWornColors()
+        {
+            return CreateColorList(
+                21, 22, 23, 24, 25, 26,
+                46, 47, 48,
+                58, 59, 60,
+                85, 86, 87,
+                113, 114, 115, 116,
+                121, 123, 124, 126, 130, 132, 133);
+        }
+
+        private static List<VehicleColor> CreateSpecialSolidColors()
+        {
+            return CreateColorList(139, 140, 144, 157);
+        }
+
+        private static List<VehicleColor> CreateMetallicColors()
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            foreach (VehicleColor color in Enum.GetValues(typeof(VehicleColor)))
+            {
+                if ((int)color < 0 || (int)color > 160)
+                {
+                    continue;
+                }
+
+                if (IsMetallicColorName(color.ToString()) && !colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+            return colors;
+        }
+
+        private static List<VehicleColor> CreateMatteColors()
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            foreach (VehicleColor color in Enum.GetValues(typeof(VehicleColor)))
+            {
+                if ((int)color < 0 || (int)color > 160)
+                {
+                    continue;
+                }
+
+                if (IsMatteColorName(color.ToString()) && !colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+            return colors;
+        }
+
+        private static List<VehicleColor> CreateMetalColors()
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            foreach (VehicleColor color in Enum.GetValues(typeof(VehicleColor)))
+            {
+                if ((int)color < 0 || (int)color > 160)
+                {
+                    continue;
+                }
+
+                if (IsMetalColorName(color.ToString()) && !colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+            return colors;
+        }
+
+        private static List<VehicleColor> CreatePearlescentColors()
+        {
+            List<VehicleColor> colors = new List<VehicleColor>();
+            List<VehicleColor>[] colorGroups =
+            {
+                ClassicColor,
+                UtilityColor,
+                WornColor,
+                SpecialSolidColor,
+                MetalColor,
+            };
+
+            foreach (List<VehicleColor> colorGroup in colorGroups)
+            {
+                foreach (VehicleColor color in colorGroup)
+                {
+                    if (!colors.Contains(color))
+                    {
+                        colors.Add(color);
+                    }
+                }
+            }
+
+            return colors;
         }
 
         private static List<VehicleColor> CreateVehicleColorRange(int first, int last)
@@ -1842,7 +2042,7 @@ namespace BennysMotorworksRevamped
                 [(VehicleColor)127] = Tuple.Create("NULL", "PoliceCarBlue"),
                 [(VehicleColor)128] = Tuple.Create("GREEN", "MatteGreen"),
                 [(VehicleColor)129] = Tuple.Create("BROWN", "MatteBrown"),
-                [(VehicleColor)130] = Tuple.Create("NULL", "SteelBlue"),
+                [(VehicleColor)130] = Tuple.Create("NULL", "WornPaleOrange"),
                 [(VehicleColor)131] = Tuple.Create("WHITE", "MatteWhite"),
                 [(VehicleColor)132] = Tuple.Create("WHITE", "WornWhite"),
                 [(VehicleColor)133] = Tuple.Create("OLIVE_GREEN", "WornOliveArmyGreen"),
@@ -2650,6 +2850,10 @@ namespace BennysMotorworksRevamped
                 {
                     if (_workshopPlayerControlSuppressionActive)
                     {
+                        if (_workshopMenuMouseInputPassthroughActive)
+                        {
+                            SetWorkshopMenuMouseInputPassthrough(false);
+                        }
                         return;
                     }
 
@@ -2672,12 +2876,43 @@ namespace BennysMotorworksRevamped
                     Function.Call(Hash.SET_PLAYER_CONTROL, player.Handle, true, 0);
                 }
 
+                _workshopMenuMouseInputPassthroughActive = false;
                 _workshopPlayerControlSuppressionActive = false;
                 _workshopOwnsPlayerControlSuppression = false;
             }
             catch (Exception ex)
             {
                 Logger.Log("Unable to update workshop player-control suppression: " + ex.Message);
+            }
+        }
+
+        public static void SetWorkshopMenuMouseInputPassthrough(bool enabled)
+        {
+            try
+            {
+                if (!_workshopPlayerControlSuppressionActive || !_workshopOwnsPlayerControlSuppression)
+                {
+                    _workshopMenuMouseInputPassthroughActive = false;
+                    return;
+                }
+
+                if (_workshopMenuMouseInputPassthroughActive == enabled)
+                {
+                    return;
+                }
+
+                Player player = Game.Player;
+                if (player == null)
+                {
+                    return;
+                }
+
+                Function.Call(Hash.SET_PLAYER_CONTROL, player.Handle, enabled, enabled ? 0 : 256);
+                _workshopMenuMouseInputPassthroughActive = enabled;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Unable to update workshop menu mouse input passthrough: " + ex.Message);
             }
         }
 
@@ -2740,6 +2975,7 @@ namespace BennysMotorworksRevamped
             Game.DisableControlThisFrame(Control.VehicleGunRight);
             Game.DisableControlThisFrame(Control.VehicleCinematicLeftRight);
             Game.DisableControlThisFrame(Control.NextCamera);
+            Game.DisableControlThisFrame(roofKey);
             Game.DisableControlThisFrame(Control.VehicleRocketBoost);
             Game.DisableControlThisFrame(Control.VehicleJump);
             Game.DisableControlThisFrame(Control.VehicleCarJump);
@@ -2810,8 +3046,11 @@ namespace BennysMotorworksRevamped
             zoutKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomOut", GTA.Control.FrontendLt);
             zinKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomIn", GTA.Control.FrontendRt);
             doorKey = config.GetValue<GTA.Control>("CONTROLS", "Door", GTA.Control.ParachuteBrakeLeft);
+            roofKey = config.GetValue<GTA.Control>("CONTROLS", "Roof", GTA.Control.ParachuteBrakeRight);
             _nextExternalBennysInteriorProbeTime = 0;
+            _externalBennysInteriorMissingSince = 0;
             _bennysSPInteriorRegistrationLogged = false;
+            _bennysInteriorMissingLogged = false;
         }
 
         public static void CreateBlip()
@@ -3210,11 +3449,11 @@ namespace BennysMotorworksRevamped
         {
             if (ply == null || veh == null)
             {
-                Logger.Log("QueueCutsceneDrive: ply or veh is null");
+                Logger.Debug("QueueCutsceneDrive: ply or veh is null");
                 return;
             }
 
-            Logger.Log($"QueueCutsceneDrive: target={target}, driveTarget={driveTarget}, radius={radius}, speed={speed}");
+            Logger.Debug($"QueueCutsceneDrive: target={target}, driveTarget={driveTarget}, radius={radius}, speed={speed}");
 
             if (activeWorkshopCutsceneTarget.Length() <= 0.001f || activeWorkshopCutsceneTarget.DistanceToSquared(target) > 0.01f)
             {
@@ -3241,7 +3480,7 @@ namespace BennysMotorworksRevamped
                 ? 0.5f
                 : Math.Max(radius, MinimumCutsceneWaypointRadius - 0.5f);
 
-            Logger.Log($"Issuing TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE with style {drivingStyle:X}");
+            Logger.Debug($"Issuing TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE with style {drivingStyle:X}");
 
             Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE,
                 ply.Handle,
@@ -3298,7 +3537,7 @@ namespace BennysMotorworksRevamped
 
             if (isStuck || noProgress)
             {
-                Logger.Log($"Refresh: re-issuing drive, stuck={isStuck}, noProgress={noProgress}");
+                Logger.Debug($"Refresh: re-issuing drive, stuck={isStuck}, noProgress={noProgress}");
                 float boostedSpeed = Math.Min(activeWorkshopCutsceneTargetSpeed * 1.2f, 8.0f);
                 Vector3 driveTarget = activeWorkshopCutsceneDriveTarget.Length() > 0.001f
                     ? activeWorkshopCutsceneDriveTarget
@@ -3320,7 +3559,7 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
-            Logger.Log($"Exit cutscene rollover recovery: roll={roll:0.0}");
+            Logger.Debug($"Exit cutscene rollover recovery: roll={roll:0.0}");
 
             Function.Call(Hash.SET_ENTITY_VELOCITY, veh.Handle, 0.0f, 0.0f, 0.0f);
             Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, veh.Handle, 0.0f);
@@ -3425,8 +3664,6 @@ namespace BennysMotorworksRevamped
                 {
                     SetCutsceneVehicleTransform(ExitCutsceneWaypointB, 312.8701f);
                 }
-
-                veh.Repair();
             }
 
             SetEnterCutsceneCooldown(12000);
@@ -3510,7 +3747,6 @@ namespace BennysMotorworksRevamped
                     EnsurePlayerInVehicleForCutscene();
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
                     camera?.Stop();
-                    veh.Repair();
 
                     SetCutsceneVehicleTransform(ExitCutsceneLanePosition, GetHeadingToward(ExitCutsceneLanePosition, ExitCutsceneWaypointA, 190.3224f));
 
@@ -3888,6 +4124,10 @@ namespace BennysMotorworksRevamped
                     PrimaryColor = veh.Mods.PrimaryColor,
                     RimColor = veh.Mods.RimColor,
                     SecondaryColor = veh.Mods.SecondaryColor,
+                    CustomPrimaryColor = veh.Mods.CustomPrimaryColor,
+                    CustomSecondaryColor = veh.Mods.CustomSecondaryColor,
+                    IsPrimaryColorCustom = veh.Mods.IsPrimaryColorCustom,
+                    IsSecondaryColorCustom = veh.Mods.IsSecondaryColorCustom,
                     TireSmokeColor = veh.Mods.TireSmokeColor,
                     NeonLightsColor = veh.Mods.NeonLightsColor,
                     PlateNumbers = veh.Mods.LicensePlate,
