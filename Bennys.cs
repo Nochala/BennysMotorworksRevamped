@@ -31,6 +31,7 @@ namespace BennysMotorworksRevamped
 
             LoadSettings();
             Logger.Initialize();
+            LogCompatibilityProfile();
             Logger.Log("Bennys startup queued.");
         }
 
@@ -189,7 +190,7 @@ namespace BennysMotorworksRevamped
 
                 if (isInBennysInterior && !IsArenaWarDLCInstalled())
                 {
-                    Helper.DisplayHelpTextThisFrame("Un-supported GTA V version detected! SPB may not work properly on this version.");
+                    Helper.DisplayHelpTextThisFrame("Unsupported GTA V version detected! SPB may not work properly on this version.");
                 }
 
                 if (!string.IsNullOrEmpty(vehicleDenialMessage)

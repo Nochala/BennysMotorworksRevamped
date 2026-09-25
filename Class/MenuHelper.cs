@@ -432,7 +432,7 @@ namespace BennysMotorworksRevamped
             target.SetMod(VehicleMod.Trim, memory.Trim, false);
             target.SetMod(VehicleMod.Tank, memory.Tank, false);
             target.SetMod(VehicleMod.Windows, memory.Windows, false);
-            target.SetMod(VehicleMod.Livery, memory.Livery, false);
+            target.SetPrimaryLivery(memory.Livery);
             target.SetLivery2(memory.Livery2);
 
             target.ToggleMod(VehicleToggleMod.Turbo, memory.Turbo);
@@ -952,6 +952,12 @@ namespace BennysMotorworksRevamped
 
         public static void UpdateLightColorPreviewLighting()
         {
+            if (!Helper.SupportsVehicleLightBlackoutIsolation)
+            {
+                _lightColorPreviewBlackoutActive = false;
+                return;
+            }
+
             UIMenu visibleMenu = UIMenu.GetVisibleMenu();
             bool shouldBlackout = visibleMenu == mHeadlights || visibleMenu == mNeon || visibleMenu == mNeonColor;
 
@@ -976,6 +982,12 @@ namespace BennysMotorworksRevamped
 
         public static void RestoreLightColorPreviewLighting()
         {
+            if (!Helper.SupportsVehicleLightBlackoutIsolation)
+            {
+                _lightColorPreviewBlackoutActive = false;
+                return;
+            }
+
             if (!_lightColorPreviewBlackoutActive)
             {
                 return;
@@ -1629,6 +1641,68 @@ namespace BennysMotorworksRevamped
             return string.IsNullOrWhiteSpace(localized) || localized.Equals("NULL", StringComparison.OrdinalIgnoreCase)
                 ? fallback
                 : localized;
+        }
+
+        private static int GetPrimaryLiveryCountSafely()
+        {
+            try
+            {
+                return veh == null || !veh.Exists() ? 0 : veh.GetPrimaryLiveryCount();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private static string GetPrimaryLiveryNameSafely(int index, int count)
+        {
+            if (index < 0)
+            {
+                string stock = Game.GetLocalizedString("CMOD_ARM_0");
+                return string.IsNullOrWhiteSpace(stock) || stock.Equals("NULL", StringComparison.OrdinalIgnoreCase)
+                    ? "Stock"
+                    : stock;
+            }
+
+            try
+            {
+                if (veh == null || !veh.Exists())
+                {
+                    return "Livery " + (index + 1).ToString();
+                }
+
+                if (veh.UsesModSlotLivery())
+                {
+                    string modName = GetLocalizedModName(index, count, VehicleMod.Livery);
+                    if (!string.IsNullOrWhiteSpace(modName) && !modName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return modName;
+                    }
+                }
+                else
+                {
+                    string label = Function.Call<string>(Hash.GET_LIVERY_NAME, veh.Handle, index);
+                    if (!string.IsNullOrWhiteSpace(label) && !label.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (DoesGXTEntryExist(label))
+                        {
+                            string localized = Game.GetLocalizedString(label);
+                            if (!string.IsNullOrWhiteSpace(localized) && !localized.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                            {
+                                return localized;
+                            }
+                        }
+
+                        return label;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return "Livery " + (index + 1).ToString();
         }
 
         private static int GetLivery2CountSafely()
@@ -2327,7 +2401,7 @@ namespace BennysMotorworksRevamped
                         MainMenu.AddItem(giHydraulics);
                         MainMenu.BindMenuToItem(mHydraulics, giHydraulics);
                     }
-                    if (veh.GetModCount(VehicleMod.Livery) != 0)
+                    if (GetPrimaryLiveryCountSafely() != 0)
                     {
                         iLivery = new UIMenuItem(GetModCategoryName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iLivery);
@@ -2567,7 +2641,7 @@ namespace BennysMotorworksRevamped
                         MainMenu.AddItem(giHydraulics);
                         MainMenu.BindMenuToItem(mHydraulics, giHydraulics);
                     }
-                    if (veh.GetModCount(VehicleMod.Livery) != 0)
+                    if (GetPrimaryLiveryCountSafely() != 0)
                     {
                         iLivery = new UIMenuItem(GetModCategoryName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iLivery);
@@ -2997,8 +3071,9 @@ namespace BennysMotorworksRevamped
                 }
 
                 menu.MenuItems.Clear();
-                int count = veh.GetModCount(vehmod);
-                int equippedMod = veh.GetMod(vehmod);
+                bool isPrimaryLivery = vehmod == VehicleMod.Livery;
+                int count = isPrimaryLivery ? GetPrimaryLiveryCountSafely() : veh.GetModCount(vehmod);
+                int equippedMod = isPrimaryLivery ? veh.GetPrimaryLivery() : veh.GetMod(vehmod);
                 HashSet<string> hornNames = vehmod == VehicleMod.Horns
                     ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                     : null;
@@ -3008,7 +3083,9 @@ namespace BennysMotorworksRevamped
 
                 for (int i = -1; i < count; i++)
                 {
-                    item = new UIMenuItem(GetLocalizedModName(i, count, vehmod));
+                    item = new UIMenuItem(isPrimaryLivery
+                        ? GetPrimaryLiveryNameSafely(i, count)
+                        : GetLocalizedModName(i, count, vehmod));
                     if (item.Text == "NULL")
                     {
                         item.Text = Game.GetLocalizedString("CMOD_ARM_0");
@@ -3136,25 +3213,28 @@ namespace BennysMotorworksRevamped
                 menu.AddItem(stockItem);
                 item = stockItem;
 
-                for (int i = 0; i <= 12; i++)
+                if (Helper.SupportsColoredXenonHeadlights)
                 {
-                    string label = LocalizedXenonColor(i);
-                    var createdItem = new UIMenuItem(label);
-
-                    if (xenonEnabled && currentColor == i)
+                    for (int i = 0; i <= 12; i++)
                     {
-                        createdItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
-                        createdItem.Tag = new ToggleModClass(true, i, 0);
-                    }
-                    else
-                    {
-                        int price = 500;
-                        createdItem.SetRightLabel($"${price}");
-                        createdItem.Tag = new ToggleModClass(true, i, price);
-                    }
+                        string label = LocalizedXenonColor(i);
+                        var createdItem = new UIMenuItem(label);
 
-                    menu.AddItem(createdItem);
-                    item = createdItem;
+                        if (xenonEnabled && currentColor == i)
+                        {
+                            createdItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                            createdItem.Tag = new ToggleModClass(true, i, 0);
+                        }
+                        else
+                        {
+                            int price = 500;
+                            createdItem.SetRightLabel($"${price}");
+                            createdItem.Tag = new ToggleModClass(true, i, price);
+                        }
+
+                        menu.AddItem(createdItem);
+                        item = createdItem;
+                    }
                 }
 
                 menu.RefreshIndex();
@@ -3169,9 +3249,7 @@ namespace BennysMotorworksRevamped
         {
             try
             {
-                return vehicle != null
-                    ? Function.Call<int>((Hash)0x3DFF319A831E0CDBUL, vehicle.Handle)
-                    : 255;
+                return vehicle != null ? vehicle.GetXenonHeadlightsColor() : 255;
             }
             catch (Exception ex)
             {
@@ -5041,7 +5119,7 @@ namespace BennysMotorworksRevamped
                     newAWVeh.SetMod(VehicleMod.Hood, lastVehMemory.Hood, false);
                     newAWVeh.SetMod(VehicleMod.Horns, lastVehMemory.Horns, false);
                     newAWVeh.SetMod(VehicleMod.Hydraulics, lastVehMemory.Hydraulics, false);
-                    newAWVeh.SetMod(VehicleMod.Livery, lastVehMemory.Livery, false);
+                    newAWVeh.SetPrimaryLivery(lastVehMemory.Livery);
                     newAWVeh.SetLivery2(lastVehMemory.Livery2);
                     newAWVeh.SetMod(VehicleMod.Ornaments, lastVehMemory.Ornaments, false);
                     newAWVeh.SetMod(VehicleMod.Plaques, lastVehMemory.Plaques, false);
@@ -5586,7 +5664,7 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        veh.SetMod(VehicleMod.Livery, mc.ModID, false);
+                        veh.SetPrimaryLivery(mc.ModID);
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
@@ -6950,7 +7028,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if (sender == mLivery)
                     {
-                        veh.SetMod(VehicleMod.Livery, mc.ModID, false);
+                        veh.SetPrimaryLivery(mc.ModID);
                     }
                     else if (sender == mTornadoC)
                     {
@@ -7277,7 +7355,7 @@ namespace BennysMotorworksRevamped
                         newVeh.SetMod(VehicleMod.Hood, lastVehMemory.Hood, false);
                         newVeh.SetMod(VehicleMod.Horns, lastVehMemory.Horns, false);
                         newVeh.SetMod(VehicleMod.Hydraulics, lastVehMemory.Hydraulics, false);
-                        newVeh.SetMod(VehicleMod.Livery, lastVehMemory.Livery, false);
+                        newVeh.SetPrimaryLivery(lastVehMemory.Livery);
                         newVeh.SetLivery2(lastVehMemory.Livery2);
                         newVeh.SetMod(VehicleMod.Ornaments, lastVehMemory.Ornaments, false);
                         newVeh.SetMod(VehicleMod.Plaques, lastVehMemory.Plaques, false);
@@ -7366,7 +7444,7 @@ namespace BennysMotorworksRevamped
                         newVeh.SetMod(VehicleMod.Hood, lastVehMemory.Hood, false);
                         newVeh.SetMod(VehicleMod.Horns, lastVehMemory.Horns, false);
                         newVeh.SetMod(VehicleMod.Hydraulics, lastVehMemory.Hydraulics, false);
-                        newVeh.SetMod(VehicleMod.Livery, lastVehMemory.Livery, false);
+                        newVeh.SetPrimaryLivery(lastVehMemory.Livery);
                         newVeh.SetLivery2(lastVehMemory.Livery2);
                         newVeh.SetMod(VehicleMod.Ornaments, lastVehMemory.Ornaments, false);
                         newVeh.SetMod(VehicleMod.Plaques, lastVehMemory.Plaques, false);
@@ -7827,7 +7905,7 @@ namespace BennysMotorworksRevamped
                 veh.SetMod(VehicleMod.Hood, lastVehMemory.Hood, false);
                 veh.SetMod(VehicleMod.Horns, lastVehMemory.Horns, false);
                 veh.SetMod(VehicleMod.Hydraulics, lastVehMemory.Hydraulics, false);
-                veh.SetMod(VehicleMod.Livery, lastVehMemory.Livery, false);
+                veh.SetPrimaryLivery(lastVehMemory.Livery);
                 veh.SetLivery2(lastVehMemory.Livery2);
                 veh.SetMod(VehicleMod.Plaques, lastVehMemory.Plaques, false);
                 veh.SetMod(VehicleMod.Roof, lastVehMemory.Roof, false);

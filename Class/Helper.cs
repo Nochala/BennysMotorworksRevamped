@@ -158,6 +158,13 @@ namespace BennysMotorworksRevamped
         public static float vehicleStatsOffsetY = -10f;
         public static string arenaVehImage = "brusier_apoc";
 
+        private static bool _compatibilityProfileLogged = false;
+
+        public static bool SupportsRoofLivery2 => IsGameBuildAtLeast(505, GameVersion.v1_0_505_2_Steam);
+        public static bool SupportsColoredXenonHeadlights => IsGameBuildAtLeast(1604, GameVersion.v1_0_1604_0_Steam);
+        public static bool SupportsVehicleManufacturerName => IsGameBuildAtLeast(1868, GameVersion.v1_0_1868_0_Steam);
+        public static bool SupportsVehicleLightBlackoutIsolation => IsGameBuildAtLeast(2060, GameVersion.v1_0_2060_0_Steam);
+
         private const float MaximumWorkshopVehicleWidth = 3.0f;
         private const float MaximumWorkshopVehicleLength = 7.0f;
         private const float MaximumWorkshopVehicleHeight = 3.5f;
@@ -167,6 +174,105 @@ namespace BennysMotorworksRevamped
         private static readonly Dictionary<int, bool> oversizedVehicleModels = new Dictionary<int, bool>();
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
+
+        private static bool IsGameBuildAtLeast(int minimumLegacyBuild, GameVersion minimumVersion)
+        {
+            if (IsEnhancedGameBuild())
+            {
+                return true;
+            }
+
+            try
+            {
+                Version fileVersion = Game.FileVersion;
+                if (fileVersion != null && fileVersion.Build > 0)
+                {
+                    return fileVersion.Build >= minimumLegacyBuild;
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+#pragma warning disable 618
+                GameVersion gameVersion = Game.Version;
+#pragma warning restore 618
+                if (gameVersion != GameVersion.Unknown)
+                {
+                    return (int)gameVersion >= (int)minimumVersion;
+                }
+            }
+            catch
+            {
+            }
+
+            return true;
+        }
+
+        public static void LogCompatibilityProfile()
+        {
+            if (_compatibilityProfileLogged)
+            {
+                return;
+            }
+
+            _compatibilityProfileLogged = true;
+
+            string gameVersionName = "Unknown";
+            string fileVersionName = "Unknown";
+
+            try
+            {
+#pragma warning disable 618
+                gameVersionName = Game.Version.ToString();
+#pragma warning restore 618
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (Game.FileVersion != null)
+                {
+                    fileVersionName = Game.FileVersion.ToString();
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Log("GTA profile: gameVersion=" + gameVersionName + ", fileVersion=" + fileVersionName + ".");
+
+            List<string> disabledFeatures = new List<string>();
+            if (!SupportsRoofLivery2)
+            {
+                disabledFeatures.Add("secondary/roof liveries (requires build 505+)");
+            }
+            if (!SupportsColoredXenonHeadlights)
+            {
+                disabledFeatures.Add("colored Xenon headlights (requires build 1604+)");
+            }
+            if (!SupportsVehicleManufacturerName)
+            {
+                disabledFeatures.Add("vehicle manufacturername lookup (requires build 1868+)");
+            }
+            if (!SupportsVehicleLightBlackoutIsolation)
+            {
+                disabledFeatures.Add("vehicle light blackout isolation (requires build 2060+)");
+            }
+
+            if (disabledFeatures.Count > 0)
+            {
+                Logger.Log("Older GTA compatibility mode active. Disabled unsupported features: " + string.Join(", ", disabledFeatures) + ".");
+            }
+            else
+            {
+                Logger.Debug("GTA profile: all optional native features enabled.");
+            }
+        }
 
         private static bool IsMissingDisplayText(string value)
         {
@@ -2350,17 +2456,123 @@ namespace BennysMotorworksRevamped
 
         public static void SetLivery2(this Vehicle veh, int liv)
         {
+            if (veh == null || !SupportsRoofLivery2)
+            {
+                return;
+            }
+
             Function.Call((Hash)0xA6D3A8750DC73270UL, veh.Handle, liv);
         }
 
         public static int GetLivery2(this Vehicle veh)
         {
+            if (veh == null || !SupportsRoofLivery2)
+            {
+                return -1;
+            }
+
             return Function.Call<int>((Hash)0x60190048C0764A26UL, veh.Handle);
         }
 
         public static int Livery2Count(this Vehicle veh)
         {
+            if (veh == null || !SupportsRoofLivery2)
+            {
+                return 0;
+            }
+
             return Function.Call<int>((Hash)0x5ECB40269053C0D4UL, veh.Handle);
+        }
+
+        public static bool UsesModSlotLivery(this Vehicle vehicle)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return false;
+            }
+
+            try
+            {
+                return vehicle.GetModCount(VehicleMod.Livery) > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static int GetPrimaryLiveryCount(this Vehicle vehicle)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return 0;
+            }
+
+            try
+            {
+                int modSlotCount = vehicle.GetModCount(VehicleMod.Livery);
+                if (modSlotCount > 0)
+                {
+                    return modSlotCount;
+                }
+
+                return Math.Max(0, Function.Call<int>(Hash.GET_VEHICLE_LIVERY_COUNT, vehicle.Handle));
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public static int GetPrimaryLivery(this Vehicle vehicle)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return -1;
+            }
+
+            try
+            {
+                if (vehicle.UsesModSlotLivery())
+                {
+                    return vehicle.GetMod(VehicleMod.Livery);
+                }
+
+                if (Function.Call<int>(Hash.GET_VEHICLE_LIVERY_COUNT, vehicle.Handle) > 0)
+                {
+                    return Function.Call<int>(Hash.GET_VEHICLE_LIVERY, vehicle.Handle);
+                }
+            }
+            catch
+            {
+            }
+
+            return -1;
+        }
+
+        public static void SetPrimaryLivery(this Vehicle vehicle, int livery)
+        {
+            if (vehicle == null || !vehicle.Exists())
+            {
+                return;
+            }
+
+            try
+            {
+                if (vehicle.UsesModSlotLivery())
+                {
+                    vehicle.SetMod(VehicleMod.Livery, livery, false);
+                    return;
+                }
+
+                if (Function.Call<int>(Hash.GET_VEHICLE_LIVERY_COUNT, vehicle.Handle) > 0)
+                {
+                    Function.Call(Hash.SET_VEHICLE_LIVERY, vehicle.Handle, livery);
+                }
+            }
+            catch
+            {
+            }
         }
 
         public static int GetBennysOriginalRim(int curRim)
@@ -2493,20 +2705,41 @@ namespace BennysMotorworksRevamped
 
         public static void SetXenonHeadlightsColor(this Vehicle veh, int colorID, bool toggleXenon)
         {
+            if (veh == null)
+            {
+                return;
+            }
+
             if (toggleXenon)
             {
                 veh.ToggleMod(VehicleToggleMod.XenonHeadlights, true);
             }
+
+            if (!SupportsColoredXenonHeadlights)
+            {
+                return;
+            }
+
             Function.Call((Hash)0xE41033B25D003A07UL, veh.Handle, colorID);
         }
 
         public static int GetXenonHeadlightsColor(this Vehicle veh)
         {
+            if (veh == null || !SupportsColoredXenonHeadlights)
+            {
+                return 255;
+            }
+
             return Function.Call<int>((Hash)0x3DFF319A831E0CDBUL, veh.Handle);
         }
 
         public static string Brand(this Vehicle veh)
         {
+            if (veh == null || !SupportsVehicleManufacturerName)
+            {
+                return string.Empty;
+            }
+
             return Gxt(Function.Call<string>((Hash)0xF7AF4F159FF99F97UL, veh.Model.Hash));
         }
 
@@ -4109,7 +4342,7 @@ namespace BennysMotorworksRevamped
                     Hood = veh.GetMod(VehicleMod.Hood),
                     Horns = veh.GetMod(VehicleMod.Horns),
                     Hydraulics = veh.GetMod(VehicleMod.Hydraulics),
-                    Livery = veh.GetMod(VehicleMod.Livery),
+                    Livery = veh.GetPrimaryLivery(),
                     Livery2 = veh.GetLivery2(),
                     Plaques = veh.GetMod(VehicleMod.Plaques),
                     Roof = veh.GetMod(VehicleMod.Roof),
