@@ -1,4 +1,4 @@
-using GTA;
+﻿using GTA;
 using GTA.Native;
 using LemonUI;
 using LemonUI.Scaleform;
@@ -548,6 +548,7 @@ namespace BennysMotorworksRevamped
                     }
 
                     MenuHelper.RefreshMenuMouseBehavior();
+                    MenuHelper.ProcessMenuMouseWheelScrolling();
                     MenuHelper.RefreshInstructionalButtons();
                     MenuHelper._menuPool?.Process();
                 }

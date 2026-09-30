@@ -1095,6 +1095,40 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        public static void ProcessMenuMouseWheelScrolling()
+        {
+            if (!optEnableMouse || _menuPool == null || !_menuPool.AreAnyVisible)
+            {
+                return;
+            }
+
+            UIMenu visibleMenu = UIMenu.GetVisibleMenu();
+            if (visibleMenu == null || visibleMenu.NativeMenu == null || visibleMenu.MenuItems.Count == 0
+                || visibleMenu.NativeMenu.MouseBehavior != LemonUI.Menus.MenuMouseBehavior.Movement)
+            {
+                return;
+            }
+
+            bool scrollUp = Game.IsControlJustPressed(Control.CursorScrollUp)
+                || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_PRESSED, 0, (int)Control.CursorScrollUp);
+            bool scrollDown = Game.IsControlJustPressed(Control.CursorScrollDown)
+                || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_PRESSED, 0, (int)Control.CursorScrollDown);
+
+            if (scrollUp == scrollDown)
+            {
+                return;
+            }
+
+            if (scrollUp)
+            {
+                visibleMenu.NativeMenu.Previous();
+            }
+            else
+            {
+                visibleMenu.NativeMenu.Next();
+            }
+        }
+
         private static bool IsEnginePreviewMenu(UIMenu menu)
         {
             return menu == mEngine || menu == mNitro || menu == mEngineBlock || menu == mAirFilter
@@ -3787,12 +3821,9 @@ namespace BennysMotorworksRevamped
                 giWheelType = new UIMenuItem(LocalizedModGroupName(GroupName.WheelType), Game.GetLocalizedString("CMOD_MOD_28_D"));
                 gmWheels.AddItem(giWheelType);
                 gmWheels.BindMenuToItem(gmWheelType, giWheelType);
-                if (SupportsWheelColor())
-                {
-                    iRimColor = new UIMenuItem(LocalizedModGroupName(GroupName.WheelColor), Game.GetLocalizedString("CMOD_MOD_59_D"));
-                    gmWheels.AddItem(iRimColor);
-                    gmWheels.BindMenuToItem(mRimColor, iRimColor);
-                }
+                iRimColor = new UIMenuItem(LocalizedModGroupName(GroupName.WheelColor), Game.GetLocalizedString("CMOD_MOD_59_D"));
+                gmWheels.AddItem(iRimColor);
+                gmWheels.BindMenuToItem(mRimColor, iRimColor);
                 giTires = new UIMenuItem(LocalizedModGroupName(GroupName.Tires), Game.GetLocalizedString("CMOD_IE_25_D"));
                 gmWheels.AddItem(giTires);
                 gmWheels.BindMenuToItem(gmTires, giTires);

@@ -116,6 +116,8 @@ namespace BennysMotorworksRevamped
         public static int fixDoor = 1;
         public static bool allowOversizedVehicles = true;
         public static bool allowEmergencyVehicles = true;
+        public static bool allowServiceVehicles = true;
+        public static bool allowUtilityVehicles = true;
         public static int bennyIntID;
         public static bool isExiting = false;
         public static Memory lastVehMemory;
@@ -3273,6 +3275,8 @@ namespace BennysMotorworksRevamped
             fixDoor = config.GetValue<int>("SETTINGS", "FixDoor", 1);
             allowOversizedVehicles = config.GetValue("SETTINGS", "AllowOversizedVehicles", true);
             allowEmergencyVehicles = config.GetValue("SETTINGS", "AllowEmergencyVehicles", true);
+            allowServiceVehicles = config.GetValue("SETTINGS", "AllowServiceVehicles", true);
+            allowUtilityVehicles = config.GetValue("SETTINGS", "AllowUtilityVehicles", true);
             vehicleStatsOffsetX = config.GetValue<float>("VEHICLE_STATS", "OffsetX", 0f);
             vehicleStatsOffsetY = config.GetValue<float>("VEHICLE_STATS", "OffsetY", -10f);
             fpcKey = config.GetValue<GTA.Control>("CONTROLS", "FirstPerson", GTA.Control.NextCamera);
@@ -3360,6 +3364,16 @@ namespace BennysMotorworksRevamped
             if (!allowEmergencyVehicles && vehicle.ClassType == VehicleClass.Emergency)
             {
                 return "Emergency Vehicles Not Allowed";
+            }
+
+            if (!allowServiceVehicles && vehicle.ClassType == VehicleClass.Service)
+            {
+                return "Service Vehicles Not Allowed";
+            }
+
+            if (!allowUtilityVehicles && vehicle.ClassType == VehicleClass.Utility)
+            {
+                return "Utility Vehicles Not Allowed";
             }
 
             if (!allowOversizedVehicles && IsOversizedWorkshopVehicle(vehicle))
