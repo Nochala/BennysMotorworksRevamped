@@ -57,9 +57,7 @@ GTA V/scripts/ folder.
 
   
 ### Planned Upcoming Features 
-- Improved Addon Vehicle Support
-- Cutscene improvements
-- Multiple languages
+- Finished!
 
 ## Credits
 ### _ImNotMentaL_   
