@@ -55,10 +55,6 @@ GTA V/scripts/ folder.
 - Enjoy
 
 
-  
-### Planned Upcoming Features 
-- Finished!
-
 ## Credits
 ### _ImNotMentaL_   
 ### _Guadmaz_
@@ -69,6 +65,9 @@ GTA V/scripts/ folder.
 ### _justalemon_
 ### _Dogamizer_
 ### _ShinyWasabi_
+### _Dogamizer_
+### _GrandHaven_
+### _calamity-inc_
 
 ## Mod pages:
 - [**GTA5 Mods**](https://www.gta5-mods.com/scripts/benny-s-motor-works-in-sp-revamped)
