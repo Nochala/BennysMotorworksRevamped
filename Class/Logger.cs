@@ -9,7 +9,10 @@ namespace BennysMotorworksRevamped
         private static bool _sessionPrepared;
 
         public static bool Enabled => Helper.optLogging;
-        public static bool DebugEnabled => Enabled && Helper.optDebugLogging;
+        public static bool DebugEnabled => Helper.optDebugLogging;
+
+        private static string LogDirectory => AppDomain.CurrentDomain.BaseDirectory;
+        private static string LogFilePath => Path.Combine(LogDirectory, "BennysMotorworksRevamped.log");
 
         public static void Initialize()
         {
@@ -17,16 +20,13 @@ namespace BennysMotorworksRevamped
             {
                 lock (SyncRoot)
                 {
-                    PrepareSessionFiles();
+                    PrepareSessionFile();
                 }
             }
             catch
             {
             }
         }
-
-        private static string LogDirectory => Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-        private static string LogFilePath => Path.Combine(LogDirectory, "BennysMotorworksRevamped.log");
 
         public static void Log(object message)
         {
@@ -35,7 +35,7 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
-            AppendLine(LogFilePath, message);
+            AppendLine(message);
         }
 
         public static void Debug(object message)
@@ -45,17 +45,19 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
-            AppendLine(LogFilePath, "[DEBUG] " + message);
+            AppendLine("[DEBUG] " + message);
         }
 
-        private static void AppendLine(string filePath, object message)
+        private static void AppendLine(object message)
         {
             try
             {
                 lock (SyncRoot)
                 {
-                    PrepareSessionFiles();
-                    File.AppendAllText(filePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}: {message}{Environment.NewLine}");
+                    PrepareSessionFile();
+                    File.AppendAllText(
+                        LogFilePath,
+                        $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}: {message}{Environment.NewLine}");
                 }
             }
             catch
@@ -63,17 +65,16 @@ namespace BennysMotorworksRevamped
             }
         }
 
-        private static void PrepareSessionFiles()
+        private static void PrepareSessionFile()
         {
-            if (_sessionPrepared)
+            if (_sessionPrepared || (!Enabled && !DebugEnabled))
             {
                 return;
             }
 
             Directory.CreateDirectory(LogDirectory);
 
-            try { File.WriteAllText(LogFilePath, string.Empty); } catch { }
-
+            File.WriteAllText(LogFilePath, string.Empty);
             _sessionPrepared = true;
         }
     }
@@ -81,5 +82,6 @@ namespace BennysMotorworksRevamped
     public static class logger
     {
         public static void Log(object message) => Logger.Log(message);
+        public static void Debug(object message) => Logger.Debug(message);
     }
 }

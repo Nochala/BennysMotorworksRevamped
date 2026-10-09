@@ -112,8 +112,15 @@ namespace BennysMotorworksRevamped
 
         public static Vehicle veh, tra;
         public static Ped ply;
-        public static int onlineMap = 0;
         public static int fixDoor = 1;
+        public static bool bypassGarageDoor = false;
+        private const ulong ArePlayerStarsGreyedOutNative = 0x0A6EB355EE14A2DBUL;
+        private const int NearbyPoliceSightProbeMs = 250;
+        private const float NearbyPoliceSightRange = 55.0f;
+        private static int _nearbyPoliceSightLastTime = -1;
+        private static int _nearbyPoliceSightPlayerHandle;
+        private static bool _nearbyPoliceCanSeePlayer;
+        public static bool cheapRepairCost = false;
         public static bool allowOversizedVehicles = true;
         public static bool allowEmergencyVehicles = true;
         public static bool allowServiceVehicles = true;
@@ -127,12 +134,12 @@ namespace BennysMotorworksRevamped
         public static bool optLogging = true;
         public static bool optDebugLogging = true;
         public static bool optEnableMouse = false;
-        private const int ExternalBennysInteriorProbeDelayMs = 1000;
-        private const int ExternalBennysInteriorFailureLogDelayMs = 5000;
+        private const int BennysInteriorProbeDelayMs = 1000;
+        private const int BennysInteriorFailureLogDelayMs = 5000;
         private const ulong SetVehicleInCarModShopHash = 0x9D44FCCE98450843UL;
-        private static int _nextExternalBennysInteriorProbeTime = 0;
-        private static int _externalBennysInteriorMissingSince = 0;
-        private static bool _bennysSPInteriorRegistrationLogged = false;
+        private static int _nextBennysInteriorProbeTime = 0;
+        private static int _bennysInteriorMissingSince = 0;
+        private static bool _bennysDlcInteriorLogged = false;
         private static bool _bennysInteriorMissingLogged = false;
         private const int ShopInitRetryDelayMs = 125;
         private const int ShopInitTimeoutMs = 4000;
@@ -416,6 +423,346 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.SET_VEHICLE_MOD_KIT, vehicle.Handle, 0);
         }
 
+        public static bool IsWantedAndPoliceTrackingPlayer()
+        {
+            if (Game.Player == null || Game.Player.Character == null
+                || !Game.Player.Character.Exists())
+            {
+                return false;
+            }
+
+            int playerHandle = Game.Player.Handle;
+            if (Function.Call<int>(Hash.GET_PLAYER_WANTED_LEVEL, playerHandle) <= 0)
+            {
+                _nearbyPoliceCanSeePlayer = false;
+                return false;
+            }
+
+            try
+            {
+                if (!Function.Call<bool>((Hash)ArePlayerStarsGreyedOutNative, playerHandle))
+                {
+                    return true;
+                }
+
+                if (Function.Call<bool>((Hash)0xB0034A223497FFCBUL)
+                    || Function.Call<bool>((Hash)0x797AC7CB535BA28FUL)
+                    || Function.Call<bool>((Hash)0xB16FCE9DDC7BA182UL)
+                    || Function.Call<bool>((Hash)0x5C544BC6C57AC575UL))
+                {
+                    return true;
+                }
+
+                return IsNearbyPoliceOfficerSeeingPlayer(Game.Player.Character);
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        private static bool IsNearbyPoliceOfficerSeeingPlayer(Ped player)
+        {
+            int now = Game.GameTime;
+            if (_nearbyPoliceSightPlayerHandle == player.Handle
+                && _nearbyPoliceSightLastTime >= 0
+                && now >= _nearbyPoliceSightLastTime
+                && now - _nearbyPoliceSightLastTime < NearbyPoliceSightProbeMs)
+            {
+                return _nearbyPoliceCanSeePlayer;
+            }
+
+            _nearbyPoliceSightPlayerHandle = player.Handle;
+            _nearbyPoliceSightLastTime = now;
+            _nearbyPoliceCanSeePlayer = false;
+
+            if (player.Position.DistanceToSquared(EnterTriggerPosition) > 75.0f * 75.0f)
+            {
+                return false;
+            }
+
+            Vehicle playerVehicle = player.CurrentVehicle;
+            int visibleTarget = playerVehicle != null && playerVehicle.Exists()
+                ? playerVehicle.Handle : player.Handle;
+
+            foreach (Ped officer in World.GetNearbyPeds(player, NearbyPoliceSightRange))
+            {
+                if (officer == null || !officer.Exists() || officer.Handle == player.Handle)
+                {
+                    continue;
+                }
+
+                int pedType = Function.Call<int>(Hash.GET_PED_TYPE, officer.Handle);
+                if (pedType != 6 && pedType != 27 && pedType != 29)
+                {
+                    continue;
+                }
+
+                if (Function.Call<bool>(Hash.IS_PED_DEAD_OR_DYING, officer.Handle, true)
+                    || !Function.Call<bool>(Hash.IS_PED_FACING_PED, officer.Handle,
+                        player.Handle, 80.0f))
+                {
+                    continue;
+                }
+
+                if (Function.Call<bool>(Hash.HAS_ENTITY_CLEAR_LOS_TO_ENTITY,
+                    officer.Handle, visibleTarget, 17))
+                {
+                    _nearbyPoliceCanSeePlayer = true;
+                    break;
+                }
+            }
+
+            return _nearbyPoliceCanSeePlayer;
+        }
+
+        public static void ClearWorkshopWantedLevelAfterRespray()
+        {
+            if (Game.Player != null &&
+                Function.Call<int>(Hash.GET_PLAYER_WANTED_LEVEL, Game.Player.Handle) > 0)
+            {
+                Function.Call(Hash.CLEAR_PLAYER_WANTED_LEVEL, Game.Player.Handle);
+                Logger.Debug("Wanted level cleared after a confirmed vehicle respray.");
+            }
+        }
+
+        public static void MarkWorkshopVehicleAsOwned(Vehicle target)
+        {
+            if (target == null || !target.Exists())
+            {
+                return;
+            }
+
+            try
+            {
+                Function.Call(Hash.SET_VEHICLE_HAS_BEEN_OWNED_BY_PLAYER, target.Handle, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("Could not update native vehicle ownership: " + ex.Message);
+            }
+        }
+
+        public static void TransferWorkshopVehicleIdentity(Vehicle original, Vehicle replacement)
+        {
+            if (original == null || replacement == null || !original.Exists() || !replacement.Exists())
+            {
+                return;
+            }
+
+            try
+            {
+                replacement.IsPersistent = original.IsPersistent;
+                MarkWorkshopVehicleAsOwned(replacement);
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("Could not transfer native vehicle identity: " + ex.Message);
+            }
+        }
+
+        private const int StoryVehicleRecordSize = 98;
+        private const int StoryVehicleSlotSize = 295;
+
+        private static int ReadStoryGlobal(int index)
+        {
+            return GlobalVariable.Get(index).Read<int>();
+        }
+
+        private static void WriteStoryField(int recordIndex, int field, int value)
+        {
+            GlobalVariable.Get(recordIndex + field).Write(value);
+        }
+
+        private static bool HasStoryGlobal(int index)
+        {
+            return GlobalVariable.Get(index).MemoryAddress != IntPtr.Zero;
+        }
+
+        private static bool TryFindPersonalVehicleSaveRecords(Vehicle target, out int storedRecord, out int activeRecord)
+        {
+            storedRecord = -1;
+            activeRecord = -1;
+            if (target == null || !target.Exists() || Game.Player?.Character == null
+                || Game.Player.Character.CurrentVehicle?.Handle != target.Handle
+                || Function.Call<bool>(Hash.NETWORK_IS_GAME_IN_PROGRESS))
+            {
+                return false;
+            }
+
+            int playerModel = Game.Player.Character.Model.Hash;
+            int owner = -1;
+            if (playerModel == Function.Call<int>(Hash.GET_HASH_KEY, "player_zero")) owner = 0;
+            else if (playerModel == Function.Call<int>(Hash.GET_HASH_KEY, "player_one")) owner = 1;
+            else if (playerModel == Function.Call<int>(Hash.GET_HASH_KEY, "player_two")) owner = 2;
+            if (owner < 0) return false;
+
+            bool enhanced = IsEnhancedGameBuild();
+            try
+            {
+                Version version = Game.FileVersion;
+                if (version != null && version.Major >= 2) enhanced = true;
+            }
+            catch { }
+
+            int trackedHandles = enhanced ? 99817 : 99792;
+            int trackedOwners = enhanced ? 99827 : 99802;
+            int currentRecords = enhanced ? 101915 : 101890;
+            int currentHandles = enhanced ? 102214 : 102189;
+            int storedRecords = enhanced ? 120306 : 120279;
+
+            if (!HasStoryGlobal(trackedHandles + 8) || !HasStoryGlobal(trackedOwners + 8)
+                || !HasStoryGlobal(currentRecords + owner * StoryVehicleRecordSize + 97)
+                || !HasStoryGlobal(currentHandles + owner)
+                || !HasStoryGlobal(storedRecords)
+                || (ReadStoryGlobal(storedRecords) != 3 && ReadStoryGlobal(storedRecords) != 4))
+            {
+                Logger.Debug("Personal-vehicle save skipped: native "
+                    + (enhanced ? "Enhanced" : "Legacy") + " Story Mode globals not verified.");
+                return false;
+            }
+
+            bool tracked = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (ReadStoryGlobal(trackedHandles + i) == target.Handle
+                    && ReadStoryGlobal(trackedOwners + i) == owner)
+                {
+                    tracked = true;
+                    break;
+                }
+            }
+            if (!tracked)
+            {
+                Logger.Debug("Personal-vehicle save skipped: car is not in Rockstar's tracked-vehicle list for this character.");
+                return false;
+            }
+
+            int slot = Function.Call<bool>(Hash.IS_THIS_MODEL_A_BIKE, target.Model.Hash) ? 1 : 0;
+            int candidateStored = storedRecords + 1 + slot * StoryVehicleSlotSize
+                                  + 1 + owner * StoryVehicleRecordSize;
+            if (!HasStoryGlobal(candidateStored + 97)
+                || ReadStoryGlobal(candidateStored) != target.Model.Hash
+                || ReadStoryGlobal(candidateStored + 11) != 12
+                || ReadStoryGlobal(candidateStored + 31) != 49
+                || ReadStoryGlobal(candidateStored + 81) != 2)
+            {
+                Logger.Debug("Personal-vehicle save skipped: saved personal-vehicle record does not match this vehicle."
+                    + " profile=" + (enhanced ? "Enhanced" : "Legacy")
+                    + " slot=" + slot + " owner=" + owner);
+                return false;
+            }
+
+            int candidateActive = currentRecords + owner * StoryVehicleRecordSize;
+            if (ReadStoryGlobal(currentHandles + owner) == target.Handle
+                && ReadStoryGlobal(candidateActive) == target.Model.Hash
+                && ReadStoryGlobal(candidateActive + 11) == 12
+                && ReadStoryGlobal(candidateActive + 31) == 49
+                && ReadStoryGlobal(candidateActive + 81) == 2)
+            {
+                activeRecord = candidateActive;
+            }
+            storedRecord = candidateStored;
+            return true;
+        }
+
+        private static void CaptureNativeStoryVehicleRecord(Vehicle target, int record)
+        {
+            int handle = target.Handle;
+            target.InstallModKit();
+            OutputArgument primary = new OutputArgument();
+            OutputArgument secondary = new OutputArgument();
+            OutputArgument pearl = new OutputArgument();
+            OutputArgument rim = new OutputArgument();
+            Function.Call(Hash.GET_VEHICLE_COLOURS, handle, primary, secondary);
+            Function.Call(Hash.GET_VEHICLE_EXTRA_COLOURS, handle, pearl, rim);
+            WriteStoryField(record, 5, primary.GetResult<int>());
+            WriteStoryField(record, 6, secondary.GetResult<int>());
+            WriteStoryField(record, 7, pearl.GetResult<int>());
+            WriteStoryField(record, 8, rim.GetResult<int>());
+            WriteStoryField(record, 4, -1);
+            WriteStoryField(record, 9, 0);
+            WriteStoryField(record, 10, 1);
+
+            for (int extra = 1; extra <= 12; extra++)
+            {
+                WriteStoryField(record, 11 + extra,
+                    Function.Call<bool>(Hash.IS_VEHICLE_EXTRA_TURNED_ON, handle, extra) ? 1 : 0);
+            }
+
+            WriteStoryField(record, 26, Function.Call<int>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX, handle));
+            GlobalVariable.Get(record + 27).WriteString(target.Mods.LicensePlate ?? string.Empty, 16);
+
+            for (int mod = 0; mod < 49; mod++)
+            {
+                int stored;
+                if (mod >= 17 && mod <= 21)
+                {
+                    stored = Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, handle, mod) ? 1 : 0;
+                }
+                else if (mod == 22)
+                {
+                    if (!Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, handle, mod)) stored = 0;
+                    else
+                    {
+                        int xenon = Function.Call<int>(Hash.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX, handle);
+                        stored = xenon == 255 ? 1 : xenon + 2;
+                    }
+                }
+                else stored = Function.Call<int>(Hash.GET_VEHICLE_MOD, handle, mod) + 1;
+                WriteStoryField(record, 32 + mod, stored);
+            }
+            WriteStoryField(record, 82, Function.Call<bool>(Hash.GET_VEHICLE_MOD_VARIATION, handle, 23) ? 1 : 0);
+            WriteStoryField(record, 83, Function.Call<bool>(Hash.GET_VEHICLE_MOD_VARIATION, handle, 24) ? 1 : 0);
+
+            OutputArgument smokeR = new OutputArgument();
+            OutputArgument smokeG = new OutputArgument();
+            OutputArgument smokeB = new OutputArgument();
+            Function.Call(Hash.GET_VEHICLE_TYRE_SMOKE_COLOR, handle, smokeR, smokeG, smokeB);
+            WriteStoryField(record, 84, smokeR.GetResult<int>());
+            WriteStoryField(record, 85, smokeG.GetResult<int>());
+            WriteStoryField(record, 86, smokeB.GetResult<int>());
+            WriteStoryField(record, 87, Function.Call<int>(Hash.GET_VEHICLE_WINDOW_TINT, handle));
+            WriteStoryField(record, 88, Function.Call<bool>(Hash.GET_VEHICLE_TYRES_CAN_BURST, handle) ? 1 : 0);
+            WriteStoryField(record, 89, Function.Call<int>(Hash.GET_VEHICLE_LIVERY, handle));
+            WriteStoryField(record, 90, Function.Call<int>(Hash.GET_VEHICLE_WHEEL_TYPE, handle));
+
+            var neonFlags = GlobalVariable.Get(record + 92);
+            for (int side = 0; side < 4; side++)
+            {
+                int bit = side == 0 ? 30 : side == 1 ? 31 : side == 2 ? 28 : 29;
+                if (Function.Call<bool>(Hash.GET_VEHICLE_NEON_ENABLED, handle, side)) neonFlags.SetBit(bit);
+                else neonFlags.ClearBit(bit);
+            }
+            OutputArgument neonR = new OutputArgument();
+            OutputArgument neonG = new OutputArgument();
+            OutputArgument neonB = new OutputArgument();
+            Function.Call(Hash.GET_VEHICLE_NEON_COLOUR, handle, neonR, neonG, neonB);
+            WriteStoryField(record, 93, neonR.GetResult<int>());
+            WriteStoryField(record, 94, neonG.GetResult<int>());
+            WriteStoryField(record, 95, neonB.GetResult<int>());
+        }
+
+        public static void CommitStoryPersonalVehicleOnWorkshopExit()
+        {
+            try
+            {
+                int stored, active;
+                if (!TryFindPersonalVehicleSaveRecords(veh, out stored, out active)) return;
+                CaptureNativeStoryVehicleRecord(veh, stored);
+                if (active >= 0)
+                {
+                    CaptureNativeStoryVehicleRecord(veh, active);
+                }
+                Logger.Debug("Committed personal-vehicle upgrades to Rockstar Story Mode records: "
+                    + "stored=" + stored + ", active=" + (active >= 0 ? active.ToString() : "not tracked") + ".");
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("Personal-vehicle native save skipped: " + ex.Message);
+            }
+        }
+
         public static int GetMod(this Vehicle vehicle, VehicleMod modType)
         {
             try
@@ -579,10 +926,6 @@ namespace BennysMotorworksRevamped
             return referenceProbeInteriorId != 0 ? referenceProbeInteriorId : workshopInteriorId;
         }
 
-        internal static void CleanupMPDLCMapLoad()
-        {
-        }
-
         internal static void LogMissingBennysInteriorOnce()
         {
             if (_bennysInteriorMissingLogged)
@@ -591,17 +934,17 @@ namespace BennysMotorworksRevamped
             }
 
             _bennysInteriorMissingLogged = true;
-            Logger.Log("Benny's interior not found. Please install Benny's Map Loader.");
+            Logger.Log("Benny's DLC interior not detected. Check that the DLC is installed and registered for Story Mode.");
         }
 
-        private static void ProcessExternallyLoadedBennysInterior()
+        private static void ProbeBennysDlcInterior()
         {
-            if (Game.GameTime < _nextExternalBennysInteriorProbeTime)
+            if (Game.GameTime < _nextBennysInteriorProbeTime)
             {
                 return;
             }
 
-            _nextExternalBennysInteriorProbeTime = Game.GameTime + ExternalBennysInteriorProbeDelayMs;
+            _nextBennysInteriorProbeTime = Game.GameTime + BennysInteriorProbeDelayMs;
 
             try
             {
@@ -612,12 +955,13 @@ namespace BennysMotorworksRevamped
                 if (externalInteriorId == 0
                     || !Function.Call<bool>(Hash.IS_VALID_INTERIOR, externalInteriorId))
                 {
-                    if (_externalBennysInteriorMissingSince == 0)
+                    if (_bennysInteriorMissingSince == 0)
                     {
-                        _externalBennysInteriorMissingSince = Game.GameTime;
+                        _bennysInteriorMissingSince = Game.GameTime;
+                        Logger.Debug("Benny's DLC interior not detected yet; awaiting registration.");
                     }
                     else if (!_bennysInteriorMissingLogged
-                        && Game.GameTime - _externalBennysInteriorMissingSince >= ExternalBennysInteriorFailureLogDelayMs)
+                        && Game.GameTime - _bennysInteriorMissingSince >= BennysInteriorFailureLogDelayMs)
                     {
                         LogMissingBennysInteriorOnce();
                     }
@@ -625,14 +969,14 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
-                _externalBennysInteriorMissingSince = 0;
+                _bennysInteriorMissingSince = 0;
                 bool interiorReady = Function.Call<bool>(Hash.IS_INTERIOR_READY, externalInteriorId);
                 bennyIntID = externalInteriorId;
 
-                if (!_bennysSPInteriorRegistrationLogged)
+                if (!_bennysDlcInteriorLogged)
                 {
-                    _bennysSPInteriorRegistrationLogged = true;
-                    Logger.Log("Benny's SP map registration detected. Using the Lowriders interior already registered through GROUP_MAP_SP. BennysMapLoader owns interior activation/refresh. interiorId="
+                    _bennysDlcInteriorLogged = true;
+                    Logger.Log("Benny's DLC interior detected in Story Mode. interiorId="
                         + externalInteriorId + " ready=" + interiorReady
                         + " referenceInteriorId=" + referenceInteriorId
                         + " workshopInteriorId=" + workshopInteriorId);
@@ -640,7 +984,7 @@ namespace BennysMotorworksRevamped
             }
             catch (Exception ex)
             {
-                Logger.Debug("Benny's SP interior probe failed. " + ex.Message);
+                Logger.Debug("Benny's DLC interior probe failed. " + ex.Message);
             }
         }
 
@@ -650,12 +994,12 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.REQUEST_ADDITIONAL_COLLISION_AT_COORD, -211.798f, -1324.292f, 30.37535f);
             Function.Call(Hash.REQUEST_COLLISION_AT_COORD, -205.8687f, -1314.41f, 30.47519f);
             Function.Call(Hash.REQUEST_ADDITIONAL_COLLISION_AT_COORD, -205.8687f, -1314.41f, 30.47519f);
-            ProcessExternallyLoadedBennysInterior();
+            ProbeBennysDlcInterior();
         }
 
-        internal static void ProcessPendingMPDLCMapLoad()
+        internal static void UpdateBennysDlcInterior()
         {
-            ProcessExternallyLoadedBennysInterior();
+            ProbeBennysDlcInterior();
         }
 
         public static void LoadMPDLCMapMissingObjects()
@@ -2429,6 +2773,11 @@ namespace BennysMotorworksRevamped
 
         public static int GetRepairPrice(this Vehicle vehicle)
         {
+            if (cheapRepairCost)
+            {
+                return 1;
+            }
+
             int price = (int)Math.Round((double)(vehicle.MaxHealth - vehicle.Health)) * 10;
             if (price == 0)
             {
@@ -3271,8 +3620,9 @@ namespace BennysMotorworksRevamped
             optLogging = config.GetValue("SETTINGS", "LOGGING", true);
             optDebugLogging = config.GetValue("SETTINGS", "DEBUGLOGGING", true);
             optEnableMouse = config.GetValue("SETTINGS", "EnableMouse", false);
-            onlineMap = 0;
             fixDoor = config.GetValue<int>("SETTINGS", "FixDoor", 1);
+            bypassGarageDoor = config.GetValue("SETTINGS", "BypassGarageDoor", false);
+            cheapRepairCost = config.GetValue("SETTINGS", "CheapRepairCost", false);
             allowOversizedVehicles = config.GetValue("SETTINGS", "AllowOversizedVehicles", true);
             allowEmergencyVehicles = config.GetValue("SETTINGS", "AllowEmergencyVehicles", true);
             allowServiceVehicles = config.GetValue("SETTINGS", "AllowServiceVehicles", true);
@@ -3284,9 +3634,9 @@ namespace BennysMotorworksRevamped
             zinKey = config.GetValue<GTA.Control>("CONTROLS", "ZoomIn", GTA.Control.FrontendRt);
             doorKey = config.GetValue<GTA.Control>("CONTROLS", "Door", GTA.Control.ParachuteBrakeLeft);
             roofKey = config.GetValue<GTA.Control>("CONTROLS", "Roof", GTA.Control.ParachuteBrakeRight);
-            _nextExternalBennysInteriorProbeTime = 0;
-            _externalBennysInteriorMissingSince = 0;
-            _bennysSPInteriorRegistrationLogged = false;
+            _nextBennysInteriorProbeTime = 0;
+            _bennysInteriorMissingSince = 0;
+            _bennysDlcInteriorLogged = false;
             _bennysInteriorMissingLogged = false;
         }
 
@@ -3412,6 +3762,16 @@ namespace BennysMotorworksRevamped
         private static readonly Vector3 ExitCutsceneWaypointB = new Vector3(-200.2561f, -1303.021f, 30.66544f);
         private static readonly Vector3 EnterCutsceneCameraPosition = new Vector3(-200.7804f, -1316.474f, 32.08001f);
         private static readonly Vector3 ExitCutsceneCameraPosition = new Vector3(-197.5533f, -1297.754f, 32.29234f);
+        private static Vector3 exitCutsceneCameraFocus = ExitCutsceneLanePosition;
+        private static int exitCutsceneCameraFocusUpdatedAt;
+        private const float EnterCutsceneZoomDegrees = 2.25f;
+        private const int EnterCutsceneZoomDurationMs = 2600;
+        private const float ExitCutsceneZoomDegrees = 2.0f;
+        private const int ExitCutsceneZoomOutDurationMs = 1700;
+        private const int ExitCutsceneZoomReturnDurationMs = 1800;
+        private static int workshopCutsceneCameraStartedAt = -1;
+        private static float workshopCutsceneCameraBaseFov;
+        private static float workshopCutsceneCameraLastFov;
         private static WorkshopCutsceneType activeWorkshopCutscene = WorkshopCutsceneType.None;
         private static int activeWorkshopCutsceneStage = -1;
         private static int activeWorkshopCutsceneStageStartedAt;
@@ -3448,7 +3808,7 @@ namespace BennysMotorworksRevamped
 
             if (ply.CurrentVehicle != veh)
             {
-                Logger.Log("EnsurePlayerInVehicle: warping player into vehicle");
+                Logger.Debug("EnsurePlayerInVehicle: warping player into vehicle");
                 Function.Call(Hash.SET_PED_INTO_VEHICLE, ply.Handle, veh.Handle, (int)VehicleSeat.Driver);
             }
         }
@@ -3471,6 +3831,7 @@ namespace BennysMotorworksRevamped
 
         private static void ResetWorkshopCutsceneCamera()
         {
+            workshopCutsceneCameraStartedAt = -1;
             try
             {
                 Function.Call(Hash.TRIGGER_SCREENBLUR_FADE_OUT, 0.0f);
@@ -3543,12 +3904,19 @@ namespace BennysMotorworksRevamped
             isCutscene = false;
         }
 
-        private static void StartWorkshopCutsceneCamera(Vector3 position, bool enableBlur = true)
+        private static void StartWorkshopCutsceneCamera(Vector3 position, bool enableBlur = true, Vector3? initialFocus = null, bool enableShake = true)
         {
             ResetWorkshopCutsceneCamera();
-            scriptCam = CreateScriptCamera(position, Vector3.Zero, GameplayCamera.FieldOfView);
-            scriptCam.PointAt(veh);
-            scriptCam.Shake(CameraShake.Hand, 0.3f);
+            workshopCutsceneCameraBaseFov = GameplayCamera.FieldOfView;
+            scriptCam = CreateScriptCamera(position, Vector3.Zero, workshopCutsceneCameraBaseFov);
+            workshopCutsceneCameraLastFov = workshopCutsceneCameraBaseFov;
+            workshopCutsceneCameraStartedAt = Game.GameTime;
+            if (initialFocus.HasValue)
+                scriptCam.PointAt(initialFocus.Value);
+            else
+                scriptCam.PointAt(veh);
+            if (enableShake)
+                scriptCam.Shake(CameraShake.Hand, 0.3f);
             Function.Call(Hash.SET_CAM_MOTION_BLUR_STRENGTH, scriptCam.Handle, enableBlur ? 1.0f : 0.0f);
             scriptCam.IsActive = true;
             Function.Call(Hash.RENDER_SCRIPT_CAMS, true, false, 0, true, false, 0);
@@ -3561,6 +3929,66 @@ namespace BennysMotorworksRevamped
             {
                 Function.Call(Hash.TRIGGER_SCREENBLUR_FADE_OUT, 0.0f);
             }
+        }
+
+        private static float EaseWorkshopCutsceneZoom(float progress)
+        {
+            float t = Math.Max(0.0f, Math.Min(1.0f, progress));
+            return t * t * (3.0f - 2.0f * t);
+        }
+
+        private static void UpdateWorkshopCutsceneZoom()
+        {
+            if (scriptCam == null || workshopCutsceneCameraStartedAt < 0
+                || activeWorkshopCutscene == WorkshopCutsceneType.None)
+                return;
+
+            int elapsed = Game.GameTime - workshopCutsceneCameraStartedAt;
+            if (elapsed < 0)
+                return;
+
+            float zoomOffset;
+            if (activeWorkshopCutscene == WorkshopCutsceneType.Enter)
+            {
+                zoomOffset = -EnterCutsceneZoomDegrees * EaseWorkshopCutsceneZoom(
+                    (float)elapsed / EnterCutsceneZoomDurationMs);
+            }
+            else
+            {
+                if (elapsed < ExitCutsceneZoomOutDurationMs)
+                {
+                    zoomOffset = ExitCutsceneZoomDegrees * EaseWorkshopCutsceneZoom(
+                        (float)elapsed / ExitCutsceneZoomOutDurationMs);
+                }
+                else
+                {
+                    zoomOffset = ExitCutsceneZoomDegrees * (1.0f - EaseWorkshopCutsceneZoom(
+                        (float)(elapsed - ExitCutsceneZoomOutDurationMs) / ExitCutsceneZoomReturnDurationMs));
+                }
+            }
+
+            float fov = workshopCutsceneCameraBaseFov + zoomOffset;
+            if (Math.Abs(fov - workshopCutsceneCameraLastFov) >= 0.01f)
+            {
+                Function.Call(Hash.SET_CAM_FOV, scriptCam.Handle, fov);
+                workshopCutsceneCameraLastFov = fov;
+            }
+        }
+
+        private static void UpdateExitCutsceneCameraFocus()
+        {
+            if (scriptCam == null || veh == null || !veh.Exists())
+                return;
+
+            int now = Game.GameTime;
+            int elapsed = now - exitCutsceneCameraFocusUpdatedAt;
+            exitCutsceneCameraFocusUpdatedAt = now;
+            if (elapsed <= 0)
+                return;
+
+            float blend = 1.0f - (float)Math.Exp(-Math.Min(elapsed, 75) / 300.0f);
+            exitCutsceneCameraFocus += (veh.Position - exitCutsceneCameraFocus) * blend;
+            scriptCam.PointAt(exitCutsceneCameraFocus);
         }
 
         private static void ReduceWorkshopCutsceneBlur()
@@ -3927,21 +4355,11 @@ namespace BennysMotorworksRevamped
                     EnsurePlayerInVehicleForCutscene();
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
                     camera?.Stop();
-
                     StartWorkshopCutsceneCamera(EnterCutsceneCameraPosition);
-
                     SetCutsceneVehicleTransform(EnterCutsceneStartPosition, 180.3224f);
-
-                    AdvanceWorkshopCutsceneStage(-1);
-                    break;
-
-                case -1:
-                    if (IsWorkshopCutsceneStageTimedOut(100))
-                    {
-                        QueueCutsceneDrive(EnterCutsceneWaypointA, 1.5f, 8.5f, EnterCutsceneWaypointADriveThroughTarget);
-                        PlaySpeech("SHOP_NICE_VEHICLE");
-                        AdvanceWorkshopCutsceneStage(1);
-                    }
+                    QueueCutsceneDrive(EnterCutsceneWaypointA, 1.5f, 8.5f, EnterCutsceneWaypointADriveThroughTarget);
+                    PlaySpeech("SHOP_NICE_VEHICLE");
+                    AdvanceWorkshopCutsceneStage(1);
                     break;
 
                 case 1:
@@ -3986,6 +4404,8 @@ namespace BennysMotorworksRevamped
         private static void ProcessExitCutscene()
         {
             StabilizeExitCutsceneVehicle();
+            if (activeWorkshopCutsceneStage >= 2)
+                UpdateExitCutsceneCameraFocus();
 
             switch (activeWorkshopCutsceneStage)
             {
@@ -3994,13 +4414,21 @@ namespace BennysMotorworksRevamped
                     EnsurePlayerInVehicleForCutscene();
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
                     camera?.Stop();
+                    exitCutsceneCameraFocus = ExitCutsceneLanePosition;
+                    exitCutsceneCameraFocusUpdatedAt = Game.GameTime;
+                    StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition, false, ExitCutsceneLanePosition, false);
+                    AdvanceWorkshopCutsceneStage(-1);
+                    break;
 
-                    SetCutsceneVehicleTransform(ExitCutsceneLanePosition, GetHeadingToward(ExitCutsceneLanePosition, ExitCutsceneWaypointA, 190.3224f));
-
-                    StartWorkshopCutsceneCamera(ExitCutsceneCameraPosition, false);
-                    QueueCutsceneDrive(ExitCutsceneWaypointA, 0.5f, 6.0f, ExitCutsceneWaypointADriveThroughTarget);
-                    PlaySpeech("SHOP_GOODBYE");
-                    AdvanceWorkshopCutsceneStage(2);
+                case -1:
+                    if (IsWorkshopCutsceneStageTimedOut(150))
+                    {
+                        SetCutsceneVehicleTransform(ExitCutsceneLanePosition, GetHeadingToward(ExitCutsceneLanePosition, ExitCutsceneWaypointA, 190.3224f));
+                        exitCutsceneCameraFocusUpdatedAt = Game.GameTime;
+                        QueueCutsceneDrive(ExitCutsceneWaypointA, 0.5f, 6.0f, ExitCutsceneWaypointADriveThroughTarget);
+                        PlaySpeech("SHOP_GOODBYE");
+                        AdvanceWorkshopCutsceneStage(2);
+                    }
                     break;
 
                 case 1:
@@ -4100,6 +4528,7 @@ namespace BennysMotorworksRevamped
                 }
 
                 EnsurePlayerInVehicleForCutscene();
+                UpdateWorkshopCutsceneZoom();
 
                 switch (activeWorkshopCutscene)
                 {
@@ -4163,6 +4592,11 @@ namespace BennysMotorworksRevamped
                 return false;
             }
 
+            if (IsWantedAndPoliceTrackingPlayer())
+            {
+                return false;
+            }
+
             if (veh.Speed < 0.8f)
             {
                 return false;
@@ -4190,7 +4624,8 @@ namespace BennysMotorworksRevamped
         {
             try
             {
-                if (veh == null || ply == null || !IsWorkshopVehicleAllowed(veh) || activeWorkshopCutscene != WorkshopCutsceneType.None || isCutscene)
+                if (veh == null || ply == null || !IsWorkshopVehicleAllowed(veh) || activeWorkshopCutscene != WorkshopCutsceneType.None || isCutscene
+                    || IsWantedAndPoliceTrackingPlayer())
                 {
                     return;
                 }
@@ -4278,6 +4713,92 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        public static Memory CaptureWorkshopVehicleMemory()
+        {
+            if (veh == null || !veh.Exists())
+            {
+                return null;
+            }
+
+            VehicleWindowTint currentWindowTint = veh.Mods.WindowTint;
+            if (currentWindowTint == VehicleWindowTint.Invalid)
+            {
+                currentWindowTint = VehicleWindowTint.None;
+            }
+            return new Memory
+            {
+                Aerials = veh.GetMod(VehicleMod.Aerials),
+                Trim = veh.GetMod(VehicleMod.Trim),
+                FrontBumper = veh.GetMod(VehicleMod.FrontBumper),
+                RearBumper = veh.GetMod(VehicleMod.RearBumper),
+                SideSkirt = veh.GetMod(VehicleMod.SideSkirt),
+                ColumnShifterLevers = veh.GetMod(VehicleMod.ColumnShifterLevers),
+                Dashboard = veh.GetMod(VehicleMod.Dashboard),
+                DialDesign = veh.GetMod(VehicleMod.DialDesign),
+                Ornaments = veh.GetMod(VehicleMod.Ornaments),
+                Seats = veh.GetMod(VehicleMod.Seats),
+                SteeringWheels = veh.GetMod(VehicleMod.SteeringWheels),
+                TrimDesign = veh.GetMod(VehicleMod.TrimDesign),
+                LightsColor = veh.Mods.DashboardColor,
+                TrimColor = veh.Mods.TrimColor,
+                WheelType = Function.Call<VehicleWheelType>(Hash.GET_VEHICLE_WHEEL_TYPE, veh.Handle),
+                AirFilter = veh.GetMod(VehicleMod.AirFilter),
+                EngineBlock = veh.GetMod(VehicleMod.EngineBlock),
+                Struts = veh.GetMod(VehicleMod.Struts),
+                NumberPlate = (LicensePlateStyle)Function.Call<int>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX, veh.Handle),
+                PlateHolder = veh.GetMod(VehicleMod.PlateHolder),
+                VanityPlates = veh.GetMod(VehicleMod.VanityPlates),
+                Armor = veh.GetMod(VehicleMod.Armor),
+                Brakes = veh.GetMod(VehicleMod.Brakes),
+                Engine = veh.GetMod(VehicleMod.Engine),
+                Transmission = veh.GetMod(VehicleMod.Transmission),
+                BackNeon = veh.IsNeonLightsOn(VehicleNeonLight.Back),
+                FrontNeon = veh.IsNeonLightsOn(VehicleNeonLight.Front),
+                LeftNeon = veh.IsNeonLightsOn(VehicleNeonLight.Left),
+                RightNeon = veh.IsNeonLightsOn(VehicleNeonLight.Right),
+                BackWheels = veh.GetMod(VehicleMod.RearWheel),
+                FrontWheels = veh.GetMod(VehicleMod.FrontWheel),
+                Headlights = veh.IsToggleModOn(VehicleToggleMod.XenonHeadlights),
+                WheelsVariation = IsCustomWheels(),
+                ArchCover = veh.GetMod(VehicleMod.ArchCover),
+                Exhaust = veh.GetMod(VehicleMod.Exhaust),
+                Fender = veh.GetMod(VehicleMod.Fender),
+                RightFender = veh.GetMod(VehicleMod.RightFender),
+                DoorSpeakers = veh.GetMod(VehicleMod.DoorSpeakers),
+                Frame = veh.GetMod(VehicleMod.Frame),
+                Grille = veh.GetMod(VehicleMod.Grille),
+                Hood = veh.GetMod(VehicleMod.Hood),
+                Horns = veh.GetMod(VehicleMod.Horns),
+                Hydraulics = veh.GetMod(VehicleMod.Hydraulics),
+                Livery = veh.GetPrimaryLivery(),
+                Livery2 = veh.GetLivery2(),
+                Plaques = veh.GetMod(VehicleMod.Plaques),
+                Roof = veh.GetMod(VehicleMod.Roof),
+                Speakers = veh.GetMod(VehicleMod.Speakers),
+                Spoilers = veh.GetMod(VehicleMod.Spoilers),
+                Tank = veh.GetMod(VehicleMod.Tank),
+                Trunk = veh.GetMod(VehicleMod.Trunk),
+                Turbo = veh.IsToggleModOn(VehicleToggleMod.Turbo),
+                Windows = veh.GetMod(VehicleMod.Windows),
+                Tint = currentWindowTint,
+                PearlescentColor = veh.Mods.PearlescentColor,
+                PrimaryColor = veh.Mods.PrimaryColor,
+                RimColor = veh.Mods.RimColor,
+                SecondaryColor = veh.Mods.SecondaryColor,
+                CustomPrimaryColor = veh.Mods.CustomPrimaryColor,
+                CustomSecondaryColor = veh.Mods.CustomSecondaryColor,
+                IsPrimaryColorCustom = veh.Mods.IsPrimaryColorCustom,
+                IsSecondaryColorCustom = veh.Mods.IsSecondaryColorCustom,
+                TireSmokeColor = veh.Mods.TireSmokeColor,
+                NeonLightsColor = veh.Mods.NeonLightsColor,
+                PlateNumbers = veh.Mods.LicensePlate,
+                HeadlightsColor = veh.GetXenonHeadlightsColor(),
+                Suspension = veh.GetMod(VehicleMod.Suspension),
+                Nitro = Helper.GetInt(veh, nitroMod),
+                BulletProofTires = veh.CanTiresBurst,
+            };
+        }
+
         private static void FinishShopInit()
         {
             string initStage = "menu readiness";
@@ -4306,83 +4827,7 @@ namespace BennysMotorworksRevamped
                 MenuHelper.RefreshMenus();
 
                 initStage = "capture vehicle state";
-                VehicleWindowTint currentWindowTint = veh.Mods.WindowTint;
-                if (currentWindowTint == VehicleWindowTint.Invalid)
-                {
-                    currentWindowTint = VehicleWindowTint.None;
-                }
-                lastVehMemory = new Memory
-                {
-                    Aerials = veh.GetMod(VehicleMod.Aerials),
-                    Trim = veh.GetMod(VehicleMod.Trim),
-                    FrontBumper = veh.GetMod(VehicleMod.FrontBumper),
-                    RearBumper = veh.GetMod(VehicleMod.RearBumper),
-                    SideSkirt = veh.GetMod(VehicleMod.SideSkirt),
-                    ColumnShifterLevers = veh.GetMod(VehicleMod.ColumnShifterLevers),
-                    Dashboard = veh.GetMod(VehicleMod.Dashboard),
-                    DialDesign = veh.GetMod(VehicleMod.DialDesign),
-                    Ornaments = veh.GetMod(VehicleMod.Ornaments),
-                    Seats = veh.GetMod(VehicleMod.Seats),
-                    SteeringWheels = veh.GetMod(VehicleMod.SteeringWheels),
-                    TrimDesign = veh.GetMod(VehicleMod.TrimDesign),
-                    LightsColor = veh.Mods.DashboardColor,
-                    TrimColor = veh.Mods.TrimColor,
-                    WheelType = Function.Call<VehicleWheelType>(Hash.GET_VEHICLE_WHEEL_TYPE, veh.Handle),
-                    AirFilter = veh.GetMod(VehicleMod.AirFilter),
-                    EngineBlock = veh.GetMod(VehicleMod.EngineBlock),
-                    Struts = veh.GetMod(VehicleMod.Struts),
-                    NumberPlate = (LicensePlateStyle)Function.Call<int>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX, veh.Handle),
-                    PlateHolder = veh.GetMod(VehicleMod.PlateHolder),
-                    VanityPlates = veh.GetMod(VehicleMod.VanityPlates),
-                    Armor = veh.GetMod(VehicleMod.Armor),
-                    Brakes = veh.GetMod(VehicleMod.Brakes),
-                    Engine = veh.GetMod(VehicleMod.Engine),
-                    Transmission = veh.GetMod(VehicleMod.Transmission),
-                    BackNeon = veh.IsNeonLightsOn(VehicleNeonLight.Back),
-                    FrontNeon = veh.IsNeonLightsOn(VehicleNeonLight.Front),
-                    LeftNeon = veh.IsNeonLightsOn(VehicleNeonLight.Left),
-                    RightNeon = veh.IsNeonLightsOn(VehicleNeonLight.Right),
-                    BackWheels = veh.GetMod(VehicleMod.RearWheel),
-                    FrontWheels = veh.GetMod(VehicleMod.FrontWheel),
-                    Headlights = veh.IsToggleModOn(VehicleToggleMod.XenonHeadlights),
-                    WheelsVariation = IsCustomWheels(),
-                    ArchCover = veh.GetMod(VehicleMod.ArchCover),
-                    Exhaust = veh.GetMod(VehicleMod.Exhaust),
-                    Fender = veh.GetMod(VehicleMod.Fender),
-                    RightFender = veh.GetMod(VehicleMod.RightFender),
-                    DoorSpeakers = veh.GetMod(VehicleMod.DoorSpeakers),
-                    Frame = veh.GetMod(VehicleMod.Frame),
-                    Grille = veh.GetMod(VehicleMod.Grille),
-                    Hood = veh.GetMod(VehicleMod.Hood),
-                    Horns = veh.GetMod(VehicleMod.Horns),
-                    Hydraulics = veh.GetMod(VehicleMod.Hydraulics),
-                    Livery = veh.GetPrimaryLivery(),
-                    Livery2 = veh.GetLivery2(),
-                    Plaques = veh.GetMod(VehicleMod.Plaques),
-                    Roof = veh.GetMod(VehicleMod.Roof),
-                    Speakers = veh.GetMod(VehicleMod.Speakers),
-                    Spoilers = veh.GetMod(VehicleMod.Spoilers),
-                    Tank = veh.GetMod(VehicleMod.Tank),
-                    Trunk = veh.GetMod(VehicleMod.Trunk),
-                    Turbo = veh.IsToggleModOn(VehicleToggleMod.Turbo),
-                    Windows = veh.GetMod(VehicleMod.Windows),
-                    Tint = currentWindowTint,
-                    PearlescentColor = veh.Mods.PearlescentColor,
-                    PrimaryColor = veh.Mods.PrimaryColor,
-                    RimColor = veh.Mods.RimColor,
-                    SecondaryColor = veh.Mods.SecondaryColor,
-                    CustomPrimaryColor = veh.Mods.CustomPrimaryColor,
-                    CustomSecondaryColor = veh.Mods.CustomSecondaryColor,
-                    IsPrimaryColorCustom = veh.Mods.IsPrimaryColorCustom,
-                    IsSecondaryColorCustom = veh.Mods.IsSecondaryColorCustom,
-                    TireSmokeColor = veh.Mods.TireSmokeColor,
-                    NeonLightsColor = veh.Mods.NeonLightsColor,
-                    PlateNumbers = veh.Mods.LicensePlate,
-                    HeadlightsColor = veh.GetXenonHeadlightsColor(),
-                    Suspension = veh.GetMod(VehicleMod.Suspension),
-                    Nitro = Helper.GetInt(veh, nitroMod),
-                    BulletProofTires = veh.CanTiresBurst,
-                };
+                lastVehMemory = CaptureWorkshopVehicleMemory();
 
                 initStage = "show MainMenu";
                 if (MenuHelper.MainMenu == null)

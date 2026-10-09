@@ -42,9 +42,9 @@ namespace BennysMotorworksRevamped
         public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryUtilityColor, mPrimaryWornColor, mPrimarySpecialSolidColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mCustomPrimaryColor, mSecondaryColor, mCustomSecondaryColor, mSecondaryClassicColor, mSecondaryUtilityColor, mSecondaryWornColor, mSecondarySpecialSolidColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
         public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iCustomPrimaryColor, iCustomSecondaryColor, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryUtilityColor, iPrimaryWornColor, iPrimarySpecialSolidColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryUtilityColor, iSecondaryWornColor, iSecondarySpecialSolidColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
         public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giMotorcycleFrontWheel, giMotorcycleRearWheel, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giCustomPrimaryCol, giCustomSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giTrackWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
-        public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank, iBackrests, iWindshields, iMotorcycleSeats;
-        public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank, giBackrests, giWindshields, giMotorcycleSeats;
-        public static UIMenu mShifter, mFMudguard, mBSeat, mOilTank, mRMudguard, mFuelTank, mBeltDriveCovers, mBEngineBlock, mBAirFilter, mBTank, mBackrests, mWindshields, mMotorcycleSeats, gmTrailer;
+        public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank, iBackrests, iWindshields, iMotorcycleSeats, iSaddleBags;
+        public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank, giBackrests, giWindshields, giMotorcycleSeats, giSaddleBags;
+        public static UIMenu mShifter, mFMudguard, mBSeat, mOilTank, mRMudguard, mFuelTank, mBeltDriveCovers, mBEngineBlock, mBAirFilter, mBTank, mBackrests, mWindshields, mMotorcycleSeats, mSaddleBags, gmTrailer;
         public static LemonUI.ObjectPool _menuPool;
         private static bool _suppressMenuRestoreOnClose;
         private static bool _lightColorPreviewBlackoutActive;
@@ -57,289 +57,41 @@ namespace BennysMotorworksRevamped
         private static VehicleMod? _motorcycleWindshieldModType;
         private static VehicleMod? _motorcycleSeatModType;
         private static VehicleMod? _motorcycleFuelTankModType;
+        private static VehicleMod? _motorcycleSaddleBagModType;
         public static bool PerformanceStatsPreviewActive { get; private set; }
         public static VehicleStats PerformanceStatsBaseline { get; private set; }
 
-        private const string StoryVehiclePersistenceFile = "scripts\\BennysMotorworksRevampedStoryVehicles.ini";
-        private const int StoryVehiclePersistenceVersion = 1;
-        private const int StoryVehiclePersistenceProbeIntervalMs = 1000;
-        private const float StoryVehiclePersistenceProbeRadius = 120.0f;
-        private static readonly string[] StoryVehiclePersistenceSections =
+        private static bool IsSupportedChameleonPaint(VehicleColor color)
         {
-            "Michael_Tailgater",
-            "Franklin_BuffaloS",
-            "Franklin_Bagger",
-            "Trevor_Bodhi",
-        };
-        private static readonly Model[] StoryVehicleModels =
-        {
-            new Model("tailgater"),
-            new Model("buffalo2"),
-            new Model("bagger"),
-            new Model("bodhi2"),
-        };
-        private static readonly Dictionary<string, Memory> StoryVehicleSavedStates = new Dictionary<string, Memory>(StringComparer.OrdinalIgnoreCase);
-        private static readonly Dictionary<int, string> StoryVehicleAppliedHandles = new Dictionary<int, string>();
-        private static bool _storyVehicleStatesLoaded;
-        private static int _nextStoryVehiclePersistenceProbeTime;
-
-        private static string NormalizeStoryVehiclePlate(string plate)
-        {
-            if (string.IsNullOrWhiteSpace(plate))
-            {
-                return string.Empty;
-            }
-
-            return new string(plate.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+            int index = (int)color;
+            return index >= 161 && index <= 222 && AreChameleonColorsAvailable();
         }
 
-        private static string GetStoryVehiclePersistenceSection(Vehicle vehicle)
+        private static void ApplyPrimaryPaint(Vehicle target, VehicleColor color, VehicleColor pearl)
         {
-            if (vehicle == null || !vehicle.Exists())
+            if (target == null || !target.Exists()) return;
+            target.Mods.ClearCustomPrimaryColor();
+            if (IsSupportedChameleonPaint(color))
             {
-                return null;
+                Function.Call(Hash.SET_VEHICLE_MOD_COLOR_1, target.Handle, 6, (int)color - 161, (int)pearl);
             }
-
-            string modelName = vehicle.Model.ToString().ToLowerInvariant();
-            string plate = NormalizeStoryVehiclePlate(vehicle.Mods.LicensePlate);
-
-            if (modelName == "tailgater" && plate == "5MDS003")
+            else
             {
-                return "Michael_Tailgater";
-            }
-
-            if (modelName == "buffalo2" && plate == "FC1988")
-            {
-                return "Franklin_BuffaloS";
-            }
-
-            if (modelName == "bagger" && plate == "FC88")
-            {
-                return "Franklin_Bagger";
-            }
-
-            if (modelName == "bodhi2" && plate == "BETTY32")
-            {
-                return "Trevor_Bodhi";
-            }
-
-            return null;
-        }
-
-        private static string SerializeStoryVehicleMemoryValue(Type type, object value)
-        {
-            if (value == null)
-            {
-                return string.Empty;
-            }
-
-            if (type == typeof(Color))
-            {
-                return ((Color)value).ToArgb().ToString(System.Globalization.CultureInfo.InvariantCulture);
-            }
-
-            if (type.IsEnum)
-            {
-                return Convert.ToInt32(value, System.Globalization.CultureInfo.InvariantCulture)
-                    .ToString(System.Globalization.CultureInfo.InvariantCulture);
-            }
-
-            if (type == typeof(bool))
-            {
-                return (bool)value ? "1" : "0";
-            }
-
-            return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        private static bool TryDeserializeStoryVehicleMemoryValue(Type type, string value, out object result)
-        {
-            result = null;
-
-            if (type == typeof(string))
-            {
-                result = value ?? string.Empty;
-                return true;
-            }
-
-            if (type == typeof(int))
-            {
-                int intValue;
-                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out intValue))
-                {
-                    result = intValue;
-                    return true;
-                }
-                return false;
-            }
-
-            if (type == typeof(bool))
-            {
-                if (value == "1")
-                {
-                    result = true;
-                    return true;
-                }
-
-                if (value == "0")
-                {
-                    result = false;
-                    return true;
-                }
-
-                bool boolValue;
-                if (bool.TryParse(value, out boolValue))
-                {
-                    result = boolValue;
-                    return true;
-                }
-                return false;
-            }
-
-            if (type == typeof(Color))
-            {
-                int argb;
-                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out argb))
-                {
-                    result = Color.FromArgb(argb);
-                    return true;
-                }
-                return false;
-            }
-
-            if (type.IsEnum)
-            {
-                int enumValue;
-                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out enumValue))
-                {
-                    result = Enum.ToObject(type, enumValue);
-                    return true;
-                }
-                return false;
-            }
-
-            return false;
-        }
-
-        private static Memory CloneStoryVehicleMemory(Memory source)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            Memory clone = new Memory();
-            foreach (Reflection.PropertyInfo property in typeof(Memory).GetProperties())
-            {
-                if (property.CanRead && property.CanWrite)
-                {
-                    property.SetValue(clone, property.GetValue(source, null), null);
-                }
-            }
-
-            return clone;
-        }
-
-        private static bool TryLoadStoryVehicleMemory(ScriptSettings config, string section, out Memory memory)
-        {
-            memory = null;
-            if (config == null || config.GetValue<int>(section, "Version", 0) != StoryVehiclePersistenceVersion)
-            {
-                return false;
-            }
-
-            Memory loaded = new Memory();
-            foreach (Reflection.PropertyInfo property in typeof(Memory).GetProperties())
-            {
-                if (!property.CanWrite)
-                {
-                    continue;
-                }
-
-                string rawValue = config.GetValue<string>(section, property.Name, null);
-                if (rawValue == null)
-                {
-                    continue;
-                }
-
-                object parsedValue;
-                if (TryDeserializeStoryVehicleMemoryValue(property.PropertyType, rawValue, out parsedValue))
-                {
-                    property.SetValue(loaded, parsedValue, null);
-                }
-            }
-
-            memory = loaded;
-            return true;
-        }
-
-        private static void EnsureStoryVehicleStatesLoaded()
-        {
-            if (_storyVehicleStatesLoaded)
-            {
-                return;
-            }
-
-            _storyVehicleStatesLoaded = true;
-            StoryVehicleSavedStates.Clear();
-
-            try
-            {
-                ScriptSettings config = ScriptSettings.Load(StoryVehiclePersistenceFile);
-                foreach (string section in StoryVehiclePersistenceSections)
-                {
-                    Memory memory;
-                    if (TryLoadStoryVehicleMemory(config, section, out memory))
-                    {
-                        StoryVehicleSavedStates[section] = memory;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Debug("Story vehicle persistence load failed. " + ex.Message);
+                target.Mods.PrimaryColor = color;
             }
         }
 
-        public static void SaveStoryVehicleStateIfNeeded()
+        private static void ApplySecondaryPaint(Vehicle target, VehicleColor color)
         {
-            if (veh == null || !veh.Exists() || lastVehMemory == null)
+            if (target == null || !target.Exists()) return;
+            target.Mods.ClearCustomSecondaryColor();
+            if (IsSupportedChameleonPaint(color))
             {
-                return;
+                Function.Call(Hash.SET_VEHICLE_MOD_COLOR_2, target.Handle, 6, (int)color - 161);
             }
-
-            string section = GetStoryVehiclePersistenceSection(veh);
-            if (section == null)
+            else
             {
-                return;
-            }
-
-            try
-            {
-                ScriptSettings config = ScriptSettings.Load(StoryVehiclePersistenceFile);
-                config.SetValue(section, "Version", StoryVehiclePersistenceVersion);
-
-                foreach (Reflection.PropertyInfo property in typeof(Memory).GetProperties())
-                {
-                    if (!property.CanRead)
-                    {
-                        continue;
-                    }
-
-                    object value = property.GetValue(lastVehMemory, null);
-                    config.SetValue(section, property.Name, SerializeStoryVehicleMemoryValue(property.PropertyType, value));
-                }
-
-                config.Save();
-
-                StoryVehicleSavedStates[section] = CloneStoryVehicleMemory(lastVehMemory);
-                _storyVehicleStatesLoaded = true;
-                StoryVehicleAppliedHandles[veh.Handle] = section;
-                Logger.Log("Saved Benny's customization state for story vehicle " + section + ".");
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("Failed to save Benny's story vehicle customization state. " + ex.Message);
+                target.Mods.SecondaryColor = color;
             }
         }
 
@@ -355,172 +107,11 @@ namespace BennysMotorworksRevamped
                 target.Mods.PrimaryColor = VehicleColor.MetallicBlack;
                 target.Mods.CustomPrimaryColor = memory.CustomPrimaryColor;
             }
-            else
-            {
-                target.Mods.ClearCustomPrimaryColor();
-            }
 
             if (memory.IsSecondaryColorCustom)
             {
                 target.Mods.SecondaryColor = VehicleColor.MetallicBlack;
                 target.Mods.CustomSecondaryColor = memory.CustomSecondaryColor;
-            }
-            else
-            {
-                target.Mods.ClearCustomSecondaryColor();
-            }
-        }
-
-        private static void ApplyStoryVehicleMemory(Vehicle target, Memory memory)
-        {
-            if (target == null || !target.Exists() || memory == null)
-            {
-                return;
-            }
-
-            target.InstallModKit();
-
-            target.Mods.PrimaryColor = memory.PrimaryColor;
-            target.Mods.SecondaryColor = memory.SecondaryColor;
-            ApplySavedCustomPaintState(target, memory);
-            target.Mods.PearlescentColor = memory.PearlescentColor;
-            target.Mods.RimColor = memory.RimColor;
-            target.Mods.DashboardColor = memory.LightsColor;
-            target.Mods.TrimColor = memory.TrimColor;
-            target.Mods.NeonLightsColor = memory.NeonLightsColor;
-            target.Mods.TireSmokeColor = memory.TireSmokeColor;
-
-            target.SetWheelType(memory.WheelType);
-            target.SetMod(VehicleMod.Spoilers, memory.Spoilers, false);
-            target.SetMod(VehicleMod.FrontBumper, memory.FrontBumper, false);
-            target.SetMod(VehicleMod.RearBumper, memory.RearBumper, false);
-            target.SetMod(VehicleMod.SideSkirt, memory.SideSkirt, false);
-            target.SetMod(VehicleMod.Exhaust, memory.Exhaust, false);
-            target.SetMod(VehicleMod.Frame, memory.Frame, false);
-            target.SetMod(VehicleMod.Grille, memory.Grille, false);
-            target.SetMod(VehicleMod.Hood, memory.Hood, false);
-            target.SetMod(VehicleMod.Fender, memory.Fender, false);
-            target.SetMod(VehicleMod.RightFender, memory.RightFender, false);
-            target.SetMod(VehicleMod.Roof, memory.Roof, false);
-            target.SetMod(VehicleMod.Engine, memory.Engine, false);
-            target.SetMod(VehicleMod.Brakes, memory.Brakes, false);
-            target.SetMod(VehicleMod.Transmission, memory.Transmission, false);
-            target.SetMod(VehicleMod.Horns, memory.Horns, false);
-            target.SetMod(VehicleMod.Suspension, memory.Suspension, false);
-            target.SetMod(VehicleMod.Armor, memory.Armor, false);
-            target.SetMod(VehicleMod.FrontWheel, memory.FrontWheels, memory.WheelsVariation);
-            target.SetMod(VehicleMod.RearWheel, memory.BackWheels, memory.WheelsVariation);
-            target.SetMod(VehicleMod.PlateHolder, memory.PlateHolder, false);
-            target.SetMod(VehicleMod.VanityPlates, memory.VanityPlates, false);
-            target.SetMod(VehicleMod.TrimDesign, memory.TrimDesign, false);
-            target.SetMod(VehicleMod.Ornaments, memory.Ornaments, false);
-            target.SetMod(VehicleMod.Dashboard, memory.Dashboard, false);
-            target.SetMod(VehicleMod.DialDesign, memory.DialDesign, false);
-            target.SetMod(VehicleMod.DoorSpeakers, memory.DoorSpeakers, false);
-            target.SetMod(VehicleMod.Seats, memory.Seats, false);
-            target.SetMod(VehicleMod.SteeringWheels, memory.SteeringWheels, false);
-            target.SetMod(VehicleMod.ColumnShifterLevers, memory.ColumnShifterLevers, false);
-            target.SetMod(VehicleMod.Plaques, memory.Plaques, false);
-            target.SetMod(VehicleMod.Speakers, memory.Speakers, false);
-            target.SetMod(VehicleMod.Trunk, memory.Trunk, false);
-            target.SetMod(VehicleMod.Hydraulics, memory.Hydraulics, false);
-            target.SetMod(VehicleMod.EngineBlock, memory.EngineBlock, false);
-            target.SetMod(VehicleMod.AirFilter, memory.AirFilter, false);
-            target.SetMod(VehicleMod.Struts, memory.Struts, false);
-            target.SetMod(VehicleMod.ArchCover, memory.ArchCover, false);
-            target.SetMod(VehicleMod.Aerials, memory.Aerials, false);
-            target.SetMod(VehicleMod.Trim, memory.Trim, false);
-            target.SetMod(VehicleMod.Tank, memory.Tank, false);
-            target.SetMod(VehicleMod.Windows, memory.Windows, false);
-            target.SetPrimaryLivery(memory.Livery);
-            target.SetLivery2(memory.Livery2);
-
-            target.ToggleMod(VehicleToggleMod.Turbo, memory.Turbo);
-            target.ToggleMod(VehicleToggleMod.XenonHeadlights, memory.Headlights);
-            target.SetXenonHeadlightsColor(memory.HeadlightsColor, target.IsToggleModOn(VehicleToggleMod.XenonHeadlights));
-            target.SetNeonLightsOn(VehicleNeonLight.Back, memory.BackNeon);
-            target.SetNeonLightsOn(VehicleNeonLight.Front, memory.FrontNeon);
-            target.SetNeonLightsOn(VehicleNeonLight.Left, memory.LeftNeon);
-            target.SetNeonLightsOn(VehicleNeonLight.Right, memory.RightNeon);
-
-            target.Mods.WindowTint = memory.Tint;
-            target.Mods.LicensePlateStyle = memory.NumberPlate;
-            if (!string.IsNullOrWhiteSpace(memory.PlateNumbers))
-            {
-                target.Mods.LicensePlate = memory.PlateNumbers;
-            }
-
-            target.CanTiresBurst = memory.BulletProofTires;
-            if (IsNitroModInstalled())
-            {
-                target.SetInt(nitroMod, memory.Nitro);
-            }
-        }
-
-        public static void ProcessStoryVehiclePersistence(Ped player)
-        {
-            if (player == null
-                || !player.Exists()
-                || isCutscene
-                || (_menuPool != null && _menuPool.AreAnyVisible)
-                || Game.GameTime < _nextStoryVehiclePersistenceProbeTime)
-            {
-                return;
-            }
-
-            _nextStoryVehiclePersistenceProbeTime = Game.GameTime + StoryVehiclePersistenceProbeIntervalMs;
-            EnsureStoryVehicleStatesLoaded();
-
-            if (StoryVehicleSavedStates.Count == 0)
-            {
-                return;
-            }
-
-            foreach (int handle in StoryVehicleAppliedHandles.Keys.ToArray())
-            {
-                if (!Function.Call<bool>(Hash.DOES_ENTITY_EXIST, handle))
-                {
-                    StoryVehicleAppliedHandles.Remove(handle);
-                }
-            }
-
-            Vehicle[] nearbyVehicles = World.GetNearbyVehicles(player.Position, StoryVehiclePersistenceProbeRadius, StoryVehicleModels);
-            foreach (Vehicle candidate in nearbyVehicles)
-            {
-                if (candidate == null || !candidate.Exists())
-                {
-                    continue;
-                }
-
-                string section = GetStoryVehiclePersistenceSection(candidate);
-                if (section == null)
-                {
-                    continue;
-                }
-
-                string appliedSection;
-                if (StoryVehicleAppliedHandles.TryGetValue(candidate.Handle, out appliedSection)
-                    && string.Equals(appliedSection, section, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                Memory memory;
-                if (!StoryVehicleSavedStates.TryGetValue(section, out memory))
-                {
-                    continue;
-                }
-
-                try
-                {
-                    ApplyStoryVehicleMemory(candidate, memory);
-                    StoryVehicleAppliedHandles[candidate.Handle] = section;
-                    Logger.Log("Reapplied Benny's customization state to respawned story vehicle " + section + ".");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Debug("Story vehicle persistence apply failed for " + section + ". " + ex.Message);
-                }
             }
         }
 
@@ -677,7 +268,7 @@ namespace BennysMotorworksRevamped
         {
             foreach (VehicleMod modType in MotorcycleSpecialSlotCandidates)
             {
-                if (MotorcycleSlotContains(modType, terms))
+                if (_motorcycleSaddleBagModType != modType && MotorcycleSlotContains(modType, terms))
                 {
                     return modType;
                 }
@@ -686,12 +277,59 @@ namespace BennysMotorworksRevamped
             return null;
         }
 
+        private static bool IsMotorcycleSaddleBagSlot(VehicleMod modType)
+        {
+            if (veh.GetModCount(modType) <= 0)
+            {
+                return false;
+            }
+
+            if (MotorcycleSlotContains(modType, "saddle bag", "saddlebag", "pannier"))
+            {
+                return true;
+            }
+
+            int named = 0;
+            int matching = 0;
+            int count = Math.Min(veh.GetModCount(modType), 12);
+            for (int i = 0; i < count; i++)
+            {
+                string label = Function.Call<string>(Hash.GET_MOD_TEXT_LABEL, veh.Handle, (int)modType, i);
+                if (string.IsNullOrWhiteSpace(label) || !DoesGXTEntryExist(label))
+                {
+                    continue;
+                }
+
+                string name = Game.GetLocalizedString(label);
+                if (string.IsNullOrWhiteSpace(name) || name.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                named++;
+                if (CategoryContains(name, "saddle bag", "saddlebag", "pannier"))
+                {
+                    matching++;
+                }
+            }
+
+            return matching > 0 && matching * 2 > named;
+        }
+
+        private static bool CanUseMotorcycleSeatFallback(VehicleMod modType)
+        {
+            string nativeName = GetNativeMotorcycleSlotText(modType);
+            return (string.IsNullOrWhiteSpace(nativeName) || CategoryContains(nativeName, "seat"))
+                && _motorcycleSaddleBagModType != modType;
+        }
+
         private static void ResolveMotorcycleSpecialCategories()
         {
             _motorcycleBackrestModType = null;
             _motorcycleWindshieldModType = null;
             _motorcycleSeatModType = null;
             _motorcycleFuelTankModType = null;
+            _motorcycleSaddleBagModType = null;
 
             if (veh == null || !veh.Exists() || veh.ClassType != VehicleClass.Motorcycles)
             {
@@ -700,10 +338,33 @@ namespace BennysMotorworksRevamped
 
             _motorcycleBackrestModType = FindMotorcycleSpecialSlot("backrest", "back rest", "sissy bar");
             _motorcycleWindshieldModType = FindMotorcycleSpecialSlot("windshield", "windscreen");
+            _motorcycleSaddleBagModType = FindMotorcycleSpecialSlot("saddle bag", "saddlebag", "pannier");
+            if (!_motorcycleSaddleBagModType.HasValue)
+            {
+                VehicleMod[] possibleSaddleBagSlots = { VehicleMod.Hood, VehicleMod.Roof, VehicleMod.Seats, VehicleMod.Trunk };
+                foreach (VehicleMod slot in possibleSaddleBagSlots)
+                {
+                    if (IsMotorcycleSaddleBagSlot(slot))
+                    {
+                        _motorcycleSaddleBagModType = slot;
+                        break;
+                    }
+                }
+            }
             _motorcycleSeatModType = FindMotorcycleSpecialSlot("seat");
             _motorcycleFuelTankModType = FindMotorcycleSpecialSlot("fuel tank", "fuel", "gas tank", "petrol tank");
 
-            if (!_motorcycleSeatModType.HasValue && veh.GetModCount(VehicleMod.Seats) > 0)
+            if (_motorcycleSeatModType == _motorcycleSaddleBagModType)
+            {
+                _motorcycleSeatModType = null;
+            }
+            if (_motorcycleFuelTankModType == _motorcycleSaddleBagModType)
+            {
+                _motorcycleFuelTankModType = null;
+            }
+
+            if (!_motorcycleSeatModType.HasValue && veh.GetModCount(VehicleMod.Seats) > 0
+                && CanUseMotorcycleSeatFallback(VehicleMod.Seats))
             {
                 _motorcycleSeatModType = VehicleMod.Seats;
             }
@@ -711,6 +372,7 @@ namespace BennysMotorworksRevamped
             if (!_motorcycleSeatModType.HasValue)
             {
                 if (veh.GetModCount(VehicleMod.Hood) > 0
+                    && CanUseMotorcycleSeatFallback(VehicleMod.Hood)
                     && _motorcycleFuelTankModType != VehicleMod.Hood
                     && _motorcycleBackrestModType != VehicleMod.Hood
                     && _motorcycleWindshieldModType != VehicleMod.Hood)
@@ -718,6 +380,7 @@ namespace BennysMotorworksRevamped
                     _motorcycleSeatModType = VehicleMod.Hood;
                 }
                 else if (veh.GetModCount(VehicleMod.Roof) > 0
+                    && CanUseMotorcycleSeatFallback(VehicleMod.Roof)
                     && _motorcycleFuelTankModType != VehicleMod.Roof
                     && _motorcycleBackrestModType != VehicleMod.Roof
                     && _motorcycleWindshieldModType != VehicleMod.Roof)
@@ -729,6 +392,7 @@ namespace BennysMotorworksRevamped
             if (!_motorcycleFuelTankModType.HasValue)
             {
                 if (veh.GetModCount(VehicleMod.Roof) > 0
+                    && _motorcycleSaddleBagModType != VehicleMod.Roof
                     && _motorcycleSeatModType != VehicleMod.Roof
                     && _motorcycleBackrestModType != VehicleMod.Roof
                     && _motorcycleWindshieldModType != VehicleMod.Roof)
@@ -736,6 +400,7 @@ namespace BennysMotorworksRevamped
                     _motorcycleFuelTankModType = VehicleMod.Roof;
                 }
                 else if (veh.GetModCount(VehicleMod.Hood) > 0
+                    && _motorcycleSaddleBagModType != VehicleMod.Hood
                     && _motorcycleSeatModType != VehicleMod.Hood
                     && _motorcycleBackrestModType != VehicleMod.Hood
                     && _motorcycleWindshieldModType != VehicleMod.Hood)
@@ -754,6 +419,7 @@ namespace BennysMotorworksRevamped
                     || (_motorcycleWindshieldModType.HasValue && _motorcycleWindshieldModType.Value == modType)
                     || (_motorcycleSeatModType.HasValue && _motorcycleSeatModType.Value == modType)
                     || (_motorcycleFuelTankModType.HasValue && _motorcycleFuelTankModType.Value == modType)
+                    || (_motorcycleSaddleBagModType.HasValue && _motorcycleSaddleBagModType.Value == modType)
                     || modType == VehicleMod.FrontBumper
                     || modType == VehicleMod.RearBumper);
         }
@@ -799,6 +465,7 @@ namespace BennysMotorworksRevamped
             mBackrests.MenuItems.Clear();
             mWindshields.MenuItems.Clear();
             mMotorcycleSeats.MenuItems.Clear();
+            mSaddleBags.MenuItems.Clear();
 
             if (veh == null || !veh.Exists() || veh.ClassType != VehicleClass.Motorcycles)
             {
@@ -821,6 +488,13 @@ namespace BennysMotorworksRevamped
             {
                 VehicleMod modType = _motorcycleSeatModType.Value;
                 RefreshModMenuFor(ref mMotorcycleSeats, ref iMotorcycleSeats, modType);
+                mMotorcycleSeats.NativeMenu.Name = "Seats";
+            }
+
+            if (_motorcycleSaddleBagModType.HasValue)
+            {
+                RefreshModMenuFor(ref mSaddleBags, ref iSaddleBags, _motorcycleSaddleBagModType.Value);
+                mSaddleBags.NativeMenu.Name = "Saddle Bags";
             }
         }
 
@@ -857,6 +531,13 @@ namespace BennysMotorworksRevamped
                 giMotorcycleSeats = new UIMenuItem("Seats", Game.GetLocalizedString("CMOD_MOD_44_D"));
                 MainMenu.AddItem(giMotorcycleSeats);
                 MainMenu.BindMenuToItem(mMotorcycleSeats, giMotorcycleSeats);
+            }
+
+            if (_motorcycleSaddleBagModType.HasValue && mSaddleBags.MenuItems.Count > 0)
+            {
+                giSaddleBags = new UIMenuItem("Saddle Bags", "Customize your motorcycle saddlebags.");
+                MainMenu.AddItem(giSaddleBags);
+                MainMenu.BindMenuToItem(mSaddleBags, giSaddleBags);
             }
 
             if (_motorcycleWindshieldModType.HasValue && mWindshields.MenuItems.Count > 0)
@@ -920,6 +601,10 @@ namespace BennysMotorworksRevamped
             else if (sender == mMotorcycleSeats)
             {
                 modType = _motorcycleSeatModType;
+            }
+            else if (sender == mSaddleBags)
+            {
+                modType = _motorcycleSaddleBagModType;
             }
 
             if (!modType.HasValue)
@@ -1360,7 +1045,6 @@ namespace BennysMotorworksRevamped
                 return true;
             }
 
-            // Livery / Decals
             return GetLivery2CountSafely() > 0;
         }
 
@@ -2250,6 +1934,7 @@ namespace BennysMotorworksRevamped
             MoveMainMenuItemToEnd(giFMudguard);
             MoveMainMenuItemToEnd(giRMudguard);
             MoveMainMenuItemToEnd(giMotorcycleSeats);
+            MoveMainMenuItemToEnd(giSaddleBags);
             MoveMainMenuItemToEnd(giWindshields);
             MoveMainMenuItemToEnd(giBumper);
             MoveMainMenuItemToEnd(giEngine);
@@ -3695,8 +3380,9 @@ namespace BennysMotorworksRevamped
                             }
                             else
                             {
-                                createdItem.SetRightLabel($"${2000}");
-                                createdItem.Tag = new ModClass((int)enumItem, 2000);
+                                int price = GetResprayPrice(null, enumItem);
+                                createdItem.SetRightLabel($"${price}");
+                                createdItem.Tag = new ModClass((int)enumItem, price);
                             }
                             menu.AddItem(createdItem);
                             item = createdItem;
@@ -3714,8 +3400,9 @@ namespace BennysMotorworksRevamped
                             }
                             else
                             {
-                                createdItem.SetRightLabel($"${2000}");
-                                createdItem.Tag = new ModClass((int)enumItem, 2000);
+                                int price = GetResprayPrice(null, enumItem);
+                                createdItem.SetRightLabel($"${price}");
+                                createdItem.Tag = new ModClass((int)enumItem, price);
                             }
                             menu.AddItem(createdItem);
                             item = createdItem;
@@ -3796,8 +3483,9 @@ namespace BennysMotorworksRevamped
                             }
                             else
                             {
-                                createdItem.SetRightLabel($"${2000}");
-                                createdItem.Tag = new ModClass((int)enumItem, 2000);
+                                int price = GetResprayPrice(PearlescentColor, enumItem);
+                                createdItem.SetRightLabel($"${price}");
+                                createdItem.Tag = new ModClass((int)enumItem, price);
                             }
                             menu.AddItem(createdItem);
                             item = createdItem;
@@ -3866,7 +3554,7 @@ namespace BennysMotorworksRevamped
             {
                 mTireEnhancements.MenuItems.Clear();
 
-                iStandardTires = new UIMenuItem(GetLocalizedMenuText("CMOD_GLD2_0", "Standard Tires"));
+                iStandardTires = new UIMenuItem("None");
                 if (veh.CanTiresBurst)
                 {
                     iStandardTires.SetRightBadge(UIMenuItem.BadgeStyle.Car);
@@ -4712,6 +4400,19 @@ namespace BennysMotorworksRevamped
             return 2;
         }
 
+        private const int CustomResprayPrice = 2500;
+
+        private static int GetResprayPrice(List<VehicleColor> palette, VehicleColor color)
+        {
+            if (palette == PearlescentColor) return 1100;
+            if (palette == ChameleonColor || (palette == null && (int)color >= 161 && (int)color <= 222)) return 45000;
+            if (palette == ChromeColor || (palette == null && ChromeColor.Contains(color))) return 1200;
+            if (palette == MatteColor || (palette == null && MatteColor.Contains(color))) return 1000;
+            if (palette == MetalColor || (palette == null && MetalColor.Contains(color))) return 900;
+            if (palette == MetallicColor || (palette == null && !ClassicColor.Contains(color) && MetallicColor.Contains(color))) return 650;
+            return 400;
+        }
+
         public static void RefreshColorMenuFor(ref UIMenu menu, ref UIMenuItem item, List<VehicleColor> colorList, string prisecpear)
         {
             try
@@ -4727,6 +4428,7 @@ namespace BennysMotorworksRevamped
                 foreach (var entry in sortedColors)
                 {
                     VehicleColor col = entry.Color;
+                    int price = GetResprayPrice(colorList, col);
                     item = new UIMenuItem(entry.Name);
                     {
                         var __with1 = item;
@@ -4739,8 +4441,8 @@ namespace BennysMotorworksRevamped
                             }
                             else
                             {
-                                item.SetRightLabel($"${2000}");
-                                __with1.Tag = new ModClass((int)col, 2000);
+                                item.SetRightLabel($"${price}");
+                                __with1.Tag = new ModClass((int)col, price);
                             }
                         }
                         else if (prisecpear == "Secondary")
@@ -4752,8 +4454,8 @@ namespace BennysMotorworksRevamped
                             }
                             else
                             {
-                                item.SetRightLabel($"${2000}");
-                                __with1.Tag = new ModClass((int)col, 2000);
+                                item.SetRightLabel($"${price}");
+                                __with1.Tag = new ModClass((int)col, price);
                             }
                         }
                         else if (prisecpear == "Pearlescent")
@@ -4765,8 +4467,8 @@ namespace BennysMotorworksRevamped
                             }
                             else
                             {
-                                item.SetRightLabel($"${2000}");
-                                __with1.Tag = new ModClass((int)col, 2000);
+                                item.SetRightLabel($"${price}");
+                                __with1.Tag = new ModClass((int)col, price);
                             }
                         }
                     }
@@ -4854,8 +4556,8 @@ namespace BennysMotorworksRevamped
                         }
                         else
                         {
-                            item.SetRightLabel("$2000");
-                            item.Tag = new RGBModClass(color, 2000);
+                            item.SetRightLabel($"${CustomResprayPrice}");
+                            item.Tag = new RGBModClass(color, CustomResprayPrice);
                         }
                     }
                     else if (string.Equals(neonsmoke, "Secondary", StringComparison.OrdinalIgnoreCase))
@@ -4868,8 +4570,8 @@ namespace BennysMotorworksRevamped
                         }
                         else
                         {
-                            item.SetRightLabel("$2000");
-                            item.Tag = new RGBModClass(color, 2000);
+                            item.SetRightLabel($"${CustomResprayPrice}");
+                            item.Tag = new RGBModClass(color, CustomResprayPrice);
                         }
                     }
 
@@ -5030,6 +4732,7 @@ namespace BennysMotorworksRevamped
             mBackrests = NewUIMenu(ref mBackrests, "BACKRESTS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mWindshields = NewUIMenu(ref mWindshields, "WINDSHIELDS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mMotorcycleSeats = NewUIMenu(ref mMotorcycleSeats, "SEATS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mSaddleBags = NewUIMenu(ref mSaddleBags, "SADDLE BAGS", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
 
             _menuSystemReady = _menuCreationFailures == 0
                 && _menuPool != null
@@ -5085,8 +4788,24 @@ namespace BennysMotorworksRevamped
                     Game.Player.Money = (Game.Player.Money - Convert.ToInt32(selectedItem.Tag));
                     selectedItem.Tag = 0;
                     lastVehMemory.BulletProofTires = veh.CanTiresBurst;
+                    MarkWorkshopVehicleAsOwned(veh);
                 }
             }
+        }
+
+        private static bool IsConfirmedBodyResprayMenu(UIMenu sender)
+        {
+            return sender == mPrimaryChromeColor || sender == mPrimaryClassicColor
+                || sender == mPrimaryUtilityColor || sender == mPrimaryWornColor
+                || sender == mPrimarySpecialSolidColor || sender == mPrimaryChameleonColor
+                || sender == mPrimaryMatteColor || sender == mPrimaryMetalsColor
+                || sender == mPrimaryMetallicColor || sender == mPrimaryPearlescentColor
+                || sender == mSecondaryChromeColor || sender == mSecondaryClassicColor
+                || sender == mSecondaryUtilityColor || sender == mSecondaryWornColor
+                || sender == mSecondarySpecialSolidColor || sender == mSecondaryChameleonColor
+                || sender == mSecondaryMatteColor || sender == mSecondaryMetallicColor
+                || sender == mSecondaryMetalsColor || sender == mCustomPrimaryColor
+                || sender == mCustomSecondaryColor;
         }
 
         public static void ModsMenuItemSelectHandler(UIMenu sender, UIMenuItem selectedItem, int index)
@@ -5103,6 +4822,7 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
+                bool buyingUnequippedOption = selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car;
                 foreach (UIMenuItem i in sender.MenuItems)
                 {
                     if (i.RightBadge == UIMenuItem.BadgeStyle.Car)
@@ -5117,9 +4837,10 @@ namespace BennysMotorworksRevamped
                     GTA.UI.Screen.FadeOut(1000);
                     Script.Wait(1000);
                     Vehicle newAWVeh = World.CreateVehicle(((ArenaWarVehicle)(selectedItem.Tag)).Model, veh.Position, veh.Heading);
-                    newAWVeh.IsPersistent = false;
-                    newAWVeh.Mods.PrimaryColor = lastVehMemory.PrimaryColor;
-                    newAWVeh.Mods.SecondaryColor = lastVehMemory.SecondaryColor;
+                    TransferWorkshopVehicleIdentity(veh, newAWVeh);
+                    newAWVeh.InstallModKit();
+                    ApplyPrimaryPaint(newAWVeh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
+                    ApplySecondaryPaint(newAWVeh, lastVehMemory.SecondaryColor);
                     ApplySavedCustomPaintState(newAWVeh, lastVehMemory);
                     newAWVeh.Mods.DashboardColor = lastVehMemory.LightsColor;
                     newAWVeh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
@@ -5127,7 +4848,7 @@ namespace BennysMotorworksRevamped
                     newAWVeh.Mods.RimColor = lastVehMemory.RimColor;
                     newAWVeh.Mods.NeonLightsColor = lastVehMemory.NeonLightsColor;
                     newAWVeh.Mods.TireSmokeColor = lastVehMemory.TireSmokeColor;
-                    newAWVeh.InstallModKit();
+
                     newAWVeh.SetWheelType(lastVehMemory.WheelType);
                     newAWVeh.SetMod(VehicleMod.Aerials, lastVehMemory.Aerials, false);
                     newAWVeh.SetMod(VehicleMod.AirFilter, lastVehMemory.AirFilter, false);
@@ -5183,6 +4904,7 @@ namespace BennysMotorworksRevamped
                     ply.Task.WarpIntoVehicle(newAWVeh, VehicleSeat.Driver);
                     veh = newAWVeh;
                     newAWVeh.InstallModKit();
+                    lastVehMemory = CaptureWorkshopVehicleMemory();
                     isRepairing = true;
                     RefreshMenus();
                     MainMenu.Visible = true;
@@ -5845,7 +5567,6 @@ namespace BennysMotorworksRevamped
                     }
                 }
 
-                // Motorcycle promoted categories
                 if (TryPurchaseMotorcycleSpecialMod(sender, selectedItem))
                 {
                 }
@@ -6439,8 +6160,7 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        veh.Mods.ClearCustomPrimaryColor();
-                        veh.Mods.PrimaryColor = ((VehicleColor)(mc.ModID));
+                        ApplyPrimaryPaint(veh, (VehicleColor)mc.ModID, veh.Mods.PearlescentColor);
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
@@ -6487,8 +6207,7 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        veh.Mods.ClearCustomSecondaryColor();
-                        veh.Mods.SecondaryColor = ((VehicleColor)(mc.ModID));
+                        ApplySecondaryPaint(veh, (VehicleColor)mc.ModID);
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
@@ -6557,6 +6276,17 @@ namespace BennysMotorworksRevamped
                         selectedItem.Tag = new RGBModClass(mc.Color(), 0);
                         lastVehMemory.TireSmokeColor = mc.Color();
                         PlaySpeech("");
+                    }
+                }
+
+                if (buyingUnequippedOption && selectedItem.RightBadge == UIMenuItem.BadgeStyle.Car)
+                {
+                    lastVehMemory = CaptureWorkshopVehicleMemory();
+                    MarkWorkshopVehicleAsOwned(veh);
+
+                    if (IsConfirmedBodyResprayMenu(sender))
+                    {
+                        ClearWorkshopWantedLevelAfterRespray();
                     }
                 }
 
@@ -7102,7 +6832,6 @@ namespace BennysMotorworksRevamped
                         veh.Mods.WindowTint = (VehicleWindowTint)mc.ModID;
                     }
 
-                    // Motorcycle promoted categories
                     if (sender == mBackrests && _motorcycleBackrestModType.HasValue)
                     {
                         veh.SetMod(_motorcycleBackrestModType.Value, mc.ModID, false);
@@ -7114,6 +6843,10 @@ namespace BennysMotorworksRevamped
                     else if (sender == mMotorcycleSeats && _motorcycleSeatModType.HasValue)
                     {
                         veh.SetMod(_motorcycleSeatModType.Value, mc.ModID, false);
+                    }
+                    else if (sender == mSaddleBags && _motorcycleSaddleBagModType.HasValue)
+                    {
+                        veh.SetMod(_motorcycleSaddleBagModType.Value, mc.ModID, false);
                     }
                     // Bike Mods
                     else if (sender == mShifter)
@@ -7274,8 +7007,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if ((sender == mPrimaryChromeColor) || (sender == mPrimaryClassicColor) || (sender == mPrimaryUtilityColor) || (sender == mPrimaryWornColor) || (sender == mPrimarySpecialSolidColor) || (sender == mPrimaryChameleonColor) || (sender == mPrimaryMatteColor) || (sender == mPrimaryMetalsColor))
                     {
-                        veh.Mods.ClearCustomPrimaryColor();
-                        veh.Mods.PrimaryColor = ((VehicleColor)(mc.ModID));
+                        ApplyPrimaryPaint(veh, (VehicleColor)mc.ModID, veh.Mods.PearlescentColor);
                     }
                     else if (sender == mPrimaryMetallicColor)
                     {
@@ -7289,8 +7021,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if ((sender == mSecondaryChromeColor) || (sender == mSecondaryClassicColor) || (sender == mSecondaryUtilityColor) || (sender == mSecondaryWornColor) || (sender == mSecondarySpecialSolidColor) || (sender == mSecondaryChameleonColor) || (sender == mSecondaryMatteColor) || (sender == mSecondaryMetallicColor) || (sender == mSecondaryMetalsColor))
                     {
-                        veh.Mods.ClearCustomSecondaryColor();
-                        veh.Mods.SecondaryColor = ((VehicleColor)(mc.ModID));
+                        ApplySecondaryPaint(veh, (VehicleColor)mc.ModID);
                     }
                 }
             }
@@ -7353,9 +7084,10 @@ namespace BennysMotorworksRevamped
                             ? (Model)selectedItem.Tag
                             : LowriderUpgrade(veh.Model);
                         Vehicle newVeh = World.CreateVehicle(replacementModel, veh.Position, veh.Heading);
-                        newVeh.IsPersistent = false;
-                        newVeh.Mods.PrimaryColor = lastVehMemory.PrimaryColor;
-                        newVeh.Mods.SecondaryColor = lastVehMemory.SecondaryColor;
+                        TransferWorkshopVehicleIdentity(veh, newVeh);
+                        newVeh.InstallModKit();
+                        ApplyPrimaryPaint(newVeh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
+                        ApplySecondaryPaint(newVeh, lastVehMemory.SecondaryColor);
                         ApplySavedCustomPaintState(newVeh, lastVehMemory);
                         newVeh.Mods.DashboardColor = lastVehMemory.LightsColor;
                         newVeh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
@@ -7363,7 +7095,7 @@ namespace BennysMotorworksRevamped
                         newVeh.Mods.RimColor = lastVehMemory.RimColor;
                         newVeh.Mods.NeonLightsColor = lastVehMemory.NeonLightsColor;
                         newVeh.Mods.TireSmokeColor = lastVehMemory.TireSmokeColor;
-                        newVeh.InstallModKit();
+
                         newVeh.SetWheelType(lastVehMemory.WheelType);
                         newVeh.SetMod(VehicleMod.Aerials, lastVehMemory.Aerials, false);
                         newVeh.SetMod(VehicleMod.AirFilter, lastVehMemory.AirFilter, false);
@@ -7420,6 +7152,7 @@ namespace BennysMotorworksRevamped
                         ply.Task.WarpIntoVehicle(newVeh, VehicleSeat.Driver);
                         veh = newVeh;
                         newVeh.InstallModKit();
+                        lastVehMemory = CaptureWorkshopVehicleMemory();
                         sender.MenuItems.Remove(selectedItem);
                         isRepairing = true;
                         RefreshMenus();
@@ -7442,9 +7175,10 @@ namespace BennysMotorworksRevamped
                         Script.Wait(1000);
                         Tuple<string, int> upgrade2 = veh.DisplayName.GetUpgradeModVehicleInfo();
                         Vehicle newVeh = World.CreateVehicle(upgrade2.Item1, veh.Position, veh.Heading);
-                        newVeh.IsPersistent = false;
-                        newVeh.Mods.PrimaryColor = lastVehMemory.PrimaryColor;
-                        newVeh.Mods.SecondaryColor = lastVehMemory.SecondaryColor;
+                        TransferWorkshopVehicleIdentity(veh, newVeh);
+                        newVeh.InstallModKit();
+                        ApplyPrimaryPaint(newVeh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
+                        ApplySecondaryPaint(newVeh, lastVehMemory.SecondaryColor);
                         ApplySavedCustomPaintState(newVeh, lastVehMemory);
                         newVeh.Mods.DashboardColor = lastVehMemory.LightsColor;
                         newVeh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
@@ -7452,7 +7186,7 @@ namespace BennysMotorworksRevamped
                         newVeh.Mods.RimColor = lastVehMemory.RimColor;
                         newVeh.Mods.NeonLightsColor = lastVehMemory.NeonLightsColor;
                         newVeh.Mods.TireSmokeColor = lastVehMemory.TireSmokeColor;
-                        newVeh.InstallModKit();
+
                         newVeh.SetWheelType(lastVehMemory.WheelType);
                         newVeh.SetMod(VehicleMod.Aerials, lastVehMemory.Aerials, false);
                         newVeh.SetMod(VehicleMod.AirFilter, lastVehMemory.AirFilter, false);
@@ -7509,6 +7243,7 @@ namespace BennysMotorworksRevamped
                         ply.Task.WarpIntoVehicle(newVeh, VehicleSeat.Driver);
                         veh = newVeh;
                         newVeh.InstallModKit();
+                        lastVehMemory = CaptureWorkshopVehicleMemory();
                         sender.MenuItems.Remove(selectedItem);
                         isRepairing = true;
                         RefreshMenus();
@@ -7649,6 +7384,10 @@ namespace BennysMotorworksRevamped
                         camera.MainCameraPosition = CameraPosition.BikeWindshield;
                     }
                     else if (selectedItem == giMotorcycleSeats)
+                    {
+                        camera.MainCameraPosition = CameraPosition.Wheels;
+                    }
+                    else if (selectedItem == giSaddleBags)
                     {
                         camera.MainCameraPosition = CameraPosition.Wheels;
                     }
@@ -7883,8 +7622,8 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == QuitMenu)
                 {
-                    SaveStoryVehicleStateIfNeeded();
                     HideAllMenus();
+                    CommitStoryPersonalVehicleOnWorkshopExit();
                     PlayExitCutScene();
                 }
             }
@@ -7966,8 +7705,8 @@ namespace BennysMotorworksRevamped
                 // Color()
                 veh.Mods.DashboardColor = lastVehMemory.LightsColor;
                 veh.Mods.TrimColor = lastVehMemory.TrimColor;
-                veh.Mods.PrimaryColor = lastVehMemory.PrimaryColor;
-                veh.Mods.SecondaryColor = lastVehMemory.SecondaryColor;
+                ApplyPrimaryPaint(veh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
+                ApplySecondaryPaint(veh, lastVehMemory.SecondaryColor);
                 ApplySavedCustomPaintState(veh, lastVehMemory);
                 veh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
                 veh.Mods.RimColor = lastVehMemory.RimColor;
@@ -8006,7 +7745,7 @@ namespace BennysMotorworksRevamped
                     veh.SetHighBeamsState(false);
                 }
                 // Reset Camera Position
-                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
+                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mSaddleBags) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
                 {
                     camera.MainCameraPosition = CameraPosition.Car;
                 }
@@ -8067,7 +7806,6 @@ namespace BennysMotorworksRevamped
                 return menu;
             }
 
-            // feature cannot leave a valid menu invisible/unprocessed.
             if (_menuPool == null)
             {
                 _menuCreationFailures++;

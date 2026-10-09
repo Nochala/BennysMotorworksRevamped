@@ -1,4 +1,4 @@
-﻿using GTA;
+using GTA;
 using GTA.Native;
 using LemonUI;
 using LemonUI.Scaleform;
@@ -47,6 +47,7 @@ namespace BennysMotorworksRevamped
 
             MenuHelper._menuPool = new ObjectPool();
             Helper._menuPool = MenuHelper._menuPool;
+            Helper.LoadSettings();
             Logger.Initialize();
             Logger.Log("BennysMenu initialized.");
             camera = new WorkshopCamera();

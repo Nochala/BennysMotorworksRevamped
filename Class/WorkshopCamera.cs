@@ -1282,7 +1282,7 @@ namespace BennysMotorworksRevamped
                         _targetPos = _target.Position - _target.ForwardVector * 0.75f + _target.UpVector * 0.45f;
                     }
 
-                    Vector3 backPlateCameraPosition = _targetPos - _target.ForwardVector * 1.35f + _target.UpVector * 0.05f;
+                    Vector3 backPlateCameraPosition = _targetPos - _target.ForwardVector * 1.65f + _target.UpVector * 0.05f;
                     SetAroundCamera(_targetPos, _targetPos.DistanceTo(backPlateCameraPosition), backPlateCameraPosition, GetStableLookRotation(_targetPos - backPlateCameraPosition, _mainCamera.Rotation.Z), new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f, LeftHorizontalValue = _target.Heading - 60.0f, RightHorizontalValue = _target.Heading - 300.0f });
                     break;
                 case CameraPosition.FrontPlate:
