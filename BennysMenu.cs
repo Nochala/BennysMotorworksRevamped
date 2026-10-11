@@ -494,6 +494,8 @@ namespace BennysMotorworksRevamped
             DrawVehicleStatRow("Traction", baselineStats.Traction, vehStats.Traction, showUpgradePreview, firstRowTop + (VehicleStatsRowSpacing * 3f), panelLeft);
         }
 
+        private bool _menuWasOpen;
+
         private void OnTick(object sender, EventArgs e)
         {
             if (!IsScriptLoaded)
@@ -534,6 +536,15 @@ namespace BennysMotorworksRevamped
 
             try
             {
+                // Menus closed and nothing to wind down: only let the pool run. The rest (buttons, mouse,
+                // vehicle stats) is only needed while a menu is open, plus one more pass after it closed.
+                bool menuOpenNow = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
+                if (!menuOpenNow && !_menuWasOpen && !isCutscene && !isRepairing)
+                {
+                    MenuHelper._menuPool?.Process();
+                    return;
+                }
+
                 BennysMotorworksRevamped.Compat.UIMenu.EnsureSingleVisibleMenu();
 
                 bool isMenuVisibleBeforeProcess = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
@@ -567,13 +578,15 @@ namespace BennysMotorworksRevamped
                 bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
                 SetWorkshopPlayerControlSuppressed(isMenuVisible);
 
-                if (veh != null)
-                {
-                    vehStats = GetVehicleStats(veh);
-                }
+                _menuWasOpen = isMenuVisible;
 
                 if (isMenuVisible)
                 {
+                    if (veh != null)
+                    {
+                        vehStats = GetVehicleStats(veh);
+                    }
+
                     Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
                     DrawVehicleStatsPanel();
                 }
