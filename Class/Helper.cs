@@ -184,7 +184,23 @@ namespace BennysMotorworksRevamped
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
 
+        // The game build never changes during a session, but these checks run every frame (menus, vehicle
+        // names...) and Process.GetCurrentProcess().ProcessName alone takes milliseconds: work each answer
+        // out once.
+        private static readonly Dictionary<int, bool> gameBuildChecks = new Dictionary<int, bool>();
+
         private static bool IsGameBuildAtLeast(int minimumLegacyBuild, GameVersion minimumVersion)
+        {
+            if (!gameBuildChecks.TryGetValue(minimumLegacyBuild, out bool result))
+            {
+                result = ComputeGameBuildAtLeast(minimumLegacyBuild, minimumVersion);
+                gameBuildChecks[minimumLegacyBuild] = result;
+            }
+
+            return result;
+        }
+
+        private static bool ComputeGameBuildAtLeast(int minimumLegacyBuild, GameVersion minimumVersion)
         {
             if (IsEnhancedGameBuild())
             {
@@ -907,16 +923,27 @@ namespace BennysMotorworksRevamped
             return World.CreateVehicle(model, position, heading);
         }
 
+        private static bool? _isEnhancedGameBuild;
+
         private static bool IsEnhancedGameBuild()
         {
+            if (_isEnhancedGameBuild.HasValue)
+            {
+                return _isEnhancedGameBuild.Value;
+            }
+
+            bool isEnhanced;
             try
             {
-                return System.Diagnostics.Process.GetCurrentProcess().ProcessName.IndexOf("Enhanced", StringComparison.OrdinalIgnoreCase) >= 0;
+                isEnhanced = System.Diagnostics.Process.GetCurrentProcess().ProcessName.IndexOf("Enhanced", StringComparison.OrdinalIgnoreCase) >= 0;
             }
             catch
             {
-                return false;
+                isEnhanced = false;
             }
+
+            _isEnhancedGameBuild = isEnhanced;
+            return isEnhanced;
         }
 
         private static int GetBennysInteriorId(out int referenceProbeInteriorId, out int workshopInteriorId)

@@ -935,7 +935,37 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        // Far from the workshop nothing here has to react every frame, and each frame costs a dozen
+        // native calls: look again 4 times a second.
+        private const float WorkshopFarDistance = 200.0f;
+        private const int WorkshopFarCheckMs = 250;
+        private bool _workshopFar;
+        private int _workshopNextCheckMs;
+
         private void OnTick(object sender, EventArgs e)
+        {
+            if (_workshopFar && unchecked(Environment.TickCount - _workshopNextCheckMs) < 0)
+            {
+                return;
+            }
+
+            OnTickCore(sender, e);
+            UpdateWorkshopFarState();
+        }
+
+        private void UpdateWorkshopFarState()
+        {
+            bool menuVisible = Helper._menuPool != null && Helper._menuPool.AreAnyVisible;
+            float farSquared = WorkshopFarDistance * WorkshopFarDistance;
+
+            _workshopFar = !isCutscene && !isExiting && !menuVisible && !_wantedWorkshopWaiting
+                && ply != null
+                && ply.Position.DistanceToSquared(WorkshopInteriorPosition) > farSquared
+                && (veh == null || veh.Position.DistanceToSquared(WorkshopInteriorPosition) > farSquared);
+            _workshopNextCheckMs = unchecked(Environment.TickCount + WorkshopFarCheckMs);
+        }
+
+        private void OnTickCore(object sender, EventArgs e)
         {
             try
             {
