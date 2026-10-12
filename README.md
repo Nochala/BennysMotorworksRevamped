@@ -56,18 +56,9 @@ GTA V/scripts/ folder.
 
 
 ## Credits
-### _ImNotMentaL_   
-### _Guadmaz_
-### _Rockstar Games_
-### _Chiheb-Bacha_
-### _Crosire & ScriptHookVDotNet contributors_
-### _Alexander Blade_
-### _justalemon_
-### _Dogamizer_
-### _ShinyWasabi_
-### _Dogamizer_
-### _GrandHaven_
-### _calamity-inc_
+### _ImNotMentaL_, _Rockstar Games_, _Chiheb-Bacha_, _Crosire & ScriptHookVDotNet contributors_, _Alexander Blade_, _justalemon_, _Dogamizer_, _ShinyWasabi_, _Dogamizer_, _GrandHaven_, _calamity-inc_, & _the-beper_. 
+
+
 
 ## Mod pages:
 - [**GTA5 Mods**](https://www.gta5-mods.com/scripts/benny-s-motor-works-in-sp-revamped)
