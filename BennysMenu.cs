@@ -567,7 +567,7 @@ namespace BennysMotorworksRevamped
                 bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
                 SetWorkshopPlayerControlSuppressed(isMenuVisible);
 
-                if (veh != null)
+                if (isMenuVisible && veh != null)
                 {
                     vehStats = GetVehicleStats(veh);
                 }

@@ -49,6 +49,15 @@ namespace BennysMotorworksRevamped
         private static bool _suppressMenuRestoreOnClose;
         private static bool _lightColorPreviewBlackoutActive;
         private static readonly List<UIMenu> _registeredMenus = new List<UIMenu>();
+        private static bool _instructionalButtonsApplied;
+        private static bool _lastInstructionalRoofVisible;
+        private static int _lastInstructionalButtonMenuCount = -1;
+        private static bool? _lastAppliedMouseDisabled;
+        private static int _lastMouseBehaviorMenuCount = -1;
+        private static bool _menuMouseApiResolved;
+        private static Reflection.PropertyInfo _menuMouseProperty;
+        private static object _menuMouseEnabledValue;
+        private static object _menuMouseDisabledValue;
         private static bool _menuSystemReady;
         private static int _menuCreationFailures;
         public static bool IsMenuSystemReady => _menuSystemReady && _menuPool != null && MainMenu != null && QuitMenu != null;
@@ -729,7 +738,15 @@ namespace BennysMotorworksRevamped
         public static void RefreshInstructionalButtons()
         {
             bool showRoofButton = ShouldShowRoofInstructionalButton();
+            int menuCount = _registeredMenus.Count;
+            if (_instructionalButtonsApplied
+                && _lastInstructionalRoofVisible == showRoofButton
+                && _lastInstructionalButtonMenuCount == menuCount)
+            {
+                return;
+            }
 
+            bool allMenusUpdated = true;
             foreach (UIMenu registeredMenu in _registeredMenus)
             {
                 if (registeredMenu == null)
@@ -751,33 +768,141 @@ namespace BennysMotorworksRevamped
                 }
                 catch (Exception ex)
                 {
+                    allMenusUpdated = false;
                     Logger.Log("Unable to refresh instructional buttons: " + ex.Message);
                 }
+            }
+
+            _instructionalButtonsApplied = allMenusUpdated;
+            _lastInstructionalRoofVisible = showRoofButton;
+            _lastInstructionalButtonMenuCount = menuCount;
+        }
+
+        private static void ResolveMenuMouseApi()
+        {
+            if (_menuMouseApiResolved)
+            {
+                return;
+            }
+
+            UIMenu menu = _registeredMenus.FirstOrDefault(m => m != null && m.NativeMenu != null);
+            if (menu == null)
+            {
+                return;
+            }
+
+            _menuMouseApiResolved = true;
+            Type nativeMenuType = menu.NativeMenu.GetType();
+
+            try
+            {
+                Reflection.PropertyInfo property = nativeMenuType.Assembly.GetType("LemonUI.Menus.MenuMouseBehavior", false) != null
+                    ? nativeMenuType.GetProperty("MouseBehavior") : null;
+                if (property != null && property.CanRead && property.CanWrite && property.PropertyType.IsEnum)
+                {
+                    object enabled = Enum.Parse(property.PropertyType, "Movement");
+                    object disabled = Enum.Parse(property.PropertyType, "Disabled");
+                    _menuMouseProperty = property;
+                    _menuMouseEnabledValue = enabled;
+                    _menuMouseDisabledValue = disabled;
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                Reflection.PropertyInfo property = nativeMenuType.GetProperty("UseMouse");
+                if (property != null && property.CanRead && property.CanWrite && property.PropertyType == typeof(bool))
+                {
+                    _menuMouseProperty = property;
+                    _menuMouseEnabledValue = true;
+                    _menuMouseDisabledValue = false;
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            Logger.Log("LemonUI mouse input API could not be resolved.");
+        }
+
+        private static bool IsMenuMouseState(UIMenu menu, object expectedValue)
+        {
+            if (_menuMouseProperty == null || menu == null || menu.NativeMenu == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                return Equals(_menuMouseProperty.GetValue(menu.NativeMenu, null), expectedValue);
+            }
+            catch (Exception ex)
+            {
+                _menuMouseProperty = null;
+                Logger.Log("Unable to read LemonUI mouse input state: " + ex.Message);
+                return false;
             }
         }
 
         public static void RefreshMenuMouseBehavior()
         {
+            ResolveMenuMouseApi();
+            if (_menuMouseProperty == null)
+            {
+                return;
+            }
+
             bool leftClickOutsideMenu = false;
 
-            if (_menuPool != null && _menuPool.AreAnyVisible && camera != null)
+            if (optEnableMouse && _menuPool != null && _menuPool.AreAnyVisible && camera != null)
             {
                 bool leftClickPressed = Game.IsControlPressed(Control.Attack)
                     || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_PRESSED, 0, (int)Control.Attack);
                 leftClickOutsideMenu = leftClickPressed && !camera.IsMouseInMenu();
             }
 
-            LemonUI.Menus.MenuMouseBehavior mouseBehavior = !optEnableMouse || (camera != null && (camera.IsDragging || leftClickOutsideMenu))
-                ? LemonUI.Menus.MenuMouseBehavior.Disabled
-                : LemonUI.Menus.MenuMouseBehavior.Movement;
+            bool mouseDisabled = !optEnableMouse || (camera != null && (camera.IsDragging || leftClickOutsideMenu));
+            int menuCount = _registeredMenus.Count;
+            object mouseBehavior = mouseDisabled ? _menuMouseDisabledValue : _menuMouseEnabledValue;
+
+            if (_lastAppliedMouseDisabled == mouseDisabled && _lastMouseBehaviorMenuCount == menuCount)
+            {
+                UIMenu visibleMenu = UIMenu.GetVisibleMenu();
+                if (visibleMenu == null || IsMenuMouseState(visibleMenu, mouseBehavior))
+                {
+                    return;
+                }
+            }
+
+            if (_menuMouseProperty == null)
+            {
+                return;
+            }
 
             foreach (UIMenu registeredMenu in _registeredMenus)
             {
-                if (registeredMenu != null)
+                if (registeredMenu != null && registeredMenu.NativeMenu != null)
                 {
-                    registeredMenu.NativeMenu.MouseBehavior = mouseBehavior;
+                    try
+                    {
+                        _menuMouseProperty.SetValue(registeredMenu.NativeMenu, mouseBehavior, null);
+                    }
+                    catch (Exception ex)
+                    {
+                        _menuMouseProperty = null;
+                        Logger.Log("Unable to set LemonUI mouse input state: " + ex.Message);
+                        return;
+                    }
                 }
             }
+
+            _lastAppliedMouseDisabled = mouseDisabled;
+            _lastMouseBehaviorMenuCount = menuCount;
         }
 
         public static void ProcessMenuMouseWheelScrolling()
@@ -789,7 +914,7 @@ namespace BennysMotorworksRevamped
 
             UIMenu visibleMenu = UIMenu.GetVisibleMenu();
             if (visibleMenu == null || visibleMenu.NativeMenu == null || visibleMenu.MenuItems.Count == 0
-                || visibleMenu.NativeMenu.MouseBehavior != LemonUI.Menus.MenuMouseBehavior.Movement)
+                || !IsMenuMouseState(visibleMenu, _menuMouseEnabledValue))
             {
                 return;
             }

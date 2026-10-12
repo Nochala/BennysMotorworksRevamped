@@ -183,11 +183,18 @@ namespace BennysMotorworksRevamped
         private static readonly Dictionary<int, bool> oversizedVehicleModels = new Dictionary<int, bool>();
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
+        private static readonly Dictionary<int, bool> _gameBuildChecks = new Dictionary<int, bool>();
 
         private static bool IsGameBuildAtLeast(int minimumLegacyBuild, GameVersion minimumVersion)
         {
+            if (_gameBuildChecks.TryGetValue(minimumLegacyBuild, out bool isSupported))
+            {
+                return isSupported;
+            }
+
             if (IsEnhancedGameBuild())
             {
+                _gameBuildChecks[minimumLegacyBuild] = true;
                 return true;
             }
 
@@ -196,7 +203,9 @@ namespace BennysMotorworksRevamped
                 Version fileVersion = Game.FileVersion;
                 if (fileVersion != null && fileVersion.Build > 0)
                 {
-                    return fileVersion.Build >= minimumLegacyBuild;
+                    isSupported = fileVersion.Build >= minimumLegacyBuild;
+                    _gameBuildChecks[minimumLegacyBuild] = isSupported;
+                    return isSupported;
                 }
             }
             catch
@@ -210,7 +219,9 @@ namespace BennysMotorworksRevamped
 #pragma warning restore 618
                 if (gameVersion != GameVersion.Unknown)
                 {
-                    return (int)gameVersion >= (int)minimumVersion;
+                    isSupported = (int)gameVersion >= (int)minimumVersion;
+                    _gameBuildChecks[minimumLegacyBuild] = isSupported;
+                    return isSupported;
                 }
             }
             catch
@@ -907,11 +918,20 @@ namespace BennysMotorworksRevamped
             return World.CreateVehicle(model, position, heading);
         }
 
+        private static bool? _isEnhancedGameBuild;
+
         private static bool IsEnhancedGameBuild()
         {
+            if (_isEnhancedGameBuild.HasValue)
+            {
+                return _isEnhancedGameBuild.Value;
+            }
+
             try
             {
-                return System.Diagnostics.Process.GetCurrentProcess().ProcessName.IndexOf("Enhanced", StringComparison.OrdinalIgnoreCase) >= 0;
+                bool isEnhanced = System.Diagnostics.Process.GetCurrentProcess().ProcessName.IndexOf("Enhanced", StringComparison.OrdinalIgnoreCase) >= 0;
+                _isEnhancedGameBuild = isEnhanced;
+                return isEnhanced;
             }
             catch
             {

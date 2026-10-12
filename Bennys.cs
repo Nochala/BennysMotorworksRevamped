@@ -982,8 +982,6 @@ namespace BennysMotorworksRevamped
                     && veh.Position.DistanceToSquared(WorkshopInteriorPosition) <= 36.0f);
                 int currentInteriorId = GetCurrentPlayerInteriorId(isMenuVisible);
                 bool isInBennysInterior = bennyIntID != 0 && currentInteriorId == bennyIntID;
-                string vehicleDenialMessage = GetWorkshopVehicleDenialMessage(veh);
-                bool isWorkshopVehicleAllowed = !unWelcome.Contains(veh.ClassType) && vehicleDenialMessage == null;
                 Vector3 approachOffset = veh.Position - BennysGarageDoorPosition;
                 float garageApproachDepth =
                     approachOffset.X * BennysGarageDoorInteriorDirX
@@ -991,6 +989,10 @@ namespace BennysMotorworksRevamped
                 bool isNearGarageDoor =
                     approachOffset.Length() <= BennysGarageDoorRetryDistance
                     && garageApproachDepth <= 1.5f;
+                bool needsVehicleClassification = isCutscene || isMenuVisible || isInBennysInterior || isNearGarageDoor;
+                string vehicleDenialMessage = needsVehicleClassification ? GetWorkshopVehicleDenialMessage(veh) : null;
+                bool isWorkshopVehicleAllowed = needsVehicleClassification
+                    && !unWelcome.Contains(veh.ClassType) && vehicleDenialMessage == null;
 
                 bool isInsideWorkshop = isCutscene
                     || isMenuVisible
