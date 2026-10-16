@@ -1,7 +1,8 @@
 # Bennys Motor Works in Single Player Revamped
 
 ![Language](https://img.shields.io/badge/LANGUAGE-C%23-239120?logo=csharp&logoColor=white)
-[![Latest Release](https://img.shields.io/badge/Version-v1.3.1-blue)](https://github.com/Nochala/BennysMotorworksRevamped/releases/latest)
+[![Latest Release](https://badgen.net/github/tag/Nochala/BennysMotorworksRevamped?label=Version&color=blue)](https://github.com/Nochala/BennysMotorworksRevamped/releases/latest)
+[![Last Commit](https://badgen.net/github/last-commit/Nochala/BennysMotorworksRevamped?label=Last%20Commit&color=blue)](https://github.com/Nochala/BennysMotorworksRevamped/commits/main)
 ### Benny's Motor Works Revamped brings a vehicle mod shop from Grand Theft Auto V Online into single player.
 #### This project is based on the original Benny's Original Motor Works SP mod created by [**ImNotMentaL**](https://github.com/qiangqiang101).
 #### Original concept goes to [**Guadmaz**](https://www.gta5-mods.com/users/Guadmaz), but overall structure and foundation goes to [**ImNotMentaL**](https://github.com/qiangqiang101).
