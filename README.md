@@ -1,4 +1,4 @@
-# BennysMotorworksRevamped
+# Bennys Motor Works Revamped
 
 ![Language](https://img.shields.io/badge/LANGUAGE-C%23-239120?logo=csharp&logoColor=white)
 [![Latest Release](https://img.shields.io/github/v/release/Nochala/BennysMotorworksRevamped?include_prereleases&label=Version)](https://github.com/Nochala/BennysMotorworksRevamped/releases/latest)
