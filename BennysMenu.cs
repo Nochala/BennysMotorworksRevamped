@@ -1,10 +1,11 @@
-using GTA;
+﻿using GTA;
 using GTA.Native;
 using LemonUI;
 using LemonUI.Scaleform;
 using LemonUI.Tools;
 using System;
 using System.Drawing;
+using System.Collections.Generic;
 using System.Reflection;
 using static BennysMotorworksRevamped.Helper;
 using static BennysMotorworksRevamped.MenuHelper;
@@ -14,6 +15,8 @@ namespace BennysMotorworksRevamped
     public class BennysMenu : Script
     {
         private const float LemonUiToShvdnScaledRatio = 720f / 1080f;
+        private const float LightPreviewFilterStrength = 1.0f;
+        private const float NightWorkshopFilterStrength = 0.55f;
         private const float VehicleStatsPanelWidth = 288f;
         private const float VehicleStatsPanelHeight = 100f;
         private const float VehicleStatsPanelPaddingLeft = 14f;
@@ -35,13 +38,250 @@ namespace BennysMotorworksRevamped
         private const float MenuAreaEstimatedFooterBaseHeight = 46f;
         private const float MenuAreaEstimatedFooterLineHeight = 18f;
         private const int MenuAreaEstimatedFooterWrapCharacters = 38;
+        private const int VehicleStatsRefreshIntervalMs = 80;
+        private static readonly string[] MenuFooterHeightMembers = { "DescriptionHeight", "FooterHeight", "HelpHeight", "InfoHeight" };
+        private static readonly string[] MenuSizeMembers = { "Size", "MenuSize", "VisibleSize", "DrawSize", "Bounds", "Rectangle" };
+        private static readonly Color VehicleStatsBarBackgroundColor = Color.FromArgb(115, 55, 55, 55);
+        private static readonly Color VehicleStatsBarFillColor = Color.FromArgb(235, 255, 255, 255);
+        private static readonly Dictionary<Type, Dictionary<string, ReflectedMemberAccessor>> ReflectedMemberAccessors =
+            new Dictionary<Type, Dictionary<string, ReflectedMemberAccessor>>();
+        private static string _cachedFooterDescription;
+        private static float _cachedFooterHeight;
+        private static float _vehicleStatsInverseScaledWidth;
 
+        private sealed class ReflectedMemberAccessor
+        {
+            internal PropertyInfo Property;
+            internal FieldInfo Field;
+        }
+
+        private static BennysMenu _activeInstance;
         public bool IsScriptLoaded { get; private set; }
         private bool _menuCreationAttempted;
         private bool _menuCreationFailureLogged;
+        private bool _workshopFilterMenuVisible;
+        private bool _headlightCameraMenuVisible;
+        private bool _workshopFilterUnavailable;
+        private bool _workshopFilterPushed;
+        private bool _workshopFilterLightPreview;
+        private bool _workshopFilterDarkUnavailable;
+        private bool _workshopFilterActivationLogged;
+        private bool _workshopFilterMissingLogged;
+        private bool _workshopFilterOverrideLogged;
+        private bool _workshopFilterRestoreFailureLogged;
+        private int _workshopFilterExpectedIndex = -1;
+        private int _workshopFilterLastAttemptAt;
+        private int _workshopFilterLastStrengthRefreshAt;
+        private int _workshopFilterLastNightCheckAt;
+        private float _workshopFilterAppliedStrength = -1.0f;
+        private bool _workshopFilterNighttime;
+        private int _lastVehicleStatsRefresh = -1;
+        private int _vehicleStatsHandle;
+
+        private void UpdateHeadlightCamera(bool menuVisible)
+        {
+            bool headlightsVisible = menuVisible
+                && BennysMotorworksRevamped.Compat.UIMenu.GetVisibleMenu() == MenuHelper.mHeadlights;
+            if (headlightsVisible == _headlightCameraMenuVisible)
+            {
+                return;
+            }
+
+            _headlightCameraMenuVisible = headlightsVisible;
+            if (camera == null || veh == null || !veh.Exists())
+            {
+                return;
+            }
+
+            if (headlightsVisible)
+            {
+                if (camera.MainCameraPosition != CameraPosition.Headlights)
+                {
+                    camera.MainCameraPosition = CameraPosition.Headlights;
+                }
+            }
+            else if (menuVisible && camera.MainCameraPosition == CameraPosition.Headlights)
+            {
+                camera.MainCameraPosition = CameraPosition.Car;
+            }
+        }
+
+        private void UpdateWorkshopVisualFilter(bool menuVisible)
+        {
+            if (!menuVisible)
+            {
+                if (_workshopFilterMenuVisible || _workshopFilterPushed)
+                {
+                    ClearWorkshopVisualFilter();
+                }
+                return;
+            }
+
+            if (_workshopFilterUnavailable)
+            {
+                return;
+            }
+
+            BennysMotorworksRevamped.Compat.UIMenu visibleMenu = BennysMotorworksRevamped.Compat.UIMenu.GetVisibleMenu();
+            bool lightPreview = !_workshopFilterDarkUnavailable
+                && (visibleMenu == MenuHelper.mHeadlights || visibleMenu == MenuHelper.mNeon || visibleMenu == MenuHelper.mNeonColor);
+
+            try
+            {
+                int currentIndex = Function.Call<int>(Hash.GET_TIMECYCLE_MODIFIER_INDEX);
+                bool firstActivation = !_workshopFilterMenuVisible;
+                bool previewChanged = _workshopFilterLightPreview != lightPreview;
+                bool wasNighttime = _workshopFilterNighttime;
+                bool modifierReplaced = _workshopFilterExpectedIndex >= 0 && currentIndex != _workshopFilterExpectedIndex;
+                int gameTime = Game.GameTime;
+                if (firstActivation || gameTime - _workshopFilterLastNightCheckAt >= 1000)
+                {
+                    int hour = Function.Call<int>(Hash.GET_CLOCK_HOURS);
+                    _workshopFilterNighttime = hour >= 19 || hour < 7;
+                    _workshopFilterLastNightCheckAt = gameTime;
+                }
+                bool nighttimeChanged = wasNighttime != _workshopFilterNighttime;
+                bool darkFilter = !_workshopFilterDarkUnavailable && (lightPreview || _workshopFilterNighttime);
+                float targetStrength = lightPreview
+                    ? LightPreviewFilterStrength
+                    : (darkFilter ? NightWorkshopFilterStrength : 1.0f);
+                bool retryUnconfirmed = _workshopFilterExpectedIndex < 0
+                    && (firstActivation || gameTime - _workshopFilterLastAttemptAt >= 1000);
+
+                if (firstActivation || previewChanged || nighttimeChanged || modifierReplaced || retryUnconfirmed)
+                {
+                    if (modifierReplaced && !_workshopFilterOverrideLogged)
+                    {
+                        Logger.Debug("Workshop timecycle was overridden while the customization menu was open. Restoring it.");
+                        _workshopFilterOverrideLogged = true;
+                    }
+
+                    if (!_workshopFilterPushed)
+                    {
+                        Function.Call((Hash)0x58F735290861E6B4UL);
+                        _workshopFilterPushed = true;
+                    }
+
+                    string modifier = darkFilter ? "superDARK" : "INT_smshop_inMOD";
+                    Function.Call(Hash.SET_TIMECYCLE_MODIFIER, modifier);
+                    Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, targetStrength);
+                    int appliedIndex = Function.Call<int>(Hash.GET_TIMECYCLE_MODIFIER_INDEX);
+
+                    if (appliedIndex == -1 && darkFilter)
+                    {
+                        modifier = "INT_NoAmbientmult_both";
+                        Function.Call(Hash.SET_TIMECYCLE_MODIFIER, modifier);
+                        Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, targetStrength);
+                        appliedIndex = Function.Call<int>(Hash.GET_TIMECYCLE_MODIFIER_INDEX);
+                    }
+
+                    if (appliedIndex == -1 && darkFilter)
+                    {
+                        modifier = "INT_NoAmbientmult";
+                        Function.Call(Hash.SET_TIMECYCLE_MODIFIER, modifier);
+                        Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, targetStrength);
+                        appliedIndex = Function.Call<int>(Hash.GET_TIMECYCLE_MODIFIER_INDEX);
+                    }
+
+                    if (appliedIndex == -1 && darkFilter)
+                    {
+                        _workshopFilterDarkUnavailable = true;
+                        lightPreview = false;
+                        modifier = "INT_smshop_inMOD";
+                        targetStrength = _workshopFilterNighttime ? 0.72f : 1.0f;
+                        Function.Call(Hash.SET_TIMECYCLE_MODIFIER, modifier);
+                        Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, targetStrength);
+                        appliedIndex = Function.Call<int>(Hash.GET_TIMECYCLE_MODIFIER_INDEX);
+                    }
+
+                    _workshopFilterExpectedIndex = appliedIndex;
+                    _workshopFilterLightPreview = lightPreview;
+                    _workshopFilterMenuVisible = true;
+                    _workshopFilterLastAttemptAt = gameTime;
+                    _workshopFilterLastStrengthRefreshAt = gameTime;
+                    _workshopFilterAppliedStrength = targetStrength;
+
+                    if (appliedIndex >= 0)
+                    {
+                        if (!_workshopFilterActivationLogged)
+                        {
+                            Logger.Debug("Workshop customization timecycle active: " + modifier + " (index " + appliedIndex + ").");
+                            _workshopFilterActivationLogged = true;
+                        }
+                        _workshopFilterMissingLogged = false;
+                    }
+                    else if (!_workshopFilterMissingLogged)
+                    {
+                        Logger.Debug("Workshop customization timecycle has not initialized; retrying while the menu remains open.");
+                        _workshopFilterMissingLogged = true;
+                    }
+                }
+                else if (_workshopFilterAppliedStrength != targetStrength || gameTime - _workshopFilterLastStrengthRefreshAt >= 1000)
+                {
+                    Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, targetStrength);
+                    _workshopFilterAppliedStrength = targetStrength;
+                    _workshopFilterLastStrengthRefreshAt = gameTime;
+                }
+            }
+            catch (Exception ex)
+            {
+                ClearWorkshopVisualFilter();
+                _workshopFilterUnavailable = true;
+                Logger.Debug("Workshop customization timecycle unavailable: " + ex.Message);
+            }
+        }
+
+        private void ClearWorkshopVisualFilter()
+        {
+            if (_workshopFilterPushed)
+            {
+                try
+                {
+                    Function.Call((Hash)0x3C8938D7D872211EUL);
+                    _workshopFilterPushed = false;
+                    _workshopFilterRestoreFailureLogged = false;
+                }
+                catch (Exception ex)
+                {
+                    if (!_workshopFilterRestoreFailureLogged)
+                    {
+                        Logger.Debug("Unable to restore the previous timecycle: " + ex.Message);
+                        _workshopFilterRestoreFailureLogged = true;
+                    }
+                    return;
+                }
+            }
+
+            _workshopFilterPushed = false;
+            _workshopFilterMenuVisible = false;
+            _workshopFilterLightPreview = false;
+            _workshopFilterActivationLogged = false;
+            _workshopFilterMissingLogged = false;
+            _workshopFilterOverrideLogged = false;
+            _workshopFilterExpectedIndex = -1;
+            _workshopFilterLastAttemptAt = 0;
+            _workshopFilterLastStrengthRefreshAt = 0;
+            _workshopFilterLastNightCheckAt = 0;
+            _workshopFilterAppliedStrength = -1.0f;
+            _workshopFilterNighttime = false;
+        }
+
+        internal static void RestoreWorkshopVisualsOnExit()
+        {
+            BennysMenu activeInstance = _activeInstance;
+            if (activeInstance == null)
+            {
+                return;
+            }
+
+            activeInstance.ClearWorkshopVisualFilter();
+            camera?.UpdateShopDepthOfField(false);
+            MenuHelper.RestoreLightColorPreviewLighting();
+        }
 
         public BennysMenu()
         {
+            _activeInstance = this;
             Tick += OnTick;
             Aborted += OnAborted;
 
@@ -79,29 +319,58 @@ namespace BennysMotorworksRevamped
             }
 
             Type type = instance.GetType();
-
-            try
+            if (!ReflectedMemberAccessors.TryGetValue(type, out Dictionary<string, ReflectedMemberAccessor> members))
             {
-                PropertyInfo property = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                if (property != null && property.GetIndexParameters().Length == 0)
-                {
-                    return property.GetValue(instance, null);
-                }
-            }
-            catch
-            {
+                members = new Dictionary<string, ReflectedMemberAccessor>(StringComparer.Ordinal);
+                ReflectedMemberAccessors.Add(type, members);
             }
 
-            try
+            if (!members.TryGetValue(memberName, out ReflectedMemberAccessor accessor))
             {
-                FieldInfo field = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                if (field != null)
+                accessor = new ReflectedMemberAccessor();
+                try
                 {
-                    return field.GetValue(instance);
+                    PropertyInfo property = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (property != null && property.GetIndexParameters().Length == 0)
+                    {
+                        accessor.Property = property;
+                    }
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    accessor.Field = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                }
+                catch
+                {
+                }
+
+                members.Add(memberName, accessor);
+            }
+
+            if (accessor.Property != null)
+            {
+                try
+                {
+                    return accessor.Property.GetValue(instance, null);
+                }
+                catch
+                {
                 }
             }
-            catch
+
+            if (accessor.Field != null)
             {
+                try
+                {
+                    return accessor.Field.GetValue(instance);
+                }
+                catch
+                {
+                }
             }
 
             return null;
@@ -218,13 +487,7 @@ namespace BennysMotorworksRevamped
 
         private static float ConvertScaledDrawXToNormalized(float scaledX)
         {
-            float scaledWidth = (float)GTA.UI.Screen.ScaledWidth;
-            if (scaledWidth <= 0f)
-            {
-                return 0f;
-            }
-
-            return scaledX / scaledWidth;
+            return scaledX * _vehicleStatsInverseScaledWidth;
         }
 
         private static float ConvertScaledDrawYToNormalized(float scaledY)
@@ -252,9 +515,7 @@ namespace BennysMotorworksRevamped
         private static float EstimateVisibleMenuFooterHeightLemonUi(BennysMotorworksRevamped.Compat.UIMenu visibleMenu)
         {
             object visibleNativeMenu = visibleMenu?.NativeMenu;
-            string[] footerHeightMembers = { "DescriptionHeight", "FooterHeight", "HelpHeight", "InfoHeight" };
-
-            foreach (string memberName in footerHeightMembers)
+            foreach (string memberName in MenuFooterHeightMembers)
             {
                 if (TryConvertToFloat(GetReflectedMemberValue(visibleNativeMenu, memberName), out float footerHeight) && footerHeight > 0f)
                 {
@@ -279,6 +540,11 @@ namespace BennysMotorworksRevamped
                 return 0f;
             }
 
+            if (string.Equals(description, _cachedFooterDescription, StringComparison.Ordinal))
+            {
+                return _cachedFooterHeight;
+            }
+
             string[] explicitLines = description.Replace("\r", string.Empty).Trim().Split(new[] { '\n' }, StringSplitOptions.None);
             int wrappedLineCount = 0;
             foreach (string explicitLine in explicitLines)
@@ -288,15 +554,15 @@ namespace BennysMotorworksRevamped
             }
 
             wrappedLineCount = Math.Max(1, wrappedLineCount);
-            return MenuAreaEstimatedFooterBaseHeight + ((wrappedLineCount - 1) * MenuAreaEstimatedFooterLineHeight);
+            _cachedFooterDescription = description;
+            _cachedFooterHeight = MenuAreaEstimatedFooterBaseHeight + ((wrappedLineCount - 1) * MenuAreaEstimatedFooterLineHeight);
+            return _cachedFooterHeight;
         }
 
         private static SizeF EstimateVisibleMenuSizeLemonUi(BennysMotorworksRevamped.Compat.UIMenu visibleMenu)
         {
             object visibleNativeMenu = visibleMenu?.NativeMenu;
-            string[] sizeMembers = { "Size", "MenuSize", "VisibleSize", "DrawSize", "Bounds", "Rectangle" };
-
-            foreach (string memberName in sizeMembers)
+            foreach (string memberName in MenuSizeMembers)
             {
                 if (TryExtractSizeF(GetReflectedMemberValue(visibleNativeMenu, memberName), out SizeF reflectedSize)
                     && reflectedSize.Width > 0f
@@ -342,13 +608,7 @@ namespace BennysMotorworksRevamped
 
         private static float ConvertScaledWidthToNormalized(float scaledWidth)
         {
-            float scaledScreenWidth = (float)GTA.UI.Screen.ScaledWidth;
-            if (scaledScreenWidth <= 0f)
-            {
-                return 0f;
-            }
-
-            return scaledWidth / scaledScreenWidth;
+            return scaledWidth * _vehicleStatsInverseScaledWidth;
         }
 
         private static float ConvertScaledHeightToNormalized(float scaledHeight)
@@ -419,10 +679,7 @@ namespace BennysMotorworksRevamped
                 float segmentLeftScaled = barLeftScaled + (i * (segmentWidthScaled + VehicleStatsBarSegmentGap));
                 float segmentCenterX = ConvertScaledDrawXToNormalized(segmentLeftScaled + (segmentWidthScaled * 0.5f));
                 float segmentWidthNormalized = ConvertScaledWidthToNormalized(segmentWidthScaled);
-                Color baseColor = Color.FromArgb(115, 55, 55, 55);
-                Color fillColor = Color.FromArgb(235, 255, 255, 255);
-
-                DrawRectNormalized(segmentCenterX, barCenterY, segmentWidthNormalized, segmentHeightNormalized, baseColor);
+                DrawRectNormalized(segmentCenterX, barCenterY, segmentWidthNormalized, segmentHeightNormalized, VehicleStatsBarBackgroundColor);
 
                 float normalSegmentFill = Clamp01(normalActiveSegments - i);
                 if (normalSegmentFill > 0f)
@@ -430,7 +687,7 @@ namespace BennysMotorworksRevamped
                     float fillWidthScaled = segmentWidthScaled * normalSegmentFill;
                     float fillCenterX = ConvertScaledDrawXToNormalized(segmentLeftScaled + (fillWidthScaled * 0.5f));
                     float fillWidthNormalized = ConvertScaledWidthToNormalized(fillWidthScaled);
-                    DrawRectNormalized(fillCenterX, barCenterY, fillWidthNormalized, segmentHeightNormalized, fillColor);
+                    DrawRectNormalized(fillCenterX, barCenterY, fillWidthNormalized, segmentHeightNormalized, VehicleStatsBarFillColor);
                 }
 
                 if (hasUpgrade)
@@ -467,6 +724,8 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
+            float scaledWidth = (float)GTA.UI.Screen.ScaledWidth;
+            _vehicleStatsInverseScaledWidth = scaledWidth > 0f ? 1f / scaledWidth : 0f;
             GetMenuAreaDrawBounds(out PointF menuPosition, out SizeF menuSize);
 
             float panelLeft = menuPosition.X + vehicleStatsOffsetX;
@@ -548,9 +807,12 @@ namespace BennysMotorworksRevamped
                         EnableWorkshopMenuMouseControls();
                     }
 
-                    MenuHelper.RefreshMenuMouseBehavior();
-                    MenuHelper.ProcessMenuMouseWheelScrolling();
-                    MenuHelper.RefreshInstructionalButtons();
+                    if (isMenuVisibleBeforeProcess)
+                    {
+                        MenuHelper.RefreshMenuMouseBehavior();
+                        MenuHelper.ProcessMenuMouseWheelScrolling();
+                        MenuHelper.RefreshInstructionalButtons();
+                    }
                     MenuHelper._menuPool?.Process();
                 }
                 finally
@@ -565,11 +827,28 @@ namespace BennysMotorworksRevamped
                 MenuHelper.UpdateLightColorPreviewLighting();
 
                 bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
+                UpdateHeadlightCamera(isMenuVisible);
+                UpdateWorkshopVisualFilter(isMenuVisible);
+                camera?.UpdateShopDepthOfField(isMenuVisible);
                 SetWorkshopPlayerControlSuppressed(isMenuVisible);
 
                 if (isMenuVisible && veh != null)
                 {
-                    vehStats = GetVehicleStats(veh);
+                    int gameTime = Game.GameTime;
+                    int vehicleHandle = veh.Handle;
+                    if (vehicleHandle != _vehicleStatsHandle || _lastVehicleStatsRefresh < 0
+                        || gameTime < _lastVehicleStatsRefresh
+                        || gameTime - _lastVehicleStatsRefresh >= VehicleStatsRefreshIntervalMs)
+                    {
+                        vehStats = GetVehicleStats(veh);
+                        _vehicleStatsHandle = vehicleHandle;
+                        _lastVehicleStatsRefresh = gameTime;
+                    }
+                }
+                else
+                {
+                    _vehicleStatsHandle = 0;
+                    _lastVehicleStatsRefresh = -1;
                 }
 
                 if (isMenuVisible)
@@ -607,12 +886,31 @@ namespace BennysMotorworksRevamped
             {
                 Logger.Log(ex.Message + " " + ex.StackTrace);
             }
+            finally
+            {
+                if ((_workshopFilterPushed || _workshopFilterMenuVisible)
+                    && (isCutscene || MenuHelper._menuPool == null || !MenuHelper._menuPool.AreAnyVisible))
+                {
+                    try
+                    {
+                        RestoreWorkshopVisualsOnExit();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Workshop visual cleanup failed: " + ex.Message);
+                    }
+                }
+            }
         }
 
         private void OnAborted(object sender, EventArgs e)
         {
-            MenuHelper.RestoreLightColorPreviewLighting();
+            RestoreWorkshopVisualsOnExit();
             SetWorkshopPlayerControlSuppressed(false);
+            if (ReferenceEquals(_activeInstance, this))
+            {
+                _activeInstance = null;
+            }
         }
     }
 }

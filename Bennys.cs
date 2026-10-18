@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using GTA;
 using GTA.Math;
 using GTA.Native;
@@ -362,7 +361,7 @@ namespace BennysMotorworksRevamped
                 1);
         }
 
-        private static void SetBennysGarageDoorOpenRatio(int doorHash, float ratio)
+        private static void SetBennysGarageDoorOpenRatio(int doorHash, float ratio, bool forceUpdate = true)
         {
             if (doorHash == 0)
             {
@@ -374,7 +373,7 @@ namespace BennysMotorworksRevamped
                 doorHash,
                 ratio,
                 0,
-                1);
+                forceUpdate ? 1 : 0);
         }
 
         private static bool IsBennysGarageDoorStillClosed(int doorHash)
@@ -576,7 +575,8 @@ namespace BennysMotorworksRevamped
                 _garageDoorOpeningRatio
                     + (float)elapsed / BennysGarageDoorOpeningDurationMs);
 
-            SetBennysGarageDoorOpenRatio(doorHash, _garageDoorOpeningRatio);
+            SetBennysGarageDoorOpenRatio(doorHash, _garageDoorOpeningRatio,
+                _garageDoorOpeningRatio >= 1.0f);
             if (_garageDoorOpeningRatio >= 1.0f)
             {
                 SetBennysGarageDoorHoldOpen(doorHash, true);
@@ -953,7 +953,8 @@ namespace BennysMotorworksRevamped
                 ply = Game.Player.Character;
 
                 int gameTime = Game.GameTime;
-                if (CanRunBennysGarageDoorRecovery(gameTime))
+                if ((gameTime >= _garageDoorNextUpdate || gameTime < _garageDoorLastObservedGameTime
+                    || _garageDoorWorldTransitionActive) && CanRunBennysGarageDoorRecovery(gameTime))
                 {
                     MaintainBennysGarageDoorRecovery(gameTime);
                 }
@@ -977,12 +978,26 @@ namespace BennysMotorworksRevamped
                 ProcessWorkshopCutscene();
 
                 bool isMenuVisible = Helper._menuPool != null && Helper._menuPool.AreAnyVisible;
+                if (workshopCashHudCleanupUntil != 0)
+                {
+                    if (gameTime < workshopCashHudCleanupUntil && !isMenuVisible && !isCutscene)
+                    {
+                        Function.Call(Hash.HIDE_HUD_COMPONENT_THIS_FRAME, 3);
+                        Function.Call(Hash.HIDE_HUD_COMPONENT_THIS_FRAME, 4);
+                        Function.Call(Hash.HIDE_HUD_COMPONENT_THIS_FRAME, 13);
+                    }
+                    else if (gameTime >= workshopCashHudCleanupUntil)
+                    {
+                        workshopCashHudCleanupUntil = 0;
+                    }
+                }
+                Vector3 vehiclePosition = veh.Position;
                 UpdateWorkshopWantedEscape(isMenuVisible && !isCutscene
                     && ply.CurrentVehicle == veh
-                    && veh.Position.DistanceToSquared(WorkshopInteriorPosition) <= 36.0f);
+                    && vehiclePosition.DistanceToSquared(WorkshopInteriorPosition) <= 36.0f);
                 int currentInteriorId = GetCurrentPlayerInteriorId(isMenuVisible);
                 bool isInBennysInterior = bennyIntID != 0 && currentInteriorId == bennyIntID;
-                Vector3 approachOffset = veh.Position - BennysGarageDoorPosition;
+                Vector3 approachOffset = vehiclePosition - BennysGarageDoorPosition;
                 float garageApproachDepth =
                     approachOffset.X * BennysGarageDoorInteriorDirX
                     + approachOffset.Y * BennysGarageDoorInteriorDirY;
@@ -1038,13 +1053,11 @@ namespace BennysMotorworksRevamped
                             UpdateTitleName();
                             PlayEnterCutScene();
                         }
-                        else if (veh.Position.DistanceTo(WorkshopInteriorPosition) <= 5.0f)
+                        else if (vehiclePosition.DistanceToSquared(WorkshopInteriorPosition) <= 25.0f)
                         {
                             camera?.Update();
                             Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
                             Function.Call(Hash.SHOW_HUD_COMPONENT_THIS_FRAME, 3);
-                            Function.Call(Hash.SHOW_HUD_COMPONENT_THIS_FRAME, 4);
-                            Function.Call(Hash.SHOW_HUD_COMPONENT_THIS_FRAME, 5);
                             Function.Call(Hash.SHOW_HUD_COMPONENT_THIS_FRAME, 13);
                         }
                     }
@@ -1061,7 +1074,7 @@ namespace BennysMotorworksRevamped
                 Logger.Log(ex.Message + " " + ex.StackTrace);
             }
 
-            if (Helper._menuPool != null && Helper._menuPool.AreAnyVisible)
+            if (Helper._menuPool != null && Helper._menuPool.AreAnyVisible && veh != null && camera != null)
             {
                 bool doorControlReleased = Game.IsControlJustReleased(doorKey)
                     || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_RELEASED, 0, (int)doorKey);
@@ -1108,14 +1121,13 @@ namespace BennysMotorworksRevamped
                     || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_PRESSED, 0, (int)zinKey))
                     && camera.MainCameraPosition != CameraPosition.Interior)
                 {
-                    PointF max = new PointF(6.0f, 3.0f);
-                    if (camera.CameraZoom > max.Y)
+                    if (camera.CameraZoom > 3.0f)
                     {
                         camera.CameraZoom -= 0.1f;
                     }
                     else
                     {
-                        camera.CameraZoom = max.Y;
+                        camera.CameraZoom = 3.0f;
                     }
                 }
 
@@ -1123,14 +1135,13 @@ namespace BennysMotorworksRevamped
                     || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_PRESSED, 0, (int)zoutKey))
                     && camera.MainCameraPosition != CameraPosition.Interior)
                 {
-                    PointF max = new PointF(6.0f, 3.0f);
-                    if (camera.CameraZoom < max.X)
+                    if (camera.CameraZoom < 6.0f)
                     {
                         camera.CameraZoom += 0.1f;
                     }
                     else
                     {
-                        camera.CameraZoom = max.X;
+                        camera.CameraZoom = 6.0f;
                     }
                 }
 

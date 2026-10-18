@@ -35,6 +35,11 @@ namespace BennysMotorworksRevamped
         FrontTrunk,
         Boost,
         Exhaust,
+        Spoiler,
+        Roof,
+        FrontRoof,
+        RearRoof,
+        Headlights,
     }
 
     public enum CameraRotationMode
@@ -56,6 +61,7 @@ namespace BennysMotorworksRevamped
     public class WorkshopCamera
     {
         private Camera _mainCamera;
+        private int _shopDepthOfFieldCameraHandle;
         private bool _isDragging;
         private PointF _dragOffset;
         private Entity _target;
@@ -73,6 +79,14 @@ namespace BennysMotorworksRevamped
         private Vector3 endValuePosition;
         private Vector3 startValueRotation;
         private Vector3 endValueRotation;
+        private Vector3 startValueFocus;
+        private Vector3 endValueFocus;
+        private Vector3 _renderedFocus;
+        private bool _hasRenderedFocus;
+        private bool _lerpAroundFocus;
+        private bool _curvedTransition;
+        private Vector3 _curveControlOne;
+        private Vector3 _curveControlTwo;
 
         private const float MinimumSafeCameraDistance = 0.35f;
         private const float MaximumSafeCameraDistance = 16.0f;
@@ -83,6 +97,11 @@ namespace BennysMotorworksRevamped
         private const float DefaultCameraSideOffset = -3.0f;
         private const float DefaultCameraHeightOffset = 1.1f;
         private const float DefaultTargetHeightOffset = 0.2f;
+        private const float HeadlightCameraAngleDegrees = 60.0f;
+        private const float HeadlightCameraForwardOffset = -0.45f;
+        private const float HeadlightCameraRightOffset = 3.0f;
+        private const float HeadlightCameraHeightOffset = 0.65f;
+        private const float HeadlightFocusHeightOffset = 0.2f;
 
         public WorkshopCamera()
         {
@@ -103,6 +122,72 @@ namespace BennysMotorworksRevamped
         }
 
         public Vector3 Rotation => _mainCamera?.Rotation ?? Vector3.Zero;
+
+        private bool _shopDepthOfFieldUnavailable;
+
+        public void UpdateShopDepthOfField(bool enabled)
+        {
+            if (!enabled || _mainCamera == null)
+            {
+                ResetShopDepthOfField();
+                return;
+            }
+
+            if (_shopDepthOfFieldUnavailable)
+            {
+                return;
+            }
+
+            try
+            {
+                if (!_mainCamera.Exists())
+                {
+                    ResetShopDepthOfField();
+                    return;
+                }
+
+                int handle = _mainCamera.Handle;
+                if (_shopDepthOfFieldCameraHandle != handle)
+                {
+                    ResetShopDepthOfField();
+                    Function.Call(Hash.SET_CAM_NEAR_DOF, handle, 0.15f);
+                    Function.Call(Hash.SET_CAM_FAR_DOF, handle, 10.0f);
+                    Function.Call(Hash.SET_CAM_DOF_STRENGTH, handle, 0.88f);
+                    Function.Call(Hash.SET_CAM_USE_SHALLOW_DOF_MODE, handle, true);
+                    _shopDepthOfFieldCameraHandle = handle;
+                }
+
+                Function.Call(Hash.SET_USE_HI_DOF);
+            }
+            catch (Exception ex)
+            {
+                ResetShopDepthOfField();
+                _shopDepthOfFieldUnavailable = true;
+                Logger.Log("Workshop depth of field unavailable: " + ex.Message);
+            }
+        }
+
+        private void ResetShopDepthOfField()
+        {
+            int handle = _shopDepthOfFieldCameraHandle;
+            _shopDepthOfFieldCameraHandle = 0;
+            if (handle == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                if (Function.Call<bool>(Hash.DOES_CAM_EXIST, handle))
+                {
+                    Function.Call(Hash.SET_CAM_USE_SHALLOW_DOF_MODE, handle, false);
+                    Function.Call(Hash.SET_CAM_DOF_STRENGTH, handle, 0.0f);
+                }
+            }
+            catch
+            {
+            }
+        }
 
         public bool IsDragging => _isDragging;
 
@@ -161,6 +246,7 @@ namespace BennysMotorworksRevamped
 
             _mainCamera.StopPointing();
             _targetPos = focusPosition;
+            _hasRenderedFocus = false;
             RotationMode = CameraRotationMode.FirstPerson;
             Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 0, false);
             CameraClamp = new CameraClamp { MaxVerticalValue = -60.0f, MinVerticalValue = -3.0f };
@@ -263,6 +349,7 @@ namespace BennysMotorworksRevamped
 
         public void Stop()
         {
+            ResetShopDepthOfField();
             ResetTransientState();
 
             try { Function.Call((Hash)0x8DB8CFFD58B62552UL, 0); } catch { }
@@ -290,6 +377,7 @@ namespace BennysMotorworksRevamped
             _targetPos = GetDefaultTargetPosition(lowrider);
             Vector3 defaultCameraPosition = GetDefaultCameraPosition(lowrider);
 
+            ResetShopDepthOfField();
             Camera.DeleteAllCameras();
             _mainCamera = CreateScriptedCamera(
                 defaultCameraPosition,
@@ -297,6 +385,8 @@ namespace BennysMotorworksRevamped
                 GameplayCamera.FieldOfView);
 
             _mainCamera.PointAt(_targetPos);
+            _renderedFocus = _targetPos;
+            _hasRenderedFocus = true;
 
             StartRenderingCamera(_mainCamera);
             _cameraZoom = (_targetPos - _mainCamera.Position).Length();
@@ -326,9 +416,24 @@ namespace BennysMotorworksRevamped
         private void ResetTransientState()
         {
             IsLerping = false;
+            _lerpAroundFocus = false;
+            _curvedTransition = false;
+            _hasRenderedFocus = false;
             _justSwitched = false;
+            EndMouseDrag();
+            _dragOffset = PointF.Empty;
+        }
+
+        private void EndMouseDrag()
+        {
+            if (!_isDragging)
+            {
+                return;
+            }
+
             _isDragging = false;
             _dragOffset = PointF.Empty;
+            Function.Call((Hash)0x8DB8CFFD58B62552UL, 0);
         }
 
         private bool HasUsableMainCamera()
@@ -379,6 +484,12 @@ namespace BennysMotorworksRevamped
         {
             return Game.IsControlJustReleased(control)
                 || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_RELEASED, 0, (int)control);
+        }
+
+        private static bool IsControlPressedIncludingDisabled(Control control)
+        {
+            return Game.IsControlPressed(control)
+                || Function.Call<bool>(Hash.IS_DISABLED_CONTROL_PRESSED, 0, (int)control);
         }
 
         private static float GetControlNormalIncludingDisabled(Control control)
@@ -482,6 +593,8 @@ namespace BennysMotorworksRevamped
             _mainCamera.StopPointing();
             _mainCamera.Position = safePosition;
             _mainCamera.PointAt(focus);
+            _renderedFocus = focus;
+            _hasRenderedFocus = true;
 
             _isDragging = false;
             _dragOffset = PointF.Empty;
@@ -506,6 +619,13 @@ namespace BennysMotorworksRevamped
 
         public void Update()
         {
+            if (_isDragging && (!Helper.optEnableMouse
+                || IsControlJustReleasedIncludingDisabled(Control.Attack)
+                || !IsControlPressedIncludingDisabled(Control.Attack)))
+            {
+                EndMouseDrag();
+            }
+
             if (_mainCamera == null)
             {
                 return;
@@ -513,34 +633,18 @@ namespace BennysMotorworksRevamped
 
             Game.DisableControlThisFrame(Control.VehicleMouseControlOverride);
 
-            if (IsLerping)
+            if (Helper.optEnableMouse && (IsLerping || _justSwitched))
             {
-                DateTime now = DateTime.Now;
-                float elapsed = (float)now.Subtract(startTime).TotalMilliseconds;
-                if (elapsed > duration)
-                {
-                    IsLerping = false;
-                    _mainCamera.Position = endValuePosition;
-                    _mainCamera.Rotation = endValueRotation;
-                    return;
-                }
-
-                _mainCamera.Position = LerpVector(elapsed, duration, startValuePosition, endValuePosition);
-                _mainCamera.Rotation = LerpVector(elapsed, duration, startValueRotation, endValueRotation);
-                return;
+                GTA.UI.Hud.ShowCursorThisFrame();
             }
 
-            if (_justSwitched)
+            if (_justSwitched && !IsLerping)
             {
                 _justSwitched = false;
-                return;
-            }
-
-            if (!Helper.optEnableMouse && _isDragging)
-            {
-                _isDragging = false;
-                _dragOffset = PointF.Empty;
-                Function.Call((Hash)0x8DB8CFFD58B62552UL, 0);
+                if (!Helper.optEnableMouse || !IsControlJustPressedIncludingDisabled(Control.Attack) || IsMouseInMenu())
+                {
+                    return;
+                }
             }
 
             if (Helper.optEnableMouse && IsControlJustPressedIncludingDisabled(Control.Attack) && !_isDragging && !IsMouseInMenu())
@@ -558,11 +662,73 @@ namespace BennysMotorworksRevamped
                 _dragOffset = new PointF(mouseX, mouseY);
             }
 
-            if (IsControlJustReleasedIncludingDisabled(Control.Attack) && _isDragging)
+            if (IsLerping)
             {
-                _isDragging = false;
-                _dragOffset = PointF.Empty;
-                Function.Call((Hash)0x8DB8CFFD58B62552UL, 0);
+                float elapsed = (float)DateTime.UtcNow.Subtract(startTime).TotalMilliseconds;
+                bool completed = elapsed >= duration;
+                _mainCamera.Position = completed ? endValuePosition
+                    : _curvedTransition ? GetCurvePosition(startValuePosition, _curveControlOne, _curveControlTwo, endValuePosition,
+                        QuadraticEasing(elapsed, 0.0f, 1.0f, duration))
+                    : LerpVector(elapsed, duration, startValuePosition, endValuePosition);
+                if (_lerpAroundFocus)
+                {
+                    Vector3 focus = completed ? endValueFocus
+                        : LerpVector(elapsed, duration, startValueFocus, endValueFocus);
+                    if (IsFiniteVector(focus) && _mainCamera.Position.DistanceTo(focus) >= MinimumSafeCameraDistance)
+                    {
+                        _mainCamera.PointAt(focus);
+                        _renderedFocus = focus;
+                        _hasRenderedFocus = true;
+                    }
+                }
+                else
+                {
+                    _mainCamera.Rotation = completed ? endValueRotation : LerpVector(elapsed, duration, startValueRotation, endValueRotation);
+                }
+
+                if (_isDragging)
+                {
+                    float mouseX = (GetControlNormalIncludingDisabled(Control.CursorX) * 2f) - 1f;
+                    float mouseY = (GetControlNormalIncludingDisabled(Control.CursorY) * 2f) - 1f;
+                    if (RotationMode == CameraRotationMode.FirstPerson)
+                    {
+                        mouseY *= -1f;
+                    }
+
+                    float deltaX = mouseX - _dragOffset.X;
+                    float deltaY = mouseY - _dragOffset.Y;
+                    Vector3 rotationDelta = Vector3.Zero;
+                    if (!IsCameraClamped(true, deltaX))
+                    {
+                        rotationDelta.Z = deltaX * 20f;
+                    }
+                    if (!IsCameraClamped(false, deltaY))
+                    {
+                        rotationDelta.X = -deltaY * 20f;
+                    }
+
+                    if (!_lerpAroundFocus)
+                    {
+                        _mainCamera.Rotation += rotationDelta;
+                        startValueRotation += rotationDelta;
+                        endValueRotation += rotationDelta;
+                    }
+                    _dragOffset = new PointF(mouseX, mouseY);
+                }
+
+                if (completed)
+                {
+                    IsLerping = false;
+                    _curvedTransition = false;
+                    _justSwitched = false;
+                    if (RotationMode == CameraRotationMode.Around)
+                    {
+                        _mainCamera.PointAt(_targetPos);
+                        _renderedFocus = _targetPos;
+                        _hasRenderedFocus = true;
+                    }
+                }
+                return;
             }
 
             if (RotationMode == CameraRotationMode.Around)
@@ -578,7 +744,54 @@ namespace BennysMotorworksRevamped
 
         }
 
-        private void UpdateAroundCamera()
+        private void OrbitAroundTarget(float horizontalInput, float verticalInput, float horizontalSensitivity, float verticalSensitivity)
+        {
+            if (_mainCamera == null || !IsFiniteVector(_targetPos))
+            {
+                return;
+            }
+
+            Vector3 displacement = _mainCamera.Position - _targetPos;
+            float radius = displacement.Length();
+            if (!IsFinite(radius) || radius < MinimumSafeCameraDistance)
+            {
+                return;
+            }
+
+            float horizontalDistance = (float)Math.Sqrt(displacement.X * displacement.X + displacement.Y * displacement.Y);
+            float yaw = (float)Math.Atan2(displacement.X, displacement.Y);
+            float elevation = (float)(Math.Atan2(displacement.Z, horizontalDistance) * (180.0 / Math.PI));
+            if (!IsCameraClamped(true, horizontalInput))
+            {
+                yaw += horizontalInput * horizontalSensitivity * (float)(Math.PI / 180.0);
+            }
+
+            float minimumElevation = 3.0f;
+            float maximumElevation = 65.0f;
+            if (CameraClamp != null && CameraClamp.MaxVerticalValue < CameraClamp.MinVerticalValue)
+            {
+                minimumElevation = Math.Max(2.0f, -CameraClamp.MinVerticalValue);
+                maximumElevation = Math.Min(80.0f, -CameraClamp.MaxVerticalValue);
+            }
+
+            elevation = Clamp(elevation + verticalInput * verticalSensitivity, minimumElevation, maximumElevation);
+            float elevationRadians = elevation * (float)(Math.PI / 180.0);
+            float horizontalRadius = radius * (float)Math.Cos(elevationRadians);
+            Vector3 nextPosition = _targetPos + new Vector3(
+                horizontalRadius * (float)Math.Sin(yaw),
+                horizontalRadius * (float)Math.Cos(yaw),
+                radius * (float)Math.Sin(elevationRadians));
+
+            if (IsFiniteVector(nextPosition))
+            {
+                _mainCamera.Position = nextPosition;
+                _mainCamera.PointAt(_targetPos);
+                _renderedFocus = _targetPos;
+                _hasRenderedFocus = true;
+            }
+        }
+
+        private void UpdateAroundCamera(bool duringTransition = false)
         {
             if (_isDragging)
             {
@@ -586,67 +799,33 @@ namespace BennysMotorworksRevamped
                 {
                     GTA.UI.Hud.ShowCursorThisFrame();
                 }
-                Vector3 dir = CutsceneManager.RotationToDirection(_mainCamera.Rotation);
-                float len = (_targetPos - _mainCamera.Position).Length();
 
-                Vector3 rotLeft = _mainCamera.Rotation + new Vector3(0f, 0f, -10f);
-                Vector3 rotRight = _mainCamera.Rotation + new Vector3(0f, 0f, 10f);
-                Vector3 right = CutsceneManager.RotationToDirection(rotRight) - CutsceneManager.RotationToDirection(rotLeft);
-
-                Vector3 rotUp = _mainCamera.Rotation + new Vector3(-20f, 0f, 0f);
-                Vector3 rotDown = _mainCamera.Rotation + new Vector3(20f, 0f, 0f);
-                Vector3 up = CutsceneManager.RotationToDirection(rotUp) - CutsceneManager.RotationToDirection(rotDown);
-
-                float mouseX = GetControlNormalIncludingDisabled(Control.CursorX);
-                float mouseY = GetControlNormalIncludingDisabled(Control.CursorY);
-                mouseX = (mouseX * 2f) - 1f;
-                mouseY = (mouseY * 2f) - 1f;
-
-                Vector3 rotation = Vector3.Zero;
-                if (!IsCameraClamped(true, mouseX - _dragOffset.X))
+                float mouseX = (GetControlNormalIncludingDisabled(Control.CursorX) * 2f) - 1f;
+                float mouseY = (GetControlNormalIncludingDisabled(Control.CursorY) * 2f) - 1f;
+                if (!duringTransition)
                 {
-                    rotation += right * 15f * (mouseX - _dragOffset.X);
+                    float deltaX = mouseX - _dragOffset.X;
+                    float deltaY = mouseY - _dragOffset.Y;
+                    if (Math.Abs(deltaX) > 0.00001f || Math.Abs(deltaY) > 0.00001f)
+                    {
+                        OrbitAroundTarget(deltaX, deltaY, 90f, 85f);
+                    }
                 }
-                if (!IsCameraClamped(false, mouseY - _dragOffset.Y))
-                {
-                    rotation += up * -((mouseY - _dragOffset.Y) * 15f);
-                }
-                rotation += dir * (len - CameraZoom);
-                _mainCamera.Position += rotation;
                 _dragOffset = new PointF(mouseX, mouseY);
             }
 
-            if (Game.LastInputMethod == InputMethod.GamePad)
+            if (!duringTransition && Game.LastInputMethod == InputMethod.GamePad)
             {
-                Vector3 dir = CutsceneManager.RotationToDirection(_mainCamera.Rotation);
-                float len = (_targetPos - _mainCamera.Position).Length();
-
-                Vector3 rotLeft = _mainCamera.Rotation + new Vector3(0f, 0f, -10f);
-                Vector3 rotRight = _mainCamera.Rotation + new Vector3(0f, 0f, 10f);
-                Vector3 right = CutsceneManager.RotationToDirection(rotRight) - CutsceneManager.RotationToDirection(rotLeft);
-
-                Vector3 rotUp = _mainCamera.Rotation + new Vector3(-20f, 0f, 0f);
-                Vector3 rotDown = _mainCamera.Rotation + new Vector3(20f, 0f, 0f);
-                Vector3 up = CutsceneManager.RotationToDirection(rotUp) - CutsceneManager.RotationToDirection(rotDown);
-
-                float mouseX = GetControlNormalIncludingDisabled(Control.LookLeftRight);
-                float mouseY = GetControlNormalIncludingDisabled(Control.LookUpDown);
-                Vector3 rotation = Vector3.Zero;
-
-                if (!IsCameraClamped(true, mouseX))
+                float horizontalInput = GetControlNormalIncludingDisabled(Control.LookLeftRight);
+                float verticalInput = GetControlNormalIncludingDisabled(Control.LookUpDown);
+                if (Math.Abs(horizontalInput) > 0.001f || Math.Abs(verticalInput) > 0.001f)
                 {
-                    rotation += right * mouseX * 0.6f;
+                    OrbitAroundTarget(horizontalInput, verticalInput, 1.6f, 1.3f);
                 }
-                if (!IsCameraClamped(false, mouseY))
-                {
-                    rotation += up * -mouseY * 0.5f;
-                }
-                rotation += dir * (len - CameraZoom);
-                _mainCamera.Position += rotation;
             }
         }
 
-        private void UpdateFirstPersonCamera()
+        private void UpdateFirstPersonCamera(bool duringTransition = false)
         {
             if (_isDragging)
             {
@@ -675,7 +854,7 @@ namespace BennysMotorworksRevamped
                 _dragOffset = new PointF(mouseX, mouseY);
             }
 
-            if (Game.LastInputMethod == InputMethod.GamePad)
+            if (!duringTransition && Game.LastInputMethod == InputMethod.GamePad)
             {
                 float mouseX = GetControlNormalIncludingDisabled(Control.LookLeftRight) * -1f;
                 float mouseY = GetControlNormalIncludingDisabled(Control.LookUpDown);
@@ -875,13 +1054,14 @@ namespace BennysMotorworksRevamped
 
         public static float QuadraticEasing(float currentTime, float startValue, float changeInValue, float duration)
         {
-            currentTime /= duration / 2f;
-            if (currentTime < 1f)
+            if (duration <= 0f)
             {
-                return changeInValue / 2f * currentTime * currentTime + startValue;
+                return startValue + changeInValue;
             }
-            currentTime -= 1f;
-            return -changeInValue / 2f * (currentTime * (currentTime - 2f) - 1f) + startValue;
+
+            float progress = Clamp(currentTime / duration, 0f, 1f);
+            float easedProgress = progress * (0.45f + progress * (2.1f - 1.55f * progress));
+            return startValue + changeInValue * easedProgress;
         }
 
         public static Vector3 LerpVector(float currentTime, float duration, Vector3 startValue, Vector3 destination)
@@ -892,6 +1072,194 @@ namespace BennysMotorworksRevamped
                 QuadraticEasing(currentTime, startValue.Z, destination.Z - startValue.Z, duration));
         }
 
+        private static float ProjectOnto(Vector3 value, Vector3 axis)
+        {
+            return value.X * axis.X + value.Y * axis.Y + value.Z * axis.Z;
+        }
+
+        private static bool ClipCurveSegment(float p, float q, ref float entering, ref float leaving)
+        {
+            if (Math.Abs(p) < 0.0001f)
+            {
+                return q >= 0.0f;
+            }
+
+            float intersection = q / p;
+            if (p < 0.0f)
+            {
+                if (intersection > leaving) return false;
+                if (intersection > entering) entering = intersection;
+            }
+            else
+            {
+                if (intersection < entering) return false;
+                if (intersection < leaving) leaving = intersection;
+            }
+            return true;
+        }
+
+        private static bool CrossesVehicleBody(float startX, float startY, float startZ,
+            float endX, float endY, float endZ, float halfWidth, float halfLength, float minimumHeight, float maximumHeight)
+        {
+            float entering = 0.0f;
+            float leaving = 1.0f;
+            float dx = endX - startX;
+            float dy = endY - startY;
+            float dz = endZ - startZ;
+            return ClipCurveSegment(-dx, startX + halfWidth, ref entering, ref leaving)
+                && ClipCurveSegment(dx, halfWidth - startX, ref entering, ref leaving)
+                && ClipCurveSegment(-dy, startY + halfLength, ref entering, ref leaving)
+                && ClipCurveSegment(dy, halfLength - startY, ref entering, ref leaving)
+                && ClipCurveSegment(-dz, startZ - minimumHeight, ref entering, ref leaving)
+                && ClipCurveSegment(dz, maximumHeight - startZ, ref entering, ref leaving);
+        }
+
+        private static Vector3 GetCurvePosition(Vector3 start, Vector3 controlOne, Vector3 controlTwo, Vector3 end, float progress)
+        {
+            float t = Clamp(progress, 0.0f, 1.0f);
+            float inverse = 1.0f - t;
+            return start * (inverse * inverse * inverse)
+                + controlOne * (3.0f * inverse * inverse * t)
+                + controlTwo * (3.0f * inverse * t * t)
+                + end * (t * t * t);
+        }
+
+        private static bool TryMeasureCurve(Vector3 start, Vector3 controlOne, Vector3 controlTwo, Vector3 destination,
+            Vector3 center, Vector3 right, Vector3 forward, Vector3 up, float halfWidth, float halfLength,
+            float minimumHeight, float maximumHeight, out float length)
+        {
+            length = 0.0f;
+            Vector3 previous = start;
+            Vector3 previousOffset = previous - center;
+            float previousX = ProjectOnto(previousOffset, right);
+            float previousY = ProjectOnto(previousOffset, forward);
+            float previousZ = ProjectOnto(previousOffset, up);
+            for (int i = 1; i <= 24; i++)
+            {
+                Vector3 next = GetCurvePosition(start, controlOne, controlTwo, destination, i / 24.0f);
+                Vector3 offset = next - center;
+                float x = ProjectOnto(offset, right);
+                float y = ProjectOnto(offset, forward);
+                float z = ProjectOnto(offset, up);
+                if (!IsFiniteVector(next) || CrossesVehicleBody(previousX, previousY, previousZ, x, y, z,
+                    halfWidth, halfLength, minimumHeight, maximumHeight))
+                {
+                    return false;
+                }
+
+                length += next.DistanceTo(previous);
+                previous = next;
+                previousX = x;
+                previousY = y;
+                previousZ = z;
+            }
+            return true;
+        }
+
+        private bool PrepareCurvedTransition(Vector3 startPosition, Vector3 destination)
+        {
+            if (_target == null || !_target.Exists() || _internalCameraPosition == CameraPosition.Interior
+                || !IsFiniteVector(startPosition) || !IsFiniteVector(destination))
+            {
+                return false;
+            }
+
+            Vector3 minimum;
+            Vector3 maximum;
+            try
+            {
+                _target.Model.GetDimensions(out minimum, out maximum);
+            }
+            catch
+            {
+                return false;
+            }
+
+            float width = maximum.X - minimum.X;
+            float vehicleLength = maximum.Y - minimum.Y;
+            if (!IsFiniteVector(minimum) || !IsFiniteVector(maximum)
+                || width < 0.4f || width > 12.0f || vehicleLength < 1.0f || vehicleLength > 24.0f)
+            {
+                return false;
+            }
+
+            Vector3 center = _target.GetOffsetPosition(new Vector3(
+                (minimum.X + maximum.X) * 0.5f, (minimum.Y + maximum.Y) * 0.5f, 0.0f));
+            Vector3 right = _target.RightVector;
+            Vector3 forward = _target.ForwardVector;
+            Vector3 up = _target.UpVector;
+            Vector3 startOffset = startPosition - center;
+            Vector3 endOffset = destination - center;
+            float startX = ProjectOnto(startOffset, right);
+            float startY = ProjectOnto(startOffset, forward);
+            float endX = ProjectOnto(endOffset, right);
+            float endY = ProjectOnto(endOffset, forward);
+            float halfWidth = width * 0.5f + 0.2f;
+            float halfLength = vehicleLength * 0.5f + 0.2f;
+            float minimumHeight = minimum.Z - 0.15f;
+            float maximumHeight = maximum.Z + 0.15f;
+            float startHeight = ProjectOnto(startOffset, up);
+            float endHeight = ProjectOnto(endOffset, up);
+            bool startInside = Math.Abs(startX) < halfWidth && Math.Abs(startY) < halfLength
+                && startHeight > minimumHeight && startHeight < maximumHeight;
+            bool endInside = Math.Abs(endX) < halfWidth && Math.Abs(endY) < halfLength
+                && endHeight > minimumHeight && endHeight < maximumHeight;
+            if (!CrossesVehicleBody(startX, startY, startHeight, endX, endY, endHeight,
+                halfWidth, halfLength, minimumHeight, maximumHeight) || startInside || endInside)
+            {
+                return false;
+            }
+
+            float shortestLength = float.MaxValue;
+            bool found = false;
+            for (int axis = 0; axis < 2; axis++)
+            {
+                float halfGuide = axis == 0 ? halfWidth : halfLength;
+                float halfOther = axis == 0 ? halfLength : halfWidth;
+                float startGuide = axis == 0 ? startX : startY;
+                float endGuide = axis == 0 ? endX : endY;
+                float startOther = axis == 0 ? startY : startX;
+                float endOther = axis == 0 ? endY : endX;
+                bool extendStart = Math.Abs(startGuide) < halfGuide && Math.Abs(startOther) >= halfOther;
+                bool extendEnd = Math.Abs(endGuide) < halfGuide && Math.Abs(endOther) >= halfOther;
+                for (int side = -1; side <= 1; side += 2)
+                {
+                    for (int step = 0; step < 10; step++)
+                    {
+                        float guide = side * (halfGuide + 0.7f + step * 0.3f);
+                        for (int extension = 0; extension < 7; extension++)
+                        {
+                            float lead = halfOther + 0.4f + extension * 0.45f;
+                            float firstOther = extendStart
+                                ? (startOther < 0.0f ? -1.0f : 1.0f) * Math.Max(Math.Abs(startOther), lead) : startOther;
+                            float secondOther = extendEnd
+                                ? (endOther < 0.0f ? -1.0f : 1.0f) * Math.Max(Math.Abs(endOther), lead) : endOther;
+                            Vector3 controlOne = center + right * (axis == 0 ? guide : firstOther)
+                                + forward * (axis == 0 ? firstOther : guide) + up * startHeight;
+                            Vector3 controlTwo = center + right * (axis == 0 ? guide : secondOther)
+                                + forward * (axis == 0 ? secondOther : guide) + up * endHeight;
+                            float pathLength;
+                            if (!TryMeasureCurve(startPosition, controlOne, controlTwo, destination,
+                                center, right, forward, up, halfWidth, halfLength, minimumHeight, maximumHeight, out pathLength))
+                            {
+                                continue;
+                            }
+
+                            if (pathLength < shortestLength)
+                            {
+                                shortestLength = pathLength;
+                                _curveControlOne = controlOne;
+                                _curveControlTwo = controlTwo;
+                                found = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return found;
+        }
+
         private void StartLerp(Vector3 endPosition, Vector3 endRotation)
         {
             if (_mainCamera == null)
@@ -899,26 +1267,50 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
-            startValueRotation = _mainCamera.Rotation;
+            EndMouseDrag();
+            Vector3 currentRotation = _mainCamera.Rotation;
+            Vector3 currentPosition = _mainCamera.Position;
+            _lerpAroundFocus = RotationMode == CameraRotationMode.Around
+                && IsFiniteVector(_targetPos) && IsFiniteVector(endPosition);
+            if (_lerpAroundFocus)
+            {
+                endValueFocus = _targetPos;
+                if (_hasRenderedFocus && IsFiniteVector(_renderedFocus))
+                {
+                    startValueFocus = _renderedFocus;
+                }
+                else
+                {
+                    float focusDistance = Clamp(currentPosition.DistanceTo(endValueFocus), 1.0f, 8.0f);
+                    startValueFocus = currentPosition + CutsceneManager.RotationToDirection(currentRotation) * focusDistance;
+                }
+            }
+            _mainCamera.StopPointing();
+            _mainCamera.Rotation = currentRotation;
+            startValueRotation = currentRotation;
             startValuePosition = _mainCamera.Position;
-            duration = 1000.0f;
+            _curvedTransition = _lerpAroundFocus && PrepareCurvedTransition(startValuePosition, endPosition);
+            duration = _curvedTransition ? 1400.0f : 1000.0f;
             IsLerping = true;
-            startTime = DateTime.Now;
+            startTime = DateTime.UtcNow;
             endValuePosition = endPosition;
+            while (endRotation.Z - currentRotation.Z > 180f)
+            {
+                endRotation.Z -= 360f;
+            }
+            while (endRotation.Z - currentRotation.Z < -180f)
+            {
+                endRotation.Z += 360f;
+            }
             endValueRotation = endRotation;
         }
 
-        private void SetAroundCamera(Vector3 targetPos, float zoom, Vector3 endPosition, Vector3 endRotation, CameraClamp clamp, bool pointAtTarget = true)
+        private void SetAroundCamera(Vector3 targetPos, float zoom, Vector3 endPosition, Vector3 endRotation, CameraClamp clamp)
         {
             Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 255, false);
             RotationMode = CameraRotationMode.Around;
             _targetPos = targetPos;
             _cameraZoom = zoom;
-            if (pointAtTarget)
-            {
-                _mainCamera.StopPointing();
-                _mainCamera.PointAt(_targetPos);
-            }
             CameraClamp = clamp;
             StartLerp(endPosition, endRotation);
             _justSwitched = true;
@@ -1064,6 +1456,101 @@ namespace BennysMotorworksRevamped
             Function.Call(Hash.RENDER_SCRIPT_CAMS, false, false, 0, true, false, 0);
         }
 
+        private void SetRoofCamera(CameraPosition position)
+        {
+            Vector3 minimumDimensions;
+            Vector3 maximumDimensions;
+            _target.Model.GetDimensions(out minimumDimensions, out maximumDimensions);
+
+            if (!IsFiniteVector(minimumDimensions) || !IsFiniteVector(maximumDimensions)
+                || maximumDimensions.Y <= minimumDimensions.Y || maximumDimensions.X <= minimumDimensions.X)
+            {
+                Vector3 fallbackRoofFocus = _target.Position + _target.UpVector * 1.25f;
+                Vector3 fallbackRoofPosition = _target.Position - _target.RightVector * 3.2f - _target.ForwardVector * 1.85f + _target.UpVector * 2.45f;
+                SetAroundCamera(fallbackRoofFocus, fallbackRoofFocus.DistanceTo(fallbackRoofPosition), fallbackRoofPosition,
+                    GetStableLookRotation(fallbackRoofFocus - fallbackRoofPosition, _mainCamera.Rotation.Z),
+                    new CameraClamp { MaxVerticalValue = -65.0f, MinVerticalValue = -5.0f });
+                return;
+            }
+
+            float length = maximumDimensions.Y - minimumDimensions.Y;
+            float width = maximumDimensions.X - minimumDimensions.X;
+            float roofY = minimumDimensions.Y + length * (position == CameraPosition.FrontRoof ? 0.63f
+                : position == CameraPosition.RearRoof ? 0.37f : 0.5f);
+            float roofZ = maximumDimensions.Z - 0.12f;
+            Vector3 focus = _target.GetOffsetPosition(new Vector3(0f, roofY, roofZ));
+            float sideDistance = Math.Max(2.55f, width * 0.96f + 1.12f);
+            if (maximumDimensions.Z > 2.0f)
+            {
+                sideDistance += Math.Min(0.9f, (maximumDimensions.Z - 2.0f) * 0.65f);
+            }
+            float lengthDistance = Math.Max(1.48f, Math.Min(2.5f, length * 0.31f));
+            float cameraY = roofY + (position == CameraPosition.FrontRoof ? lengthDistance
+                : position == CameraPosition.RearRoof ? -lengthDistance : -0.75f);
+            float cameraZ = Math.Min(maximumDimensions.Z + (maximumDimensions.Z > 2.0f ? 0.25f : 1.05f), maximumDimensions.Z > 2.0f ? 2.25f : 2.0f);
+            Vector3 cameraPosition = _target.GetOffsetPosition(new Vector3(-sideDistance, cameraY, cameraZ));
+            SetAroundCamera(focus, focus.DistanceTo(cameraPosition), cameraPosition,
+                GetStableLookRotation(focus - cameraPosition, _mainCamera.Rotation.Z),
+                new CameraClamp { MaxVerticalValue = -65.0f, MinVerticalValue = -5.0f });
+        }
+
+        private void SetSpoilerCamera()
+        {
+            Vector3 minimumDimensions;
+            Vector3 maximumDimensions;
+            _target.Model.GetDimensions(out minimumDimensions, out maximumDimensions);
+
+            if (!IsFiniteVector(minimumDimensions) || !IsFiniteVector(maximumDimensions)
+                || maximumDimensions.Y <= minimumDimensions.Y || maximumDimensions.X <= minimumDimensions.X)
+            {
+                Vector3 fallbackSpoilerFocus = _target.Position + _target.UpVector * 1.0f;
+                Vector3 fallbackSpoilerPosition = _target.Position - _target.ForwardVector * 3.3f - _target.RightVector * 1.9f + _target.UpVector * 1.5f;
+                SetAroundCamera(fallbackSpoilerFocus, fallbackSpoilerFocus.DistanceTo(fallbackSpoilerPosition), fallbackSpoilerPosition,
+                    GetStableLookRotation(fallbackSpoilerFocus - fallbackSpoilerPosition, _mainCamera.Rotation.Z),
+                    new CameraClamp { MaxVerticalValue = -60.0f, MinVerticalValue = -5.0f });
+                return;
+            }
+
+            float length = maximumDimensions.Y - minimumDimensions.Y;
+            float width = maximumDimensions.X - minimumDimensions.X;
+            float focusY = minimumDimensions.Y + Math.Min(0.75f, length * 0.18f);
+            float focusZ = maximumDimensions.Z - Math.Min(0.3f, (maximumDimensions.Z - minimumDimensions.Z) * 0.2f);
+            Vector3 focus = _target.GetOffsetPosition(new Vector3(0f, focusY, focusZ));
+            float sideDistance = Math.Max(1.5f, width * 0.8f + 0.95f);
+            float rearDistance = Math.Max(0.65f, Math.Min(1.9f, length * 0.28f));
+            float cameraHeightOffset = Math.Min(0.35f, Math.Max(0.05f, (maximumDimensions.Z - minimumDimensions.Z) * 0.1f));
+            Vector3 cameraPosition = _target.GetOffsetPosition(new Vector3(-sideDistance, minimumDimensions.Y - rearDistance, maximumDimensions.Z + cameraHeightOffset));
+            SetAroundCamera(focus, focus.DistanceTo(cameraPosition), cameraPosition,
+                GetStableLookRotation(focus - cameraPosition, _mainCamera.Rotation.Z),
+                new CameraClamp { MaxVerticalValue = -30.0f, MinVerticalValue = -2.0f });
+        }
+
+        private void SetHeadlightCamera()
+        {
+            Vector3 headlightPosition;
+            if (!TryGetAverageBonePosition(_target, "headlight_l", "headlight_r", out headlightPosition)
+                && !TryGetUsableBonePosition(_target, "headlight", out headlightPosition)
+                && !TryGetUsableBonePosition(_target, "bumper_f", out headlightPosition))
+            {
+                Vector3 minimumDimensions;
+                Vector3 maximumDimensions;
+                _target.Model.GetDimensions(out minimumDimensions, out maximumDimensions);
+                float frontOffset = IsFiniteVector(maximumDimensions) && maximumDimensions.Y > 0.1f && maximumDimensions.Y < 10.0f
+                    ? maximumDimensions.Y - 0.2f : 1.4f;
+                headlightPosition = _target.Position + _target.ForwardVector * frontOffset + _target.UpVector * 0.5f;
+            }
+
+            float focusForwardOffset = HeadlightCameraForwardOffset + HeadlightCameraRightOffset
+                / (float)Math.Tan(HeadlightCameraAngleDegrees * Math.PI / 180.0);
+            Vector3 focus = headlightPosition + _target.ForwardVector * focusForwardOffset
+                + _target.UpVector * HeadlightFocusHeightOffset;
+            Vector3 position = headlightPosition + _target.ForwardVector * HeadlightCameraForwardOffset
+                + _target.RightVector * HeadlightCameraRightOffset + _target.UpVector * HeadlightCameraHeightOffset;
+            SetAroundCamera(focus, focus.DistanceTo(position), position,
+                GetStableLookRotation(focus - position, _mainCamera.Rotation.Z),
+                new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f });
+        }
+
         private void OnCameraChange(CameraPosition newPos)
         {
             if (_mainCamera == null || _target == null || !_target.Exists())
@@ -1071,8 +1558,20 @@ namespace BennysMotorworksRevamped
                 return;
             }
 
+            EndMouseDrag();
             switch (newPos)
             {
+                case CameraPosition.Headlights:
+                    SetHeadlightCamera();
+                    break;
+                case CameraPosition.Spoiler:
+                    SetSpoilerCamera();
+                    break;
+                case CameraPosition.Roof:
+                case CameraPosition.FrontRoof:
+                case CameraPosition.RearRoof:
+                    SetRoofCamera(newPos);
+                    break;
                 case CameraPosition.Car:
                     Game.Player.Character.Opacity = 255;
                     RotationMode = CameraRotationMode.Around;
@@ -1083,9 +1582,6 @@ namespace BennysMotorworksRevamped
                     _cameraZoom = _targetPos.DistanceTo(newCamPos);
                     CameraClamp = new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f };
                     _mainCamera.Shake(CameraShake.Hand, 0.5f);
-
-                    _mainCamera.StopPointing();
-                    _mainCamera.PointAt(_targetPos);
 
                     StartLerp(newCamPos, CutsceneManager.DirectionToRotation(_targetPos - newCamPos));
                     _justSwitched = true;
@@ -1109,11 +1605,15 @@ namespace BennysMotorworksRevamped
                     break;
                 case CameraPosition.Interior:
                     IsLerping = false;
+                    _curvedTransition = false;
                     Vector3 headPos = Game.Player.Character.Bones[Bone.IKHead].Position;
+                    ResetShopDepthOfField();
                     Camera.DeleteAllCameras();
                     _mainCamera = CreateScriptedCamera(headPos + new Vector3(0f, 0f, 0.1f), new Vector3(0f, 0f, _target.Heading), GameplayCamera.FieldOfView);
                     StartRenderingCamera(_mainCamera);
                     _targetPos = headPos;
+                    _hasRenderedFocus = false;
+                    _lerpAroundFocus = false;
                     RotationMode = CameraRotationMode.FirstPerson;
                     Function.Call(Hash.SET_ENTITY_ALPHA, Game.Player.Character.Handle, 0, false);
                     CameraClamp = new CameraClamp { MaxVerticalValue = -60.0f, MinVerticalValue = -3.0f };

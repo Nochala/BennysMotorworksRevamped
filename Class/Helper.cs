@@ -127,6 +127,7 @@ namespace BennysMotorworksRevamped
         public static bool allowUtilityVehicles = true;
         public static int bennyIntID;
         public static bool isExiting = false;
+        public static int workshopCashHudCleanupUntil;
         public static Memory lastVehMemory;
         public static Blip BennysBlip;
         public static Ped bennyPed;
@@ -184,6 +185,7 @@ namespace BennysMotorworksRevamped
 
         private static string Gxt(string key) => Game.GetLocalizedString(key);
         private static readonly Dictionary<int, bool> _gameBuildChecks = new Dictionary<int, bool>();
+        private static bool? _arenaWarDlcInstalled;
 
         private static bool IsGameBuildAtLeast(int minimumLegacyBuild, GameVersion minimumVersion)
         {
@@ -572,6 +574,120 @@ namespace BennysMotorworksRevamped
             }
         }
 
+
+        private static readonly string[] FamilyOriginalPlates = { "P3RSEUS", "KRYST4L" };
+        private static readonly int[] FamilyModelHashes = { new Model("issi2").Hash, new Model("sentinel2").Hash };
+        private const int StoryFamilyRecordOffset = 1211;
+        private static int _familyWorkshopHandle;
+        private static int _familyWorkshopKind = -1;
+
+        private static bool IsEnhancedStoryRecordLayout()
+        {
+            bool enhanced = IsEnhancedGameBuild();
+            try
+            {
+                Version version = Game.FileVersion;
+                if (version != null && version.Major >= 2) enhanced = true;
+            }
+            catch { }
+            return enhanced;
+        }
+
+        private static string NormalizeFamilyPlate(string plate)
+        {
+            return (plate ?? string.Empty).Trim().ToUpperInvariant();
+        }
+
+        private static bool TryFindStoryFamilyVehicleSaveRecord(Vehicle target, int kind, out int record)
+        {
+            record = -1;
+            if (target == null || !target.Exists() || kind < 0 || kind >= FamilyModelHashes.Length
+                || target.Model.Hash != FamilyModelHashes[kind]
+                || Function.Call<bool>(Hash.NETWORK_IS_GAME_IN_PROGRESS)) return false;
+
+            int storedRecords = IsEnhancedStoryRecordLayout() ? 120306 : 120279;
+            int familyRecords = storedRecords + StoryFamilyRecordOffset;
+            int familyIndex = kind == 0 ? 1 : 0;
+            int candidate = familyRecords + 1 + familyIndex * StoryVehicleRecordSize;
+            if (!HasStoryGlobal(familyRecords) || !HasStoryGlobal(candidate + 97)) return false;
+            int slotCount = ReadStoryGlobal(familyRecords);
+            if (slotCount < 1 || slotCount > 4) return false;
+
+            int model = ReadStoryGlobal(candidate);
+            if (model != 0 && model != target.Model.Hash) return false;
+            int extrasCount = ReadStoryGlobal(candidate + 11);
+            int modsCount = ReadStoryGlobal(candidate + 31);
+            int variationsCount = ReadStoryGlobal(candidate + 81);
+            if ((extrasCount != 0 && extrasCount != 12)
+                || (modsCount != 0 && modsCount != 49)
+                || (variationsCount != 0 && variationsCount != 2)) return false;
+
+            record = candidate;
+            return true;
+        }
+
+        private static string ReadStoryFamilyRecordPlate(int record)
+        {
+            if (!HasStoryGlobal(record + 28)) return string.Empty;
+            byte[] bytes = new byte[16];
+            System.Runtime.InteropServices.Marshal.Copy(GlobalVariable.Get(record + 27).MemoryAddress,
+                bytes, 0, bytes.Length);
+            int length = Array.IndexOf(bytes, (byte)0);
+            if (length < 0) length = bytes.Length;
+            return NormalizeFamilyPlate(System.Text.Encoding.ASCII.GetString(bytes, 0, length));
+        }
+
+        private static int GetStoryFamilyVehicleKind(Vehicle target)
+        {
+            if (target == null || !target.Exists()) return -1;
+            string plate = NormalizeFamilyPlate(target.Mods.LicensePlate);
+            for (int kind = 0; kind < FamilyModelHashes.Length; kind++)
+            {
+                if (target.Model.Hash != FamilyModelHashes[kind]) continue;
+                if (plate == FamilyOriginalPlates[kind]) return kind;
+                int record;
+                if (TryFindStoryFamilyVehicleSaveRecord(target, kind, out record)
+                    && plate == ReadStoryFamilyRecordPlate(record)) return kind;
+            }
+            return -1;
+        }
+
+        public static void RememberStoryFamilyVehicleOnWorkshopEntry(Vehicle target)
+        {
+            _familyWorkshopHandle = 0;
+            _familyWorkshopKind = -1;
+            if (Function.Call<bool>(Hash.NETWORK_IS_GAME_IN_PROGRESS)) return;
+            int kind = GetStoryFamilyVehicleKind(target);
+            if (kind < 0) return;
+            _familyWorkshopHandle = target.Handle;
+            _familyWorkshopKind = kind;
+        }
+
+        private static bool TryCommitStoryFamilyVehicle(Vehicle target)
+        {
+            int kind = target != null && target.Exists() && target.Handle == _familyWorkshopHandle
+                ? _familyWorkshopKind : -1;
+            _familyWorkshopHandle = 0;
+            _familyWorkshopKind = -1;
+            if (kind < 0) return false;
+
+            int record;
+            if (!TryFindStoryFamilyVehicleSaveRecord(target, kind, out record))
+            {
+                Logger.Debug("Family-vehicle native save skipped: Rockstar save record not verified.");
+                return true;
+            }
+
+            WriteStoryField(record, 0, target.Model.Hash);
+            WriteStoryField(record, 11, 12);
+            WriteStoryField(record, 31, 49);
+            WriteStoryField(record, 81, 2);
+            CaptureNativeStoryVehicleRecord(target, record);
+            Logger.Debug("Committed family-vehicle upgrades to Rockstar Story Mode record: "
+                + (kind == 0 ? "Tracey's Issi" : "Amanda's Sentinel") + ".");
+            return true;
+        }
+
         private const int StoryVehicleRecordSize = 98;
         private const int StoryVehicleSlotSize = 295;
 
@@ -601,20 +717,7 @@ namespace BennysMotorworksRevamped
                 return false;
             }
 
-            int playerModel = Game.Player.Character.Model.Hash;
-            int owner = -1;
-            if (playerModel == Function.Call<int>(Hash.GET_HASH_KEY, "player_zero")) owner = 0;
-            else if (playerModel == Function.Call<int>(Hash.GET_HASH_KEY, "player_one")) owner = 1;
-            else if (playerModel == Function.Call<int>(Hash.GET_HASH_KEY, "player_two")) owner = 2;
-            if (owner < 0) return false;
-
-            bool enhanced = IsEnhancedGameBuild();
-            try
-            {
-                Version version = Game.FileVersion;
-                if (version != null && version.Major >= 2) enhanced = true;
-            }
-            catch { }
+            bool enhanced = IsEnhancedStoryRecordLayout();
 
             int trackedHandles = enhanced ? 99817 : 99792;
             int trackedOwners = enhanced ? 99827 : 99802;
@@ -623,44 +726,79 @@ namespace BennysMotorworksRevamped
             int storedRecords = enhanced ? 120306 : 120279;
 
             if (!HasStoryGlobal(trackedHandles + 8) || !HasStoryGlobal(trackedOwners + 8)
-                || !HasStoryGlobal(currentRecords + owner * StoryVehicleRecordSize + 97)
-                || !HasStoryGlobal(currentHandles + owner)
-                || !HasStoryGlobal(storedRecords)
-                || (ReadStoryGlobal(storedRecords) != 3 && ReadStoryGlobal(storedRecords) != 4))
+                || !HasStoryGlobal(currentRecords + 2 * StoryVehicleRecordSize + 97)
+                || !HasStoryGlobal(currentHandles + 2)
+                || !HasStoryGlobal(storedRecords))
             {
                 Logger.Debug("Personal-vehicle save skipped: native "
                     + (enhanced ? "Enhanced" : "Legacy") + " Story Mode globals not verified.");
                 return false;
             }
 
-            bool tracked = false;
-            for (int i = 0; i < 9; i++)
+            int recordCount = ReadStoryGlobal(storedRecords);
+            if (recordCount != 3 && recordCount != 4)
             {
-                if (ReadStoryGlobal(trackedHandles + i) == target.Handle
-                    && ReadStoryGlobal(trackedOwners + i) == owner)
-                {
-                    tracked = true;
-                    break;
-                }
-            }
-            if (!tracked)
-            {
-                Logger.Debug("Personal-vehicle save skipped: car is not in Rockstar's tracked-vehicle list for this character.");
+                Logger.Debug("Personal-vehicle save skipped: native Story Mode record layout not verified.");
                 return false;
             }
 
-            int slot = Function.Call<bool>(Hash.IS_THIS_MODEL_A_BIKE, target.Model.Hash) ? 1 : 0;
-            int candidateStored = storedRecords + 1 + slot * StoryVehicleSlotSize
-                                  + 1 + owner * StoryVehicleRecordSize;
-            if (!HasStoryGlobal(candidateStored + 97)
-                || ReadStoryGlobal(candidateStored) != target.Model.Hash
-                || ReadStoryGlobal(candidateStored + 11) != 12
-                || ReadStoryGlobal(candidateStored + 31) != 49
-                || ReadStoryGlobal(candidateStored + 81) != 2)
+            int owner = -1;
+            for (int i = 0; i < 9; i++)
             {
-                Logger.Debug("Personal-vehicle save skipped: saved personal-vehicle record does not match this vehicle."
+                if (ReadStoryGlobal(trackedHandles + i) == target.Handle)
+                {
+                    int trackedOwner = ReadStoryGlobal(trackedOwners + i);
+                    if (trackedOwner >= 0 && trackedOwner <= 2)
+                    {
+                        owner = trackedOwner;
+                        break;
+                    }
+                }
+            }
+
+            if (owner < 0)
+            {
+                Logger.Debug("Personal-vehicle save skipped: car is not in Rockstar's tracked-vehicle list.");
+                return false;
+            }
+
+            int preferredSlot = Function.Call<bool>(Hash.IS_THIS_MODEL_A_BIKE, target.Model.Hash) ? 1 : 0;
+            int matchedSlot = -1;
+            for (int slot = 0; slot < recordCount; slot++)
+            {
+                int candidate = storedRecords + 1 + slot * StoryVehicleSlotSize
+                                + 1 + owner * StoryVehicleRecordSize;
+                if (!HasStoryGlobal(candidate + 97)
+                    || ReadStoryGlobal(candidate) != target.Model.Hash
+                    || ReadStoryGlobal(candidate + 11) != 12
+                    || ReadStoryGlobal(candidate + 31) != 49
+                    || ReadStoryGlobal(candidate + 81) != 2)
+                {
+                    continue;
+                }
+
+                if (slot == preferredSlot)
+                {
+                    matchedSlot = slot;
+                    storedRecord = candidate;
+                    break;
+                }
+
+                if (matchedSlot >= 0)
+                {
+                    Logger.Debug("Personal-vehicle save skipped: multiple Rockstar records match this vehicle model.");
+                    return false;
+                }
+
+                matchedSlot = slot;
+                storedRecord = candidate;
+            }
+
+            if (storedRecord < 0)
+            {
+                Logger.Debug("Personal-vehicle save skipped: no Rockstar save record matches this tracked vehicle."
                     + " profile=" + (enhanced ? "Enhanced" : "Legacy")
-                    + " slot=" + slot + " owner=" + owner);
+                    + " owner=" + owner + " model=" + target.Model.Hash);
                 return false;
             }
 
@@ -673,7 +811,9 @@ namespace BennysMotorworksRevamped
             {
                 activeRecord = candidateActive;
             }
-            storedRecord = candidateStored;
+
+            Logger.Debug("Personal-vehicle Rockstar record matched: owner=" + owner
+                + " slot=" + matchedSlot + ".");
             return true;
         }
 
@@ -759,6 +899,8 @@ namespace BennysMotorworksRevamped
             try
             {
                 int stored, active;
+                if (veh == null || !veh.Exists()) return;
+                if (!Function.Call<bool>(Hash.NETWORK_IS_GAME_IN_PROGRESS) && TryCommitStoryFamilyVehicle(veh)) return;
                 if (!TryFindPersonalVehicleSaveRecords(veh, out stored, out active)) return;
                 CaptureNativeStoryVehicleRecord(veh, stored);
                 if (active >= 0)
@@ -3121,7 +3263,12 @@ namespace BennysMotorworksRevamped
 
         public static bool IsArenaWarDLCInstalled()
         {
-            return Function.Call<bool>(Hash.IS_DLC_PRESENT, "mpchristmas2018".GetHashKey());
+            if (!_arenaWarDlcInstalled.HasValue)
+            {
+                _arenaWarDlcInstalled = Function.Call<bool>(Hash.IS_DLC_PRESENT, "mpchristmas2018".GetHashKey());
+            }
+
+            return _arenaWarDlcInstalled.Value;
         }
 
         public static void UpdateTitleCaption(this object menu, string newCaption, bool upper = false)
@@ -3784,7 +3931,7 @@ namespace BennysMotorworksRevamped
         private static readonly Vector3 ExitCutsceneCameraPosition = new Vector3(-197.5533f, -1297.754f, 32.29234f);
         private static Vector3 exitCutsceneCameraFocus = ExitCutsceneLanePosition;
         private static int exitCutsceneCameraFocusUpdatedAt;
-        private const float EnterCutsceneZoomDegrees = 2.25f;
+        private const float EnterCutsceneZoomDegrees = 5.5f;
         private const int EnterCutsceneZoomDurationMs = 2600;
         private const float ExitCutsceneZoomDegrees = 2.0f;
         private const int ExitCutsceneZoomOutDurationMs = 1700;
@@ -4363,6 +4510,7 @@ namespace BennysMotorworksRevamped
 
             SetEnterCutsceneCooldown(12000);
             AbortWorkshopCutscene(true);
+            workshopCashHudCleanupUntil = Game.GameTime + 2500;
         }
 
         private static void ProcessEnterCutscene()
@@ -4650,6 +4798,7 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
+                RememberStoryFamilyVehicleOnWorkshopEntry(veh);
                 SetEnterCutsceneCooldown(9000);
                 isExiting = true;
                 isCutscene = true;
@@ -4733,6 +4882,40 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        internal static VehicleColor GetCapturedVehiclePaintColor(Vehicle target, bool primary)
+        {
+            VehicleColor standardColor = primary ? target.Mods.PrimaryColor : target.Mods.SecondaryColor;
+            if (!AreChameleonColorsAvailable())
+            {
+                return standardColor;
+            }
+
+            try
+            {
+                OutputArgument paintType = new OutputArgument();
+                OutputArgument paintIndex = new OutputArgument();
+                if (primary)
+                {
+                    OutputArgument pearl = new OutputArgument();
+                    Function.Call(Hash.GET_VEHICLE_MOD_COLOR_1, target.Handle, paintType, paintIndex, pearl);
+                }
+                else
+                {
+                    Function.Call(Hash.GET_VEHICLE_MOD_COLOR_2, target.Handle, paintType, paintIndex);
+                }
+
+                int colorIndex = paintIndex.GetResult<int>();
+                if (paintType.GetResult<int>() == 6 && colorIndex >= 0 && colorIndex <= 61)
+                {
+                    return (VehicleColor)(colorIndex + 161);
+                }
+            }
+            catch
+            {
+            }
+            return standardColor;
+        }
+
         public static Memory CaptureWorkshopVehicleMemory()
         {
             if (veh == null || !veh.Exists())
@@ -4802,14 +4985,15 @@ namespace BennysMotorworksRevamped
                 Windows = veh.GetMod(VehicleMod.Windows),
                 Tint = currentWindowTint,
                 PearlescentColor = veh.Mods.PearlescentColor,
-                PrimaryColor = veh.Mods.PrimaryColor,
+                PrimaryColor = GetCapturedVehiclePaintColor(veh, true),
                 RimColor = veh.Mods.RimColor,
-                SecondaryColor = veh.Mods.SecondaryColor,
+                SecondaryColor = GetCapturedVehiclePaintColor(veh, false),
                 CustomPrimaryColor = veh.Mods.CustomPrimaryColor,
                 CustomSecondaryColor = veh.Mods.CustomSecondaryColor,
                 IsPrimaryColorCustom = veh.Mods.IsPrimaryColorCustom,
                 IsSecondaryColorCustom = veh.Mods.IsSecondaryColorCustom,
                 TireSmokeColor = veh.Mods.TireSmokeColor,
+                TireSmokeEnabled = veh.IsToggleModOn(VehicleToggleMod.TireSmoke),
                 NeonLightsColor = veh.Mods.NeonLightsColor,
                 PlateNumbers = veh.Mods.LicensePlate,
                 HeadlightsColor = veh.GetXenonHeadlightsColor(),

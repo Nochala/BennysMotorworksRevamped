@@ -39,18 +39,31 @@ namespace BennysMotorworksRevamped
         }
 
         public static UIMenu QuitMenu, MainMenu, gmSpecialUpgrades, gmBodywork, gmBodyworkArena, gmEngine, gmInterior, gmPlate, gmLights, gmRespray, gmWheels, gmBumper, gmWheelType, gmMotorcycleWheelPosition, mMotorcycleFrontWheel, mMotorcycleRearWheel, gmTires, gmNeonKits, gmWeapon;
-        public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryUtilityColor, mPrimaryWornColor, mPrimarySpecialSolidColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mCustomPrimaryColor, mSecondaryColor, mCustomSecondaryColor, mSecondaryClassicColor, mSecondaryUtilityColor, mSecondaryWornColor, mSecondarySpecialSolidColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
-        public static UIMenuItem iRepair, iHorn, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iCustomPrimaryColor, iCustomSecondaryColor, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryUtilityColor, iPrimaryWornColor, iPrimarySpecialSolidColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryUtilityColor, iSecondaryWornColor, iSecondarySpecialSolidColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
+        public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHornStandard, mHornMusical, mHornLoop, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryUtilityColor, mPrimaryWornColor, mPrimarySpecialSolidColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mCustomPrimaryColor, mSecondaryColor, mCustomSecondaryColor, mSecondaryClassicColor, mSecondaryUtilityColor, mSecondaryWornColor, mSecondarySpecialSolidColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
+        public static UIMenuItem iRepair, iHorn, iHornStandard, iHornMusical, iHornLoop, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iCustomPrimaryColor, iCustomSecondaryColor, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryUtilityColor, iPrimaryWornColor, iPrimarySpecialSolidColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryUtilityColor, iSecondaryWornColor, iSecondarySpecialSolidColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
         public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giMotorcycleFrontWheel, giMotorcycleRearWheel, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giCustomPrimaryCol, giCustomSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giTrackWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
         public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank, iBackrests, iWindshields, iMotorcycleSeats, iSaddleBags;
         public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank, giBackrests, giWindshields, giMotorcycleSeats, giSaddleBags;
         public static UIMenu mShifter, mFMudguard, mBSeat, mOilTank, mRMudguard, mFuelTank, mBeltDriveCovers, mBEngineBlock, mBAirFilter, mBTank, mBackrests, mWindshields, mMotorcycleSeats, mSaddleBags, gmTrailer;
         public static LemonUI.ObjectPool _menuPool;
         private static bool _suppressMenuRestoreOnClose;
+        private static bool _roofSlotIsFrontPlate;
+        private static UIMenu gmRoofSelection;
+        private static readonly string[] TornadoCustomRoofNames = { "Leopard Roof", "Tiger Roof", "Zebra Roof", "Croc Roof", "Camo Roof", "Digital Camo Roof" };
+        private static UIMenuItem _frontPlateRoofMenuItem;
         private static bool _lightColorPreviewBlackoutActive;
+        private static int _lightColorPreviewHeadlightVehicleHandle;
+        private static int _lightColorManagedVehicleHandle;
+        private static bool _lightColorOriginalHeadlightsOn;
+        private static bool _lightColorOriginalHighBeamsOn;
+        private const float LightPreviewHeadlightMultiplier = 1.5f;
         private static readonly List<UIMenu> _registeredMenus = new List<UIMenu>();
         private static bool _instructionalButtonsApplied;
         private static bool _lastInstructionalRoofVisible;
+        private static int _roofConvertibleCheckedAt = -1;
+        private static int _roofConvertibleVehicleHandle;
+        private static bool _roofConvertibleCached;
+        private const int RoofConvertibleRefreshMs = 250;
         private static int _lastInstructionalButtonMenuCount = -1;
         private static bool? _lastAppliedMouseDisabled;
         private static int _lastMouseBehaviorMenuCount = -1;
@@ -104,6 +117,24 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static void ApplyPrimaryPaintPreview(Vehicle target, VehicleColor color)
+        {
+            if (target == null || !target.Exists()) return;
+            VehicleColor pearl = lastVehMemory != null ? lastVehMemory.PearlescentColor : target.Mods.PearlescentColor;
+            ApplyPrimaryPaint(target, color, pearl);
+            target.Mods.PearlescentColor = pearl;
+        }
+
+        private static void ApplySecondaryPaintPreview(Vehicle target, VehicleColor color)
+        {
+            if (target == null || !target.Exists()) return;
+            ApplySecondaryPaint(target, color);
+            if (lastVehMemory != null)
+            {
+                target.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
+            }
+        }
+
         private static void ApplySavedCustomPaintState(Vehicle target, Memory memory)
         {
             if (target == null || !target.Exists() || memory == null)
@@ -121,6 +152,34 @@ namespace BennysMotorworksRevamped
             {
                 target.Mods.SecondaryColor = VehicleColor.MetallicBlack;
                 target.Mods.CustomSecondaryColor = memory.CustomSecondaryColor;
+            }
+        }
+
+        private static void ApplySavedVehiclePaint(Vehicle target, Memory memory)
+        {
+            if (target == null || !target.Exists() || memory == null)
+            {
+                return;
+            }
+
+            bool primaryChameleon = !memory.IsPrimaryColorCustom && IsSupportedChameleonPaint(memory.PrimaryColor);
+            bool secondaryChameleon = !memory.IsSecondaryColorCustom && IsSupportedChameleonPaint(memory.SecondaryColor);
+            if (!memory.IsPrimaryColorCustom && !primaryChameleon)
+            {
+                ApplyPrimaryPaint(target, memory.PrimaryColor, memory.PearlescentColor);
+            }
+            if (!memory.IsSecondaryColorCustom && !secondaryChameleon)
+            {
+                ApplySecondaryPaint(target, memory.SecondaryColor);
+            }
+            ApplySavedCustomPaintState(target, memory);
+            if (primaryChameleon)
+            {
+                ApplyPrimaryPaint(target, memory.PrimaryColor, memory.PearlescentColor);
+            }
+            if (secondaryChameleon)
+            {
+                ApplySecondaryPaint(target, memory.SecondaryColor);
             }
         }
 
@@ -644,17 +703,68 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static void RestoreLightPreviewHeadlights()
+        {
+            int handle = _lightColorManagedVehicleHandle;
+            bool headlightsOn = _lightColorOriginalHeadlightsOn;
+            bool highBeamsOn = _lightColorOriginalHighBeamsOn;
+            _lightColorManagedVehicleHandle = 0;
+            _lightColorPreviewHeadlightVehicleHandle = 0;
+            _lightColorOriginalHeadlightsOn = false;
+            _lightColorOriginalHighBeamsOn = false;
+            if (handle != 0 && Function.Call<bool>(Hash.DOES_ENTITY_EXIST, handle))
+            {
+                Function.Call(Hash.SET_VEHICLE_LIGHT_MULTIPLIER, handle, 1.0f);
+                Function.Call(Hash.SET_VEHICLE_LIGHTS, handle, headlightsOn ? 3 : 0);
+                if (headlightsOn)
+                {
+                    Function.Call(Hash.SET_VEHICLE_FULLBEAM, handle, highBeamsOn);
+                }
+            }
+        }
+
         public static void UpdateLightColorPreviewLighting()
         {
+            UIMenu visibleMenu = UIMenu.GetVisibleMenu();
+            int desiredVehicleHandle = visibleMenu != null && Helper.veh != null && Helper.veh.Exists()
+                ? Helper.veh.Handle : 0;
+            bool headlightPreview = desiredVehicleHandle != 0 && visibleMenu == mHeadlights;
+            if (_lightColorManagedVehicleHandle != desiredVehicleHandle)
+            {
+                RestoreLightPreviewHeadlights();
+                if (desiredVehicleHandle != 0)
+                {
+                    OutputArgument headlightsOn = new OutputArgument();
+                    OutputArgument highBeamsOn = new OutputArgument();
+                    if (Function.Call<bool>(Hash.GET_VEHICLE_LIGHTS_STATE, desiredVehicleHandle, headlightsOn, highBeamsOn))
+                    {
+                        _lightColorOriginalHeadlightsOn = headlightsOn.GetResult<int>() != 0;
+                        _lightColorOriginalHighBeamsOn = highBeamsOn.GetResult<int>() != 0;
+                    }
+                    _lightColorManagedVehicleHandle = desiredVehicleHandle;
+                    Function.Call(Hash.SET_VEHICLE_LIGHTS, desiredVehicleHandle, headlightPreview ? 2 : 1);
+                    if (headlightPreview)
+                    {
+                        Function.Call(Hash.SET_VEHICLE_LIGHT_MULTIPLIER, desiredVehicleHandle, LightPreviewHeadlightMultiplier);
+                        _lightColorPreviewHeadlightVehicleHandle = desiredVehicleHandle;
+                    }
+                }
+            }
+            else if (desiredVehicleHandle != 0 && (_lightColorPreviewHeadlightVehicleHandle != 0) != headlightPreview)
+            {
+                Function.Call(Hash.SET_VEHICLE_LIGHTS, desiredVehicleHandle, headlightPreview ? 2 : 1);
+                Function.Call(Hash.SET_VEHICLE_LIGHT_MULTIPLIER, desiredVehicleHandle,
+                    headlightPreview ? LightPreviewHeadlightMultiplier : 1.0f);
+                _lightColorPreviewHeadlightVehicleHandle = headlightPreview ? desiredVehicleHandle : 0;
+            }
+
             if (!Helper.SupportsVehicleLightBlackoutIsolation)
             {
                 _lightColorPreviewBlackoutActive = false;
                 return;
             }
 
-            UIMenu visibleMenu = UIMenu.GetVisibleMenu();
             bool shouldBlackout = visibleMenu == mHeadlights || visibleMenu == mNeon || visibleMenu == mNeonColor;
-
             if (shouldBlackout == _lightColorPreviewBlackoutActive)
             {
                 return;
@@ -676,6 +786,8 @@ namespace BennysMotorworksRevamped
 
         public static void RestoreLightColorPreviewLighting()
         {
+            RestoreLightPreviewHeadlights();
+
             if (!Helper.SupportsVehicleLightBlackoutIsolation)
             {
                 _lightColorPreviewBlackoutActive = false;
@@ -726,13 +838,25 @@ namespace BennysMotorworksRevamped
 
         private static bool ShouldShowRoofInstructionalButton()
         {
-            UIMenu visibleMenu = UIMenu.GetVisibleMenu();
-            if (visibleMenu == null)
+            if (UIMenu.GetVisibleMenu() == null || veh == null)
             {
+                _roofConvertibleVehicleHandle = 0;
+                _roofConvertibleCheckedAt = -1;
                 return false;
             }
 
-            return IsWorkshopVehicleConvertible();
+            int vehicleHandle = veh.Handle;
+            int gameTime = Game.GameTime;
+            if (vehicleHandle != _roofConvertibleVehicleHandle || _roofConvertibleCheckedAt < 0
+                || gameTime < _roofConvertibleCheckedAt
+                || gameTime - _roofConvertibleCheckedAt >= RoofConvertibleRefreshMs)
+            {
+                _roofConvertibleCached = IsWorkshopVehicleConvertible();
+                _roofConvertibleVehicleHandle = vehicleHandle;
+                _roofConvertibleCheckedAt = gameTime;
+            }
+
+            return _roofConvertibleCached;
         }
 
         public static void RefreshInstructionalButtons()
@@ -1033,6 +1157,39 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static CameraPosition GetRoofCameraPosition(UIMenuItem item)
+        {
+            if (_roofSlotIsFrontPlate)
+            {
+                return CameraPosition.FrontPlate;
+            }
+
+            string upgradeName = item?.Text ?? string.Empty;
+            if (CategoryContains(upgradeName, "rear", "back", "aft", "roof spoiler", "tail"))
+            {
+                return CameraPosition.RearRoof;
+            }
+            if (CategoryContains(upgradeName, "front", "forward", "visor", "windscreen", "windshield", "sunstrip", "sun strip"))
+            {
+                return CameraPosition.FrontRoof;
+            }
+            return CameraPosition.Roof;
+        }
+
+        private static void UpdateRoofCamera(UIMenuItem item)
+        {
+            if (camera == null || veh == null || !veh.Exists())
+            {
+                return;
+            }
+
+            CameraPosition position = GetRoofCameraPosition(item);
+            if (camera.MainCameraPosition != position)
+            {
+                camera.MainCameraPosition = position;
+            }
+        }
+
         #region Refresh Menus
         private static int GetIndexedModPrice(int index, int priceStep)
         {
@@ -1173,9 +1330,33 @@ namespace BennysMotorworksRevamped
             return GetLivery2CountSafely() > 0;
         }
 
-        private static string GetNativeLiveryCategoryName()
+        private static void AddRoofCategoriesToMainMenu()
         {
-            return GetLocalizedMenuText("CMM_MOD_ST23", "Liveries");
+            bool hasRoofMods = !_roofSlotIsFrontPlate && veh.GetModCount(VehicleMod.Roof) > 0;
+            bool hasRoofPatterns = GetLivery2CountSafely() > 0;
+            if (!hasRoofMods && !hasRoofPatterns)
+            {
+                return;
+            }
+
+            iRoof = new UIMenuItem("Roof", Game.GetLocalizedString("CMOD_MOD_73_D"));
+            MainMenu.AddItem(iRoof);
+            if (hasRoofMods && hasRoofPatterns)
+            {
+                gmRoofSelection.MenuItems.Clear();
+                UIMenuItem roofOptions = new UIMenuItem("Roof Upgrades", Game.GetLocalizedString("CMOD_MOD_73_D"));
+                gmRoofSelection.AddItem(roofOptions);
+                gmRoofSelection.BindMenuToItem(mRoof, roofOptions);
+                UIMenuItem roofPatterns = new UIMenuItem("Roof Patterns", Game.GetLocalizedString("CMOD_MOD_73_D"));
+                gmRoofSelection.AddItem(roofPatterns);
+                gmRoofSelection.BindMenuToItem(mTornadoC, roofPatterns);
+                gmRoofSelection.RefreshIndex();
+                MainMenu.BindMenuToItem(gmRoofSelection, iRoof);
+            }
+            else
+            {
+                MainMenu.BindMenuToItem(hasRoofMods ? mRoof : mTornadoC, iRoof);
+            }
         }
 
         private static string GetModCategoryName(VehicleMod modType)
@@ -1198,6 +1379,49 @@ namespace BennysMotorworksRevamped
 
             string nativeName = GetNativeModCategoryName(modType);
             return string.IsNullOrWhiteSpace(nativeName) ? fallback : nativeName;
+        }
+
+        private static bool IsFrontPlateRoofSlot()
+        {
+            if (veh == null || !veh.Exists()
+                || veh.ClassType == VehicleClass.Motorcycles
+                || veh.Model.ToString().Equals("blazer4", StringComparison.OrdinalIgnoreCase)
+                || arenavehicle.Contains(veh.Model))
+            {
+                return false;
+            }
+
+            int modCount = veh.GetModCount(VehicleMod.Roof);
+            if (modCount <= 0)
+            {
+                return false;
+            }
+
+            if (IsFrontPlateLabel(GetNativeModCategoryName(VehicleMod.Roof)))
+            {
+                return true;
+            }
+
+            bool foundFrontPlate = false;
+            for (int index = 0; index < modCount; index++)
+            {
+                string name = GetLocalizedModName(index, modCount, VehicleMod.Roof);
+                if (IsFrontPlateLabel(name))
+                {
+                    foundFrontPlate = true;
+                }
+                else if (CategoryContains(name, "roof", "sunstrip", "sun strip", "sun visor", "windscreen visor"))
+                {
+                    return false;
+                }
+            }
+
+            return foundFrontPlate;
+        }
+
+        private static bool IsFrontPlateLabel(string name)
+        {
+            return CategoryContains(name, "front plate", "frontplate", "front license plate", "front licence plate", "front number plate", "front tag", "plate front");
         }
 
         private static string NormalizeModCategoryName(string value)
@@ -1452,9 +1676,13 @@ namespace BennysMotorworksRevamped
             {
                 camera.MainCameraPosition = CameraPosition.Tank;
             }
+            else if (CategoryContains(categoryName, "roof", "visor", "sunstrip", "sun strip"))
+            {
+                UpdateRoofCamera(selectedItem);
+            }
             else if (CategoryContains(categoryName, "spoiler", "wing", "diffuser"))
             {
-                camera.MainCameraPosition = CameraPosition.RearBumper;
+                camera.MainCameraPosition = CameraPosition.Spoiler;
             }
             else
             {
@@ -1565,8 +1793,19 @@ namespace BennysMotorworksRevamped
             }
         }
 
-        private static string GetLivery2NameSafely(int index)
+        private static string GetLivery2NameSafely(int index, int count)
         {
+            if (veh != null && veh.Exists() && veh.Model == "tornado5" && index >= 0 && index < count)
+            {
+                if (count == TornadoCustomRoofNames.Length + 1)
+                {
+                    return index == 0 ? "Stock Roof" : TornadoCustomRoofNames[index - 1];
+                }
+                if (count == TornadoCustomRoofNames.Length)
+                {
+                    return TornadoCustomRoofNames[index];
+                }
+            }
             try
             {
                 if (veh == null || !veh.Exists())
@@ -1593,7 +1832,7 @@ namespace BennysMotorworksRevamped
             {
             }
 
-            return "Livery " + (index + 1).ToString();
+            return "Roof Pattern " + (index + 1).ToString();
         }
 
         private static int GetPerformanceModPrice(VehicleMod modType, int index)
@@ -1622,9 +1861,20 @@ namespace BennysMotorworksRevamped
             }
 
             int priceIndex = index + 1;
-            return priceIndex >= 0 && priceIndex < prices.Length
-                ? prices[priceIndex]
-                : GetIndexedModPrice(index, 2000);
+            if (priceIndex < 0)
+            {
+                return prices[0];
+            }
+            if (priceIndex < prices.Length)
+            {
+                return prices[priceIndex];
+            }
+
+            int highestTierIndex = prices.Length - 1;
+            int priceIncrease = Math.Max(prices[highestTierIndex] - prices[highestTierIndex - 1],
+                Math.Max(500, prices[highestTierIndex] / 5));
+            long extendedPrice = (long)prices[highestTierIndex] + (long)(priceIndex - highestTierIndex) * priceIncrease;
+            return (int)Math.Min(extendedPrice, int.MaxValue);
         }
 
 
@@ -1733,6 +1983,7 @@ namespace BennysMotorworksRevamped
             ClearPerformanceStatsPreview();
             bool chameleonColorsAvailable = AreChameleonColorsAvailable();
             ResolveMotorcycleSpecialCategories();
+            _roofSlotIsFrontPlate = IsFrontPlateRoofSlot();
 
             if (arenavehicle.Contains(veh.Model))
             {
@@ -1873,12 +2124,16 @@ namespace BennysMotorworksRevamped
             RefreshModMenuFor(ref mFrame, ref iFrame, VehicleMod.Frame);
             RefreshModMenuFor(ref mGrille, ref iGrille, VehicleMod.Grille);
             RefreshModMenuFor(ref mHood, ref iHood, VehicleMod.Hood);
-            RefreshModMenuFor(ref mHorn, ref iHorn, VehicleMod.Horns);
+            RefreshHornMenus();
             RefreshModMenuFor(ref mHydraulics, ref iHydraulics, VehicleMod.Hydraulics);
             RefreshModMenuFor(ref mLivery, ref iLivery, VehicleMod.Livery);
             RefreshModMenuForLivery2(ref mTornadoC, ref iTornadoC);
             RefreshModMenuFor(ref mPlaques, ref iPlaques, VehicleMod.Plaques);
             RefreshModMenuFor(ref mRoof, ref iRoof, VehicleMod.Roof);
+            if (_roofSlotIsFrontPlate)
+            {
+                mRoof.NativeMenu.Name = "Front Plates";
+            }
             RefreshModMenuFor(ref mSpeakers, ref iSpeaker, VehicleMod.Speakers);
             RefreshModMenuFor(ref mSpoilers, ref iSpoilers, VehicleMod.Spoilers);
             RefreshModMenuFor(ref mTank, ref iTank, VehicleMod.Tank);
@@ -2253,7 +2508,7 @@ namespace BennysMotorworksRevamped
                     }
                     if (GetLivery2CountSafely() != 0)
                     {
-                        iTornadoC = new UIMenuItem(GetNativeLiveryCategoryName(), Game.GetLocalizedString("CMOD_SMOD_6_D"));
+                        iTornadoC = new UIMenuItem("Roof", Game.GetLocalizedString("CMOD_MOD_73_D"));
                         MainMenu.AddItem(iTornadoC);
                         MainMenu.BindMenuToItem(mTornadoC, iTornadoC);
                     }
@@ -2388,12 +2643,7 @@ namespace BennysMotorworksRevamped
                             MainMenu.AddItem(iRFender);
                             MainMenu.BindMenuToItem(mRFender, iRFender);
                         }
-                        if (veh.GetModCount(VehicleMod.Roof) != 0)
-                        {
-                            iRoof = new UIMenuItem(LocalizedModTypeName(VehicleMod.Roof), Game.GetLocalizedString("CMOD_MOD_73_D"));
-                            MainMenu.AddItem(iRoof);
-                            MainMenu.BindMenuToItem(mRoof, iRoof);
-                        }
+                        AddRoofCategoriesToMainMenu();
                         if (veh.GetModCount(VehicleMod.Tank) != 0)
                         {
                             giTank = new UIMenuItem(GetModCategoryName(VehicleMod.Tank), Game.GetLocalizedString("CMOD_MOD_45_D"));
@@ -2490,12 +2740,6 @@ namespace BennysMotorworksRevamped
                         iLivery = new UIMenuItem(GetModCategoryName(VehicleMod.Livery), Game.GetLocalizedString("CMOD_SMOD_6_D"));
                         MainMenu.AddItem(iLivery);
                         MainMenu.BindMenuToItem(mLivery, iLivery);
-                    }
-                    if (GetLivery2CountSafely() != 0)
-                    {
-                        iTornadoC = new UIMenuItem(GetNativeLiveryCategoryName(), Game.GetLocalizedString("CMOD_SMOD_6_D"));
-                        MainMenu.AddItem(iTornadoC);
-                        MainMenu.BindMenuToItem(mTornadoC, iTornadoC);
                     }
 
                     if (veh.GetModCount(VehicleMod.Spoilers) != 0)
@@ -2869,14 +3113,14 @@ namespace BennysMotorworksRevamped
             {
                 if (menu != null && menu.NativeMenu != null)
                 {
-                    menu.NativeMenu.Name = GetNativeLiveryCategoryName();
+                    menu.NativeMenu.Name = "Roof";
                 }
 
                 menu.MenuItems.Clear();
                 int count = GetLivery2CountSafely();
                 for (int i = 0; i < count; i++)
                 {
-                    item = new UIMenuItem(GetLivery2NameSafely(i));
+                    item = new UIMenuItem(GetLivery2NameSafely(i, count));
 
                     if (veh.GetLivery2() == i)
                     {
@@ -2898,6 +3142,123 @@ namespace BennysMotorworksRevamped
             catch (Exception ex)
             {
                 Logger.Log(ex.Message + " " + ex.StackTrace);
+            }
+        }
+
+        private static bool IsHornOptionMenu(UIMenu menu)
+        {
+            return menu == mHornStandard || menu == mHornMusical || menu == mHornLoop;
+        }
+
+        private static UIMenu GetHornOptionMenu(int index)
+        {
+            if (index <= 2 || index >= 52)
+            {
+                return mHornStandard;
+            }
+            if (index == 27 || index == 32 || index == 34 || index == 35 || index == 37 || (index >= 38 && index <= 51))
+            {
+                return mHornLoop;
+            }
+            return mHornMusical;
+        }
+
+        private static void RefreshHornMenus()
+        {
+            mHorn.MenuItems.Clear();
+            mHornStandard.MenuItems.Clear();
+            mHornMusical.MenuItems.Clear();
+            mHornLoop.MenuItems.Clear();
+
+            int count = veh.GetModCount(VehicleMod.Horns);
+            if (count <= 0)
+            {
+                return;
+            }
+
+            int equippedIndex = veh.GetMod(VehicleMod.Horns);
+            string equippedName = GetLocalizedModName(equippedIndex, count, VehicleMod.Horns);
+            HashSet<string> usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int index = -1; index < count; index++)
+            {
+                string name = GetLocalizedModName(index, count, VehicleMod.Horns);
+                if (name == "NULL")
+                {
+                    name = Game.GetLocalizedString("CMOD_ARM_0");
+                }
+                if (!usedNames.Add(name))
+                {
+                    continue;
+                }
+
+                UIMenu menu = GetHornOptionMenu(index);
+                UIMenuItem hornItem = new UIMenuItem(name);
+                bool equipped = index == equippedIndex || string.Equals(name, equippedName, StringComparison.OrdinalIgnoreCase);
+                if (equipped)
+                {
+                    hornItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                    hornItem.Tag = new ModClass(index, 0);
+                }
+                else
+                {
+                    int price = GetIndexedModPrice(index, 200);
+                    if (price > 0)
+                    {
+                        hornItem.SetRightLabel($"${price}");
+                    }
+                    hornItem.Tag = new ModClass(index, price);
+                }
+                menu.AddItem(hornItem);
+            }
+
+            if (mHornStandard.MenuItems.Count > 0)
+            {
+                iHornStandard = new UIMenuItem("Standard");
+                mHorn.AddItem(iHornStandard);
+                mHorn.BindMenuToItem(mHornStandard, iHornStandard);
+                mHornStandard.RefreshIndex();
+            }
+            if (mHornMusical.MenuItems.Count > 0)
+            {
+                iHornMusical = new UIMenuItem("Musical");
+                mHorn.AddItem(iHornMusical);
+                mHorn.BindMenuToItem(mHornMusical, iHornMusical);
+                mHornMusical.RefreshIndex();
+            }
+            if (mHornLoop.MenuItems.Count > 0)
+            {
+                iHornLoop = new UIMenuItem("Loop");
+                mHorn.AddItem(iHornLoop);
+                mHorn.BindMenuToItem(mHornLoop, iHornLoop);
+                mHornLoop.RefreshIndex();
+            }
+            mHorn.RefreshIndex();
+        }
+
+        private static void UpdatePurchasedHornBadges(int equippedIndex)
+        {
+            UIMenu[] menus = { mHornStandard, mHornMusical, mHornLoop };
+            int count = veh.GetModCount(VehicleMod.Horns);
+            string equippedName = GetLocalizedModName(equippedIndex, count, VehicleMod.Horns);
+            foreach (UIMenu menu in menus)
+            {
+                foreach (UIMenuItem hornItem in menu.MenuItems)
+                {
+                    if (!(hornItem.Tag is ModClass mod))
+                    {
+                        continue;
+                    }
+                    if (mod.ModID == equippedIndex || string.Equals(hornItem.Text, equippedName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        hornItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                        hornItem.SetRightLabel(null);
+                        hornItem.Tag = new ModClass(mod.ModID, 0);
+                    }
+                    else if (hornItem.RightBadge == UIMenuItem.BadgeStyle.Car)
+                    {
+                        hornItem.SetRightBadge(UIMenuItem.BadgeStyle.Tick);
+                    }
+                }
             }
         }
 
@@ -3020,6 +3381,22 @@ namespace BennysMotorworksRevamped
                 bool xenonEnabled = veh.IsToggleModOn(VehicleToggleMod.XenonHeadlights);
                 int currentColor = GetXenonHeadlightsColorIndex(veh);
 
+                var stockItem = new UIMenuItem(Game.GetLocalizedString("CMOD_LGT_0"));
+                if (!xenonEnabled)
+                {
+                    stockItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                    stockItem.Tag = new ToggleModClass(false, 255, 0);
+                }
+                else
+                {
+                    const int stockPrice = 500;
+                    stockItem.SetRightLabel($"${stockPrice}");
+                    stockItem.Tag = new ToggleModClass(false, 255, stockPrice);
+                }
+
+                menu.AddItem(stockItem);
+                item = stockItem;
+
                 var xenonItem = new UIMenuItem(LocalizedModTypeName(VehicleToggleMod.XenonHeadlights));
                 if (xenonEnabled && currentColor == 255)
                 {
@@ -3040,22 +3417,6 @@ namespace BennysMotorworksRevamped
 
                 menu.AddItem(xenonItem);
                 item = xenonItem;
-
-                var stockItem = new UIMenuItem(Game.GetLocalizedString("CMOD_LGT_0"));
-                if (!xenonEnabled)
-                {
-                    stockItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
-                    stockItem.Tag = new ToggleModClass(false, 255, 0);
-                }
-                else
-                {
-                    const int stockPrice = 500;
-                    stockItem.SetRightLabel($"${stockPrice}");
-                    stockItem.Tag = new ToggleModClass(false, 255, stockPrice);
-                }
-
-                menu.AddItem(stockItem);
-                item = stockItem;
 
                 if (Helper.SupportsColoredXenonHeadlights)
                 {
@@ -3438,12 +3799,20 @@ namespace BennysMotorworksRevamped
                         {
                             equippedTint = VehicleWindowTint.None;
                         }
+                        if (equippedTint == VehicleWindowTint.Limo)
+                        {
+                            equippedTint = VehicleWindowTint.PureBlack;
+                            veh.Mods.WindowTint = equippedTint;
+                            if (lastVehMemory != null)
+                            {
+                                lastVehMemory.Tint = equippedTint;
+                            }
+                        }
                         VehicleWindowTint[] tintOptions =
                         {
                             VehicleWindowTint.None,
                             VehicleWindowTint.LightSmoke,
                             VehicleWindowTint.DarkSmoke,
-                            VehicleWindowTint.Limo,
                             VehicleWindowTint.PureBlack,
                             VehicleWindowTint.Green,
                         };
@@ -3452,7 +3821,9 @@ namespace BennysMotorworksRevamped
                         {
                             string tintName = enumItem == VehicleWindowTint.None
                                 ? "Stock"
-                                : LocalizedWindowsTint(enumItem);
+                                : enumItem == VehicleWindowTint.PureBlack
+                                    ? "Limo / Pure Black"
+                                    : LocalizedWindowsTint(enumItem);
                             if (string.IsNullOrWhiteSpace(tintName) || tintName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
                             {
                                 tintName = enumItem == VehicleWindowTint.None
@@ -3573,10 +3944,24 @@ namespace BennysMotorworksRevamped
                         break;
 
                     case EnumTypes.VehicleColorRim:
+                        VehicleColor defaultWheelColor = (VehicleColor)156;
+                        var stockWheelColorItem = new UIMenuItem("Stock");
+                        if (veh.Mods.RimColor == defaultWheelColor)
+                        {
+                            stockWheelColorItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                            stockWheelColorItem.Tag = new ModClass((int)defaultWheelColor, 0);
+                        }
+                        else
+                        {
+                            stockWheelColorItem.SetRightLabel("$500");
+                            stockWheelColorItem.Tag = new ModClass((int)defaultWheelColor, 500);
+                        }
+                        menu.AddItem(stockWheelColorItem);
+                        item = stockWheelColorItem;
                         bool includeChameleonColors = AreChameleonColorsAvailable();
                         foreach (VehicleColor enumItem in AllVehicleColors)
                         {
-                            if (!includeChameleonColors && ChameleonColor.Contains(enumItem))
+                            if (enumItem == defaultWheelColor || (!includeChameleonColors && ChameleonColor.Contains(enumItem)))
                             {
                                 continue;
                             }
@@ -4114,6 +4499,12 @@ namespace BennysMotorworksRevamped
             try
             {
                 gmPlate.MenuItems.Clear();
+                if (_roofSlotIsFrontPlate)
+                {
+                    _frontPlateRoofMenuItem = new UIMenuItem("Front Plates", "Customize front license plate addons.");
+                    gmPlate.AddItem(_frontPlateRoofMenuItem);
+                    gmPlate.BindMenuToItem(mRoof, _frontPlateRoofMenuItem);
+                }
                 if (HasGroupedModSlot(VehicleMod.PlateHolder))
                 {
                     giPlateHolder = new UIMenuItem(LocalizedModTypeName(VehicleMod.PlateHolder), Game.GetLocalizedString("CMOD_MOD_49_D"));
@@ -4543,6 +4934,9 @@ namespace BennysMotorworksRevamped
             try
             {
                 menu.MenuItems.Clear();
+                VehicleColor equippedColor = prisecpear == "Primary"
+                    ? GetCapturedVehiclePaintColor(veh, true)
+                    : prisecpear == "Secondary" ? GetCapturedVehiclePaintColor(veh, false) : default(VehicleColor);
                 var sortedColors = colorList
                     .Select(col => new { Color = col, Name = GetLocalizedColorName(col), SortName = GetColorSortName(col) })
                     .OrderBy(entry => GetColorFamilyOrder(entry.SortName))
@@ -4559,7 +4953,7 @@ namespace BennysMotorworksRevamped
                         var __with1 = item;
                         if (prisecpear == "Primary")
                         {
-                            if (!veh.Mods.IsPrimaryColorCustom && veh.Mods.PrimaryColor == col)
+                            if (!veh.Mods.IsPrimaryColorCustom && equippedColor == col)
                             {
                                 __with1.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                                 __with1.Tag = new ModClass((int)col, 0);
@@ -4572,7 +4966,7 @@ namespace BennysMotorworksRevamped
                         }
                         else if (prisecpear == "Secondary")
                         {
-                            if (!veh.Mods.IsSecondaryColorCustom && veh.Mods.SecondaryColor == col)
+                            if (!veh.Mods.IsSecondaryColorCustom && equippedColor == col)
                             {
                                 __with1.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                                 __with1.Tag = new ModClass((int)col, 0);
@@ -4620,8 +5014,25 @@ namespace BennysMotorworksRevamped
                 IEnumerable<Reflection.PropertyInfo> colorProperties = typeof(Color).GetProperties();
                 bool sortResprayColors = string.Equals(neonsmoke, "Primary", StringComparison.OrdinalIgnoreCase) ||
                     string.Equals(neonsmoke, "Secondary", StringComparison.OrdinalIgnoreCase);
+                bool sortSmokeColors = string.Equals(neonsmoke, "Smoke", StringComparison.OrdinalIgnoreCase);
+                bool sortNeonColors = string.Equals(neonsmoke, "Neon", StringComparison.OrdinalIgnoreCase);
+                bool smokeEnabled = sortSmokeColors && veh.IsToggleModOn(VehicleToggleMod.TireSmoke);
+                if (sortSmokeColors)
+                {
+                    item = new UIMenuItem("Stock");
+                    if (!smokeEnabled)
+                    {
+                        item.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                    }
+                    else
+                    {
+                        item.SetRightLabel("$200");
+                    }
+                    item.Tag = new RGBModClass(Color.Empty, smokeEnabled ? 200 : 0);
+                    menu.AddItem(item);
+                }
 
-                if (sortResprayColors)
+                if (sortResprayColors || sortSmokeColors || sortNeonColors)
                 {
                     colorProperties = colorProperties
                         .Where(col => !removeList.Contains(col.Name))
@@ -4643,7 +5054,9 @@ namespace BennysMotorworksRevamped
                     }
 
                     item = new UIMenuItem(RegularExpressions.Regex.Replace(col.Name, "[A-Z]", " $0").Trim());
-                    Color color = Color.FromName(col.Name);
+                    Color color = sortSmokeColors && col.Name == "Black"
+                        ? Color.FromArgb(1, 1, 1)
+                        : Color.FromName(col.Name);
 
                     if (string.Equals(neonsmoke, "Neon", StringComparison.OrdinalIgnoreCase))
                     {
@@ -4660,7 +5073,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if (string.Equals(neonsmoke, "Smoke", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (veh.Mods.TireSmokeColor == color)
+                        if (smokeEnabled && veh.Mods.TireSmokeColor.ToArgb() == color.ToArgb())
                         {
                             item.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                             item.Tag = new RGBModClass(color, 0);
@@ -4703,6 +5116,23 @@ namespace BennysMotorworksRevamped
                     menu.AddItem(item);
                 }
 
+                if (sortSmokeColors)
+                {
+                    Color patriotColor = Color.FromArgb(0, 0, 0);
+                    item = new UIMenuItem("Patriot");
+                    if (smokeEnabled && veh.Mods.TireSmokeColor.ToArgb() == patriotColor.ToArgb())
+                    {
+                        item.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                        item.Tag = new RGBModClass(patriotColor, 0);
+                    }
+                    else
+                    {
+                        item.SetRightLabel("$200");
+                        item.Tag = new RGBModClass(patriotColor, 200);
+                    }
+                    menu.AddItem(item);
+                }
+
                 menu.RefreshIndex();
             }
             catch (Exception ex)
@@ -4723,6 +5153,7 @@ namespace BennysMotorworksRevamped
             mUpgradeAW = NewUIMenu(ref mUpgradeAW, "ARENA PERFORMANCE", false, selectHandler: ModsMenuItemSelectHandler, indexChangeHandler: ArenaWarMenuIndexChangedHandler);
             gmBodywork = NewUIMenu(ref gmBodywork, "CMOD_BW_T", false, true, selectHandler: ModsMenuItemSelectHandler);
             gmBodyworkArena = NewUIMenu(ref gmBodyworkArena, "CMOD_BW_T", false, true, selectHandler: ModsMenuItemSelectHandler);
+            gmRoofSelection = NewUIMenu(ref gmRoofSelection, "CMOD_ROF_T", false, true, RoofSelectionMenuCloseHandler);
             gmWeapon = NewUIMenu(ref gmWeapon, "PM_SCR_WEA", false, true, selectHandler: ModsMenuItemSelectHandler);
             mAerials = NewUIMenu(ref mAerials, "CMM_MOD_ST18", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mTrim = NewUIMenu(ref mTrim, "CMM_MOD_ST19", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
@@ -4827,10 +5258,13 @@ namespace BennysMotorworksRevamped
             mFrame = NewUIMenu(ref mFrame, "CMOD_RC_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mGrille = NewUIMenu(ref mGrille, "CMOD_GRL_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mHood = NewUIMenu(ref mHood, "CMOD_BON_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
-            mHorn = NewUIMenu(ref mHorn, "CMOD_HRN_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mHorn = NewUIMenu(ref mHorn, "CMOD_HRN_T", false, true, ModsMenuCloseHandler);
+            mHornStandard = NewUIMenu(ref mHornStandard, "STANDARD", false, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mHornMusical = NewUIMenu(ref mHornMusical, "MUSICAL", false, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mHornLoop = NewUIMenu(ref mHornLoop, "LOOP", false, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mHydraulics = NewUIMenu(ref mHydraulics, "CMM_MOD_ST13", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mLivery = NewUIMenu(ref mLivery, "CMM_MOD_ST23", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
-            mTornadoC = NewUIMenu(ref mTornadoC, GetNativeLiveryCategoryName(), true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mTornadoC = NewUIMenu(ref mTornadoC, "Roof", true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mPlaques = NewUIMenu(ref mPlaques, "CMM_MOD_ST10", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mRoof = NewUIMenu(ref mRoof, "CMOD_ROF_T", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mSpeakers = NewUIMenu(ref mSpeakers, "CMM_MOD_S11", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
@@ -4942,6 +5376,11 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
+                if (IsHornOptionMenu(sender) && selectedItem.RightBadge == UIMenuItem.BadgeStyle.Car)
+                {
+                    return;
+                }
+
                 if (!CanAffordPurchase(GetPurchasePrice(selectedItem)))
                 {
                     return;
@@ -4964,9 +5403,7 @@ namespace BennysMotorworksRevamped
                     Vehicle newAWVeh = World.CreateVehicle(((ArenaWarVehicle)(selectedItem.Tag)).Model, veh.Position, veh.Heading);
                     TransferWorkshopVehicleIdentity(veh, newAWVeh);
                     newAWVeh.InstallModKit();
-                    ApplyPrimaryPaint(newAWVeh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
-                    ApplySecondaryPaint(newAWVeh, lastVehMemory.SecondaryColor);
-                    ApplySavedCustomPaintState(newAWVeh, lastVehMemory);
+                    ApplySavedVehiclePaint(newAWVeh, lastVehMemory);
                     newAWVeh.Mods.DashboardColor = lastVehMemory.LightsColor;
                     newAWVeh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
                     newAWVeh.Mods.TrimColor = lastVehMemory.TrimColor;
@@ -5018,7 +5455,7 @@ namespace BennysMotorworksRevamped
                     newAWVeh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                     newAWVeh.SetMod(VehicleMod.VanityPlates, lastVehMemory.VanityPlates, false);
                     newAWVeh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
-                    newAWVeh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                    newAWVeh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
                     newAWVeh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                     newAWVeh.ToggleMod(VehicleToggleMod.XenonHeadlights, lastVehMemory.Headlights);
                     newAWVeh.SetXenonHeadlightsColor(lastVehMemory.HeadlightsColor, newAWVeh.IsToggleModOn(VehicleToggleMod.XenonHeadlights));
@@ -5509,7 +5946,7 @@ namespace BennysMotorworksRevamped
                         PlaySpeech("");
                     }
                 }
-                else if (sender == mHorn)
+                else if (IsHornOptionMenu(sender))
                 {
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
@@ -5520,6 +5957,7 @@ namespace BennysMotorworksRevamped
                         Game.Player.Money = (Game.Player.Money - mc.Price);
                         selectedItem.Tag = new ModClass(mc.ModID, 0);
                         lastVehMemory.Horns = mc.ModID;
+                        UpdatePurchasedHornBadges(mc.ModID);
                         PlaySpeech("SHOP_SELL_HORN");
                     }
                 }
@@ -6285,7 +6723,7 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        ApplyPrimaryPaint(veh, (VehicleColor)mc.ModID, veh.Mods.PearlescentColor);
+                        ApplyPrimaryPaintPreview(veh, (VehicleColor)mc.ModID);
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
@@ -6332,7 +6770,7 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         ModClass mc = (ModClass)selectedItem.Tag;
-                        ApplySecondaryPaint(veh, (VehicleColor)mc.ModID);
+                        ApplySecondaryPaintPreview(veh, (VehicleColor)mc.ModID);
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
@@ -6393,20 +6831,31 @@ namespace BennysMotorworksRevamped
                     if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
                     {
                         RGBModClass mc = (RGBModClass)selectedItem.Tag;
-                        veh.Mods.TireSmokeColor = mc.Color();
-                        veh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                        if (index == 0)
+                        {
+                            veh.ToggleMod(VehicleToggleMod.TireSmoke, false);
+                        }
+                        else
+                        {
+                            veh.Mods.TireSmokeColor = mc.Color();
+                            veh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                        }
                         selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
                         selectedItem.SetRightLabel(null);
                         Game.Player.Money = (Game.Player.Money - mc.Price);
                         selectedItem.Tag = new RGBModClass(mc.Color(), 0);
-                        lastVehMemory.TireSmokeColor = mc.Color();
+                        lastVehMemory.TireSmokeColor = veh.Mods.TireSmokeColor;
+                        lastVehMemory.TireSmokeEnabled = veh.IsToggleModOn(VehicleToggleMod.TireSmoke);
                         PlaySpeech("");
                     }
                 }
 
                 if (buyingUnequippedOption && selectedItem.RightBadge == UIMenuItem.BadgeStyle.Car)
                 {
-                    lastVehMemory = CaptureWorkshopVehicleMemory();
+                    if (!IsConfirmedBodyResprayMenu(sender))
+                    {
+                        lastVehMemory = CaptureWorkshopVehicleMemory();
+                    }
                     MarkWorkshopVehicleAsOwned(veh);
 
                     if (IsConfirmedBodyResprayMenu(sender))
@@ -6490,7 +6939,11 @@ namespace BennysMotorworksRevamped
                 }
                 else if (sender == gmPlate)
                 {
-                    if (selectedItem == giNumberPlate)
+                    if (selectedItem == _frontPlateRoofMenuItem && _roofSlotIsFrontPlate)
+                    {
+                        camera.MainCameraPosition = CameraPosition.FrontPlate;
+                    }
+                    else if (selectedItem == giNumberPlate)
                     {
                         if (veh.ClassType == VehicleClass.Motorcycles)
                         {
@@ -6665,48 +7118,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if (selectedItem == giRoof)
                     {
-                        if (veh.HasBone("boot"))
-                        {
-                            if (veh.GetVehTrunkPos() == EngineLoc.rear)
-                            {
-                                camera.MainCameraPosition = CameraPosition.Trunk;
-                            }
-                            else
-                            {
-                                if (veh.HasBone("windscreen_r"))
-                                {
-                                    camera.MainCameraPosition = CameraPosition.RearWindscreen;
-                                }
-                                else
-                                {
-                                    camera.MainCameraPosition = CameraPosition.RearEngine;
-                                }
-                            }
-                        }
-                        else if (veh.HasBone("windscreen_r"))
-                        {
-                            camera.MainCameraPosition = CameraPosition.RearWindscreen;
-                        }
-                        else if (veh.GetVehEnginePos() == EngineLoc.rear)
-                        {
-                            switch (veh.Model.ToString().ToLowerInvariant())
-                            {
-                                case "barrage":
-                                    camera.MainCameraPosition = CameraPosition.Car;
-                                    break;
-                                default:
-                                    camera.MainCameraPosition = CameraPosition.RearEngine;
-                                    break;
-                            }
-                        }
-                        else if (veh.HasBone("neon_b"))
-                        {
-                            camera.MainCameraPosition = CameraPosition.RearBumper;
-                        }
-                        else
-                        {
-                            camera.MainCameraPosition = CameraPosition.Car;
-                        }
+                        UpdateRoofCamera(GetCurrentMenuItem(mRoof));
                     }
                 }
             }
@@ -6752,8 +7164,15 @@ namespace BennysMotorworksRevamped
                     }
                     else if (sender == mTireSmoke)
                     {
-                        veh.Mods.TireSmokeColor = mc.Color();
-                        veh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                        if (index == 0)
+                        {
+                            veh.ToggleMod(VehicleToggleMod.TireSmoke, false);
+                        }
+                        else
+                        {
+                            veh.Mods.TireSmokeColor = mc.Color();
+                            veh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                        }
                     }
                     else if (sender == mCustomPrimaryColor)
                     {
@@ -6902,7 +7321,7 @@ namespace BennysMotorworksRevamped
                     {
                         veh.SetMod(VehicleMod.Hood, mc.ModID, false);
                     }
-                    else if (sender == mHorn)
+                    else if (IsHornOptionMenu(sender))
                     {
                         veh.SetMod(VehicleMod.Horns, mc.ModID, false);
                         SetHornPreviewMode(true);
@@ -6919,6 +7338,7 @@ namespace BennysMotorworksRevamped
                     else if (sender == mTornadoC)
                     {
                         veh.SetLivery2(mc.ModID);
+                        UpdateRoofCamera(selectedItem);
                     }
                     else if (sender == mPlaques)
                     {
@@ -6927,6 +7347,7 @@ namespace BennysMotorworksRevamped
                     else if (sender == mRoof)
                     {
                         veh.SetMod(VehicleMod.Roof, mc.ModID, false);
+                        UpdateRoofCamera(selectedItem);
                     }
                     else if (sender == mSpeakers)
                     {
@@ -7132,7 +7553,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if ((sender == mPrimaryChromeColor) || (sender == mPrimaryClassicColor) || (sender == mPrimaryUtilityColor) || (sender == mPrimaryWornColor) || (sender == mPrimarySpecialSolidColor) || (sender == mPrimaryChameleonColor) || (sender == mPrimaryMatteColor) || (sender == mPrimaryMetalsColor))
                     {
-                        ApplyPrimaryPaint(veh, (VehicleColor)mc.ModID, veh.Mods.PearlescentColor);
+                        ApplyPrimaryPaintPreview(veh, (VehicleColor)mc.ModID);
                     }
                     else if (sender == mPrimaryMetallicColor)
                     {
@@ -7146,7 +7567,7 @@ namespace BennysMotorworksRevamped
                     }
                     else if ((sender == mSecondaryChromeColor) || (sender == mSecondaryClassicColor) || (sender == mSecondaryUtilityColor) || (sender == mSecondaryWornColor) || (sender == mSecondarySpecialSolidColor) || (sender == mSecondaryChameleonColor) || (sender == mSecondaryMatteColor) || (sender == mSecondaryMetallicColor) || (sender == mSecondaryMetalsColor))
                     {
-                        ApplySecondaryPaint(veh, (VehicleColor)mc.ModID);
+                        ApplySecondaryPaintPreview(veh, (VehicleColor)mc.ModID);
                     }
                 }
             }
@@ -7211,9 +7632,7 @@ namespace BennysMotorworksRevamped
                         Vehicle newVeh = World.CreateVehicle(replacementModel, veh.Position, veh.Heading);
                         TransferWorkshopVehicleIdentity(veh, newVeh);
                         newVeh.InstallModKit();
-                        ApplyPrimaryPaint(newVeh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
-                        ApplySecondaryPaint(newVeh, lastVehMemory.SecondaryColor);
-                        ApplySavedCustomPaintState(newVeh, lastVehMemory);
+                        ApplySavedVehiclePaint(newVeh, lastVehMemory);
                         newVeh.Mods.DashboardColor = lastVehMemory.LightsColor;
                         newVeh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
                         newVeh.Mods.TrimColor = lastVehMemory.TrimColor;
@@ -7265,7 +7684,7 @@ namespace BennysMotorworksRevamped
                         newVeh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                         newVeh.SetMod(VehicleMod.VanityPlates, lastVehMemory.VanityPlates, false);
                         newVeh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
-                        newVeh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                        newVeh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
                         newVeh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                         newVeh.ToggleMod(VehicleToggleMod.XenonHeadlights, lastVehMemory.Headlights);
                         newVeh.SetXenonHeadlightsColor(lastVehMemory.HeadlightsColor, newVeh.IsToggleModOn(VehicleToggleMod.XenonHeadlights));
@@ -7302,9 +7721,7 @@ namespace BennysMotorworksRevamped
                         Vehicle newVeh = World.CreateVehicle(upgrade2.Item1, veh.Position, veh.Heading);
                         TransferWorkshopVehicleIdentity(veh, newVeh);
                         newVeh.InstallModKit();
-                        ApplyPrimaryPaint(newVeh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
-                        ApplySecondaryPaint(newVeh, lastVehMemory.SecondaryColor);
-                        ApplySavedCustomPaintState(newVeh, lastVehMemory);
+                        ApplySavedVehiclePaint(newVeh, lastVehMemory);
                         newVeh.Mods.DashboardColor = lastVehMemory.LightsColor;
                         newVeh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
                         newVeh.Mods.TrimColor = lastVehMemory.TrimColor;
@@ -7356,7 +7773,7 @@ namespace BennysMotorworksRevamped
                         newVeh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                         newVeh.SetMod(VehicleMod.VanityPlates, lastVehMemory.VanityPlates, false);
                         newVeh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
-                        newVeh.ToggleMod(VehicleToggleMod.TireSmoke, true);
+                        newVeh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
                         newVeh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                         newVeh.ToggleMod(VehicleToggleMod.XenonHeadlights, lastVehMemory.Headlights);
                         newVeh.SetXenonHeadlightsColor(lastVehMemory.HeadlightsColor, newVeh.IsToggleModOn(VehicleToggleMod.XenonHeadlights));
@@ -7561,50 +7978,15 @@ namespace BennysMotorworksRevamped
                     {
                         camera.MainCameraPosition = CameraPosition.Plaque;
                     }
+                    else if (selectedItem == iRoof || selectedItem == iTornadoC)
+                    {
+                        UpdateRoofCamera(selectedItem == iTornadoC || (_roofSlotIsFrontPlate || veh.GetModCount(VehicleMod.Roof) == 0)
+                            ? GetCurrentMenuItem(mTornadoC)
+                            : GetCurrentMenuItem(mRoof));
+                    }
                     else if (selectedItem == giSpoilers)
                     {
-                        if (veh.HasBone("boot"))
-                        {
-                            if (veh.GetVehTrunkPos() == EngineLoc.rear)
-                            {
-                                camera.MainCameraPosition = CameraPosition.Trunk;
-                            }
-                            else
-                            {
-                                if (veh.HasBone("windscreen_r"))
-                                {
-                                    camera.MainCameraPosition = CameraPosition.RearWindscreen;
-                                }
-                                else
-                                {
-                                    camera.MainCameraPosition = CameraPosition.RearEngine;
-                                }
-                            }
-                        }
-                        else if (veh.HasBone("windscreen_r"))
-                        {
-                            camera.MainCameraPosition = CameraPosition.RearWindscreen;
-                        }
-                        else if (veh.GetVehEnginePos() == EngineLoc.rear)
-                        {
-                            switch (veh.Model.ToString().ToLowerInvariant())
-                            {
-                                case "barrage":
-                                    camera.MainCameraPosition = CameraPosition.Car;
-                                    break;
-                                default:
-                                    camera.MainCameraPosition = CameraPosition.RearEngine;
-                                    break;
-                            }
-                        }
-                        else if (veh.HasBone("neon_b"))
-                        {
-                            camera.MainCameraPosition = CameraPosition.RearBumper;
-                        }
-                        else
-                        {
-                            camera.MainCameraPosition = CameraPosition.Car;
-                        }
+                        camera.MainCameraPosition = CameraPosition.Spoiler;
                     }
                     else if (selectedItem == giTank)
                     {
@@ -7748,6 +8130,7 @@ namespace BennysMotorworksRevamped
                 else if (sender == QuitMenu)
                 {
                     HideAllMenus();
+                    BennysMenu.RestoreWorkshopVisualsOnExit();
                     CommitStoryPersonalVehicleOnWorkshopExit();
                     PlayExitCutScene();
                 }
@@ -7758,11 +8141,19 @@ namespace BennysMotorworksRevamped
             }
         }
 
+        private static void RoofSelectionMenuCloseHandler(UIMenu sender)
+        {
+            if (camera != null && veh != null && veh.Exists() && camera.MainCameraPosition != CameraPosition.Car)
+            {
+                camera.MainCameraPosition = CameraPosition.Car;
+            }
+        }
+
         public static void ModsMenuCloseHandler(UIMenu sender)
         {
             try
             {
-                if (sender == mHorn)
+                if (sender == mHorn || IsHornOptionMenu(sender))
                 {
                     SetHornPreviewMode(false);
                 }
@@ -7830,13 +8221,12 @@ namespace BennysMotorworksRevamped
                 // Color()
                 veh.Mods.DashboardColor = lastVehMemory.LightsColor;
                 veh.Mods.TrimColor = lastVehMemory.TrimColor;
-                ApplyPrimaryPaint(veh, lastVehMemory.PrimaryColor, lastVehMemory.PearlescentColor);
-                ApplySecondaryPaint(veh, lastVehMemory.SecondaryColor);
-                ApplySavedCustomPaintState(veh, lastVehMemory);
+                ApplySavedVehiclePaint(veh, lastVehMemory);
                 veh.Mods.PearlescentColor = lastVehMemory.PearlescentColor;
                 veh.Mods.RimColor = lastVehMemory.RimColor;
                 veh.Mods.NeonLightsColor = lastVehMemory.NeonLightsColor;
                 veh.Mods.TireSmokeColor = lastVehMemory.TireSmokeColor;
+                veh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
 
                 // Close Doors
                 if (sender == gmEngine)
@@ -7870,7 +8260,7 @@ namespace BennysMotorworksRevamped
                     veh.SetHighBeamsState(false);
                 }
                 // Reset Camera Position
-                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mSaddleBags) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
+                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mSaddleBags) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mTornadoC) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
                 {
                     camera.MainCameraPosition = CameraPosition.Car;
                 }

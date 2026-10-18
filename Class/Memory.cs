@@ -70,6 +70,7 @@ namespace BennysMotorworksRevamped
         public VehicleColor LightsColor { get; set; }
         public Color NeonLightsColor { get; set; }
         public Color TireSmokeColor { get; set; }
+        public bool TireSmokeEnabled { get; set; }
         public int Livery2 { get; set; }
         public int HeadlightsColor { get; set; }
         public bool BulletProofTires { get; set; }
