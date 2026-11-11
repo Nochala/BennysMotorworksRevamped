@@ -39,8 +39,8 @@ namespace BennysMotorworksRevamped
         }
 
         public static UIMenu QuitMenu, MainMenu, gmSpecialUpgrades, gmBodywork, gmBodyworkArena, gmEngine, gmInterior, gmPlate, gmLights, gmRespray, gmWheels, gmBumper, gmWheelType, gmMotorcycleWheelPosition, mMotorcycleFrontWheel, mMotorcycleRearWheel, gmTires, gmNeonKits, gmWeapon;
-        public static UIMenu mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHornStandard, mHornMusical, mHornLoop, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryUtilityColor, mPrimaryWornColor, mPrimarySpecialSolidColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mCustomPrimaryColor, mSecondaryColor, mCustomSecondaryColor, mSecondaryClassicColor, mSecondaryUtilityColor, mSecondaryWornColor, mSecondarySpecialSolidColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
-        public static UIMenuItem iRepair, iHorn, iHornStandard, iHornMusical, iHornLoop, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iCustomPrimaryColor, iCustomSecondaryColor, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryUtilityColor, iPrimaryWornColor, iPrimarySpecialSolidColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryUtilityColor, iSecondaryWornColor, iSecondarySpecialSolidColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
+        public static UIMenu mAdditionalBodywork, mAerials, mSuspension, mArmor, mBrakes, mEngine, mTransmission, mFBumper, mRBumper, mSSkirt, mTrim, mEngineBlock, mAirFilter, mStruts, mColumnShifterLevers, mDashboard, mDialDesign, mOrnaments, mSeats, mSteeringWheels, mTrimDesign, mPlateHolder, mVanityPlates, mNumberPlate, gmBikeWheels, gmHighEnd, gmLowrider, gmMuscle, gmOffroad, gmSport, gmSUV, gmTuner, mBennysOriginals, mBespoke, mRacing, mStreet, mTrack, mTires, mTireEnhancements, mHeadlights, mNeon, mNeonColor, mArchCover, mExhaust, mFender, mRFender, mDoor, mFrame, mGrille, mHood, mHorn, mHornStandard, mHornMusical, mHornLoop, mHydraulics, mLivery, mPlaques, mRoof, mSpeakers, mSpoilers, mTank, mTrunk, mWindow, mTurbo, mTint, mLightsColor, mTrimColor, mRimColor, mPrimaryClassicColor, mPrimaryUtilityColor, mPrimaryWornColor, mPrimarySpecialSolidColor, mPrimaryChromeColor, mPrimaryChameleonColor, mPrimaryMetallicColor, mPrimaryMetalsColor, mPrimaryMatteColor, mPrimaryPearlescentColor, mPrimaryColor, mCustomPrimaryColor, mSecondaryColor, mCustomSecondaryColor, mSecondaryClassicColor, mSecondaryUtilityColor, mSecondaryWornColor, mSecondarySpecialSolidColor, mSecondaryChromeColor, mSecondaryChameleonColor, mSecondaryMetallicColor, mSecondaryMetalsColor, mSecondaryMatteColor, mTireSmoke, mTornadoC, mSBikeWheels, mCBikeWheels, mSHighEnd, mCHighEnd, mSLowrider, mCLowrider, mSMuscle, mCMuscle, mSOffroad, mCOffroad, mSSport, mCSport, mSSUV, mCSUV, mSTuner, mCTuner, mUpgradeAW, mNitro;
+        public static UIMenuItem iAdditionalBodywork, iRepair, iHorn, iHornStandard, iHornMusical, iHornLoop, iArmor, iBrakes, iFBumper, iExhaust, iFender, iRollcage, iRoof, iTransmission, iEngine, iPlate, iLights, iTint, iTurbo, iRespray, iWheels, iSuspension, iEngineBlock, iAerials, iAirFilter, iArchCover, iDoor, iFrame, iGrille, iHood, iHydraulics, iLivery, iPlaques, iRFender, iSpeaker, iSpoilers, iTank, iTrunk, iWindows, iTrim, iUpgrade, iRemoveUpgrade, iUpgradeMod, iUpgradeAW, iUpgradeAWV, iStruts, iTrimColor, iColumnShifterLevers, iDashboard, iDialDesign, iOrnaments, iSeats, iSteeringWheels, iTrimDesign, iRBumper, iSideSkirt, iRimColor, iPlateHolder, iVanityPlates, iHeadlights, iDashboardColor, iNumberPlate, iBikeWheels, iHighEnd, iLowrider, iMuscle, iOffroad, iSport, iSUV, iTuner, iBennys, iBespoke, iRacing, iStreet, iTrack, iTires, iStandardTires, iBPTires, iNeon, iTireSmoke, iNeonColor, iLightsColor, iPrimaryCol, iSecondaryCol, iCustomPrimaryColor, iCustomSecondaryColor, iPrimaryChromeColor, iPrimaryClassicColor, iPrimaryUtilityColor, iPrimaryWornColor, iPrimarySpecialSolidColor, iPrimaryChameleonColor, iPrimaryMetallicColor, iPrimaryMetalsColor, iPrimaryMatteColor, iPrimaryPearlescentColor, iSecondaryChromeColor, iSecondaryClassicColor, iSecondaryUtilityColor, iSecondaryWornColor, iSecondarySpecialSolidColor, iSecondaryChameleonColor, iSecondaryMetallicColor, iSecondaryMetalsColor, iSecondaryMatteColor, iSecondaryPearlescentColor, iTornadoC, iNitro;
         public static UIMenuItem giSpecialUpgrades, giBodywork, giBodyworkArena, giEngine, giInterior, giPlate, giLights, giRespray, giWheels, giBumper, giWheelType, giMotorcycleFrontWheel, giMotorcycleRearWheel, giTires, giTireDesign, giTireEnhancements, giNeonKits, giPrimaryCol, giSecondaryCol, giCustomPrimaryCol, giCustomSecondaryCol, giBikeWheels, giHighEndWheels, giDoor, giLowriderWheels, giMuscleWheels, giOffroadWheels, giSportWheels, giSUVWheels, giTunerWheels, giBennysWheels, giBespokeWheels, giRacingWheels, giStreetWheels, giTrackWheels, giFBumper, giRBumper, giSSkirt, giNumberPlate, giVanityPlate, giPlateHolder, giExhaust, giBrakes, giGrille, giHood, giHydraulics, giPlaques, giSpoilers, giTank, giTrunk, giStruts, iSBikeWheels, iCBikeWheels, iSHighEnd, iCHighEnd, iSLowrider, iCLowrider, iSMuscle, iCMuscle, iSOffroad, iCOffroad, iSSport, iCSport, iSSUV, iCSUV, iSTuner, iCTuner, giTrailer, giWeapon, giArchCover, giRoof, giAirfilter, giOrnaments;
         public static UIMenuItem iShifter, iFMudguard, iBSeat, iOilTank, iRMudguard, iFuelTank, iBeltDriveCovers, iBEngineBlock, iBAirFilter, iBTank, iBackrests, iWindshields, iMotorcycleSeats, iSaddleBags;
         public static UIMenuItem giShifter, giFMudguard, giOilTank, giRMudguard, giFuelTank, giBeltDriveCovers, giBEngineBlock, giBAirFilter, giBTank, giBackrests, giWindshields, giMotorcycleSeats, giSaddleBags;
@@ -1069,6 +1069,28 @@ namespace BennysMotorworksRevamped
                 || menu == mStruts || menu == mBEngineBlock || menu == mBAirFilter;
         }
 
+        internal static void ApplySpecializedCameraForVisibleMenu(UIMenu menu)
+        {
+            if (menu == null || camera == null || veh == null || !veh.Exists())
+            {
+                return;
+            }
+
+            if (menu == mFrame && !arenavehicle.Contains(veh.Model))
+            {
+                camera.MainCameraPosition = CameraPosition.RollCage;
+                return;
+            }
+
+            string modelName = veh.Model.ToString();
+            if ((modelName.StartsWith("banshee", StringComparison.OrdinalIgnoreCase)
+                || modelName.Equals("mamba", StringComparison.OrdinalIgnoreCase))
+                && (menu == gmEngine || IsEnginePreviewMenu(menu)))
+            {
+                ApplyEnginePreviewCamera(true);
+            }
+        }
+
         private static void ApplyEnginePreviewCamera(bool openCover)
         {
             if (camera == null || veh == null || !veh.Exists())
@@ -1078,7 +1100,20 @@ namespace BennysMotorworksRevamped
 
             if (veh.GetVehEnginePos() != EngineLoc.rear)
             {
-                HoodCamera(openCover);
+                string modelName = veh.Model.ToString();
+                if (modelName.StartsWith("banshee", StringComparison.OrdinalIgnoreCase)
+                    || modelName.Equals("mamba", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (openCover && veh.HasBone("bonnet"))
+                    {
+                        veh.OpenDoor(VehicleDoorIndex.Hood, false, false);
+                    }
+                    camera.MainCameraPosition = CameraPosition.EngineBaySide;
+                }
+                else
+                {
+                    HoodCamera(openCover);
+                }
                 return;
             }
 
@@ -2005,6 +2040,7 @@ namespace BennysMotorworksRevamped
             RefreshModMenuFor(ref mAerials, ref iAerials, VehicleMod.Aerials);
             RefreshModMenuFor(ref mTrim, ref iTrim, VehicleMod.Trim);
             RefreshModMenuFor(ref mWindow, ref iWindows, VehicleMod.Windows);
+            RefreshModMenuFor(ref mAdditionalBodywork, ref iAdditionalBodywork, (VehicleMod)47);
             RefreshModMenuFor(ref mArchCover, ref iArchCover, VehicleMod.ArchCover);
             RefreshEngineMenu();
             RefreshPerformanceMenuFor(ref mEngine, ref iEngine, VehicleMod.Engine, "CMOD_ENG_");
@@ -2359,6 +2395,7 @@ namespace BennysMotorworksRevamped
             MoveMainMenuItemToEnd(iSuspension);
             MoveMainMenuItemToEnd(iTransmission);
             MoveMainMenuItemToEnd(giTrunk);
+            MoveMainMenuItemToEnd(iAdditionalBodywork);
             MoveMainMenuItemToEnd(iTurbo);
             MoveMainMenuItemToEnd(giWheels);
             MoveMainMenuItemToEnd(iTint);
@@ -2766,6 +2803,17 @@ namespace BennysMotorworksRevamped
                         giTrunk = new UIMenuItem(GetModCategoryName(VehicleMod.Trunk), Game.GetLocalizedString("CMOD_MOD_62_D"));
                         MainMenu.AddItem(giTrunk);
                         MainMenu.BindMenuToItem(mTrunk, giTrunk);
+                    }
+                    if (bennysvehicle.Contains(veh.Model) && mAdditionalBodywork.MenuItems.Count > 1)
+                    {
+                        string categoryName = GetModCategoryName((VehicleMod)47);
+                        if (string.IsNullOrWhiteSpace(categoryName) || categoryName.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            categoryName = "Additional Bodywork";
+                        }
+                        iAdditionalBodywork = new UIMenuItem(categoryName, "Customize " + categoryName + ".");
+                        MainMenu.AddItem(iAdditionalBodywork);
+                        MainMenu.BindMenuToItem(mAdditionalBodywork, iAdditionalBodywork);
                     }
                     iTurbo = new UIMenuItem(LocalizedModTypeName(VehicleToggleMod.Turbo), Game.GetLocalizedString("CMOD_MOD_27_D"));
                     MainMenu.AddItem(iTurbo);
@@ -5158,6 +5206,7 @@ namespace BennysMotorworksRevamped
             mAerials = NewUIMenu(ref mAerials, "CMM_MOD_ST18", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mTrim = NewUIMenu(ref mTrim, "CMM_MOD_ST19", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mWindow = NewUIMenu(ref mWindow, "CMM_MOD_ST21", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
+            mAdditionalBodywork = NewUIMenu(ref mAdditionalBodywork, "CMM_MOD_ST22", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             mArchCover = NewUIMenu(ref mArchCover, "CMM_MOD_ST17", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
             gmEngine = NewUIMenu(ref gmEngine, "CMM_MOD_GT3", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler);
             mEngine = NewUIMenu(ref mEngine, "CMM_MOD_GT3", false, true, ModsMenuCloseHandler, ModsMenuItemSelectHandler, ModsMenuIndexChangedHandler);
@@ -5455,6 +5504,7 @@ namespace BennysMotorworksRevamped
                     newAWVeh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                     newAWVeh.SetMod(VehicleMod.VanityPlates, lastVehMemory.VanityPlates, false);
                     newAWVeh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
+                    newAWVeh.SetMod((VehicleMod)47, lastVehMemory.AdditionalBodywork, false);
                     newAWVeh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
                     newAWVeh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                     newAWVeh.ToggleMod(VehicleToggleMod.XenonHeadlights, lastVehMemory.Headlights);
@@ -6098,6 +6148,20 @@ namespace BennysMotorworksRevamped
                         Game.Player.Money = (Game.Player.Money - mc.Price);
                         selectedItem.Tag = new ModClass(mc.ModID, 0);
                         lastVehMemory.Windows = mc.ModID;
+                        PlaySpeech("");
+                    }
+                }
+                else if (sender == mAdditionalBodywork)
+                {
+                    if (selectedItem.RightBadge != UIMenuItem.BadgeStyle.Car)
+                    {
+                        ModClass mc = (ModClass)selectedItem.Tag;
+                        veh.SetMod((VehicleMod)47, mc.ModID, false);
+                        selectedItem.SetRightBadge(UIMenuItem.BadgeStyle.Car);
+                        selectedItem.SetRightLabel(null);
+                        Game.Player.Money = (Game.Player.Money - mc.Price);
+                        selectedItem.Tag = new ModClass(mc.ModID, 0);
+                        lastVehMemory.AdditionalBodywork = mc.ModID;
                         PlaySpeech("");
                     }
                 }
@@ -7369,6 +7433,10 @@ namespace BennysMotorworksRevamped
                     {
                         veh.SetMod(VehicleMod.Windows, mc.ModID, false);
                     }
+                    else if (sender == mAdditionalBodywork)
+                    {
+                        veh.SetMod((VehicleMod)47, mc.ModID, false);
+                    }
                     else if (sender == mTurbo)
                     {
                         veh.ToggleMod(VehicleToggleMod.Turbo, mc.ModIDBool());
@@ -7684,6 +7752,7 @@ namespace BennysMotorworksRevamped
                         newVeh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                         newVeh.SetMod(VehicleMod.VanityPlates, lastVehMemory.VanityPlates, false);
                         newVeh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
+                        newVeh.SetMod((VehicleMod)47, lastVehMemory.AdditionalBodywork, false);
                         newVeh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
                         newVeh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                         newVeh.ToggleMod(VehicleToggleMod.XenonHeadlights, lastVehMemory.Headlights);
@@ -7773,6 +7842,7 @@ namespace BennysMotorworksRevamped
                         newVeh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                         newVeh.SetMod(VehicleMod.VanityPlates, lastVehMemory.VanityPlates, false);
                         newVeh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
+                        newVeh.SetMod((VehicleMod)47, lastVehMemory.AdditionalBodywork, false);
                         newVeh.ToggleMod(VehicleToggleMod.TireSmoke, lastVehMemory.TireSmokeEnabled);
                         newVeh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                         newVeh.ToggleMod(VehicleToggleMod.XenonHeadlights, lastVehMemory.Headlights);
@@ -7806,6 +7876,10 @@ namespace BennysMotorworksRevamped
                     }
                     else if (TryApplyRepurposedModCamera(selectedItem))
                     {
+                    }
+                    else if (selectedItem == iFrame)
+                    {
+                        camera.MainCameraPosition = CameraPosition.RollCage;
                     }
                     else if (selectedItem == giEngine)
                     {
@@ -7973,6 +8047,10 @@ namespace BennysMotorworksRevamped
                     {
                         veh.OpenDoor(VehicleDoorIndex.Trunk, false, false);
                         camera.MainCameraPosition = CameraPosition.Trunk;
+                    }
+                    else if (selectedItem == iAdditionalBodywork)
+                    {
+                        camera.MainCameraPosition = veh.Model == "slamvan3" ? CameraPosition.Trunk : CameraPosition.Car;
                     }
                     else if (selectedItem == giPlaques)
                     {
@@ -8214,6 +8292,7 @@ namespace BennysMotorworksRevamped
                 veh.SetMod(VehicleMod.Tank, lastVehMemory.Tank, false);
                 veh.SetMod(VehicleMod.Trunk, lastVehMemory.Trunk, false);
                 veh.SetMod(VehicleMod.Windows, lastVehMemory.Windows, false);
+                veh.SetMod((VehicleMod)47, lastVehMemory.AdditionalBodywork, false);
                 veh.ToggleMod(VehicleToggleMod.Turbo, lastVehMemory.Turbo);
                 veh.Mods.WindowTint = lastVehMemory.Tint;
                 veh.CanTiresBurst = lastVehMemory.BulletProofTires;
@@ -8254,13 +8333,14 @@ namespace BennysMotorworksRevamped
                 if (sender == mHydraulics) { veh.CloseDoor(VehicleDoorIndex.Trunk, false); }
                 if (sender == mSpeakers && sender.ParentMenu != gmInterior) { veh.CloseDoor(VehicleDoorIndex.Trunk, false); }
                 if (sender == mTrunk) { veh.CloseDoor(VehicleDoorIndex.Trunk, false); }
+                if (sender == mAdditionalBodywork) { camera.MainCameraPosition = CameraPosition.Car; }
                 if (sender == gmLights)
                 {
                     veh.SetLightsState(true);
                     veh.SetHighBeamsState(false);
                 }
                 // Reset Camera Position
-                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mSaddleBags) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mTornadoC) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
+                if ((sender == gmInterior) || (sender == gmEngine) || (sender == mFrame) || (sender == mFBumper) || (sender == mRBumper) || (sender == mSSkirt) || (sender == mNumberPlate) || (sender == mPlateHolder) || (sender == mSpoilers) || (sender == mVanityPlates) || (sender == gmWheels) || (sender == mExhaust) || (sender == mBrakes) || (sender == mGrille) || (sender == mHood) || (sender == mHydraulics) || (sender == mPlaques) || (sender == mTank) || (sender == mShifter) || (sender == mFMudguard) || (sender == mOilTank) || (sender == mRMudguard) || (sender == mBackrests) || (sender == mWindshields) || (sender == mMotorcycleSeats) || (sender == mSaddleBags) || (sender == mFuelTank) || (sender == mBeltDriveCovers) || (sender == mBTank) || (sender == mTrunk) || (sender == mArchCover) || (sender == mRoof) || (sender == mTornadoC) || (sender == mSpeakers && sender.ParentMenu != gmInterior))
                 {
                     camera.MainCameraPosition = CameraPosition.Car;
                 }

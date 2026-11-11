@@ -2320,19 +2320,7 @@ namespace BennysMotorworksRevamped
 
         internal static bool AreChameleonColorsAvailable()
         {
-            try
-            {
-                if (IsEnhancedGameBuild())
-                {
-                    return true;
-                }
-
-                return Function.Call<bool>(Hash.IS_DLC_PRESENT, "spchameleon".GetHashKey());
-            }
-            catch
-            {
-                return false;
-            }
+            return IsEnhancedGameBuild();
         }
 
         private static bool IsMetallicColorName(string name)
@@ -4983,6 +4971,7 @@ namespace BennysMotorworksRevamped
                 Trunk = veh.GetMod(VehicleMod.Trunk),
                 Turbo = veh.IsToggleModOn(VehicleToggleMod.Turbo),
                 Windows = veh.GetMod(VehicleMod.Windows),
+                AdditionalBodywork = veh.GetMod((VehicleMod)47),
                 Tint = currentWindowTint,
                 PearlescentColor = veh.Mods.PearlescentColor,
                 PrimaryColor = GetCapturedVehiclePaintColor(veh, true),

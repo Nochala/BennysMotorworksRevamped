@@ -1,4 +1,4 @@
-using GTA;
+﻿using GTA;
 using GTA.Math;
 using GTA.Native;
 using LemonUI.Tools;
@@ -40,6 +40,8 @@ namespace BennysMotorworksRevamped
         FrontRoof,
         RearRoof,
         Headlights,
+        RollCage,
+        EngineBaySide,
     }
 
     public enum CameraRotationMode
@@ -1551,6 +1553,60 @@ namespace BennysMotorworksRevamped
                 new CameraClamp { MaxVerticalValue = -40.0f, MinVerticalValue = -3.0f });
         }
 
+        private void SetRollCageCamera()
+        {
+            Vector3 minimum;
+            Vector3 maximum;
+            _target.Model.GetDimensions(out minimum, out maximum);
+            bool hasDimensions = IsFiniteVector(minimum) && IsFiniteVector(maximum)
+                && maximum.X > minimum.X && maximum.Y > minimum.Y && maximum.Z > minimum.Z;
+
+            Vector3 focus;
+            if (TryGetAverageBonePosition(_target, "seat_dside_f", "seat_pside_f", out focus))
+            {
+                focus += _target.UpVector * 0.55f;
+            }
+            else if (hasDimensions)
+            {
+                focus = _target.GetOffsetPosition(new Vector3(0f, minimum.Y + (maximum.Y - minimum.Y) * 0.58f,
+                    minimum.Z + (maximum.Z - minimum.Z) * 0.78f));
+            }
+            else
+            {
+                focus = _target.Position + _target.UpVector * 1.05f;
+            }
+
+            float sideDistance = hasDimensions
+                ? Math.Max(2.75f, (maximum.X - minimum.X) * 0.65f + 1.25f)
+                : 2.85f;
+            Vector3 position = focus + _target.ForwardVector * 1.35f
+                - _target.RightVector * sideDistance + _target.UpVector * 0.4f;
+            SetAroundCamera(focus, focus.DistanceTo(position), position,
+                GetStableLookRotation(focus - position, _mainCamera.Rotation.Z),
+                new CameraClamp { MaxVerticalValue = -55.0f, MinVerticalValue = -3.0f });
+        }
+
+        private void SetEngineBaySideCamera()
+        {
+            Vector3 focus;
+            if (!TryGetUsableBonePosition(_target, "engine", out focus))
+            {
+                focus = _target.Position + _target.ForwardVector * 0.95f + _target.UpVector * 0.7f;
+            }
+
+            Vector3 minimum;
+            Vector3 maximum;
+            _target.Model.GetDimensions(out minimum, out maximum);
+            float sideDistance = IsFiniteVector(minimum) && IsFiniteVector(maximum) && maximum.X > minimum.X
+                ? Math.Max(2.5f, (maximum.X - minimum.X) * 0.65f + 1.15f)
+                : 2.65f;
+            Vector3 position = focus - _target.RightVector * sideDistance
+                + _target.ForwardVector * 0.25f + _target.UpVector * 1.55f;
+            SetAroundCamera(focus, focus.DistanceTo(position), position,
+                GetStableLookRotation(focus - position, _mainCamera.Rotation.Z),
+                new CameraClamp { MaxVerticalValue = -65.0f, MinVerticalValue = -5.0f });
+        }
+
         private void OnCameraChange(CameraPosition newPos)
         {
             if (_mainCamera == null || _target == null || !_target.Exists())
@@ -1563,6 +1619,12 @@ namespace BennysMotorworksRevamped
             {
                 case CameraPosition.Headlights:
                     SetHeadlightCamera();
+                    break;
+                case CameraPosition.RollCage:
+                    SetRollCageCamera();
+                    break;
+                case CameraPosition.EngineBaySide:
+                    SetEngineBaySideCamera();
                     break;
                 case CameraPosition.Spoiler:
                     SetSpoilerCamera();

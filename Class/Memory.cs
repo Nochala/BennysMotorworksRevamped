@@ -57,6 +57,7 @@ namespace BennysMotorworksRevamped
         public int Tank { get; set; }
         public int Trunk { get; set; }
         public int Windows { get; set; }
+        public int AdditionalBodywork { get; set; }
         public bool Turbo { get; set; }
         public VehicleWindowTint Tint { get; set; }
         public VehicleColor PrimaryColor { get; set; }
