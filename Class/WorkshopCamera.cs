@@ -122,6 +122,12 @@ namespace BennysMotorworksRevamped
                     return;
                 }
 
+                if (_internalCameraPosition == CameraPosition.RollCage && value != CameraPosition.RollCage)
+                {
+                    Logger.Debug("Roll cage camera replaced by " + value + ": target="
+                        + (_target != null && _target.Exists() ? _target.Model.ToString() : "none"));
+                }
+
                 if (EnsureCameraReady())
                 {
                     OnCameraChange(value);
@@ -1604,6 +1610,10 @@ namespace BennysMotorworksRevamped
 
         private void SetRollCageCamera()
         {
+            Logger.Debug("Roll cage camera invoked: active=" + (Helper.veh != null && Helper.veh.Exists() ? Helper.veh.Model.ToString() : "none")
+                + " activeHandle=" + (Helper.veh != null && Helper.veh.Exists() ? Helper.veh.Handle : 0)
+                + " target=" + (_target != null && _target.Exists() ? _target.Model.ToString() : "none")
+                + " targetHandle=" + (_target != null && _target.Exists() ? _target.Handle : 0));
             Vector3 minimum;
             Vector3 maximum;
             _target.Model.GetDimensions(out minimum, out maximum);
@@ -1615,6 +1625,7 @@ namespace BennysMotorworksRevamped
                 Vector3 cabinFocus = _target.Position + _target.ForwardVector * 0.95f + _target.UpVector * 1.55f;
                 Vector3 cabinCamera = cabinFocus - _target.RightVector * 2.85f
                     + _target.ForwardVector * 0.2f + _target.UpVector * 0.6f;
+                Logger.Debug("Roll cage slamvan3 anchor: focus=" + cabinFocus + " camera=" + cabinCamera);
                 SetAroundCamera(cabinFocus, cabinFocus.DistanceTo(cabinCamera), cabinCamera,
                     GetStableLookRotation(cabinFocus - cabinCamera, _mainCamera.Rotation.Z),
                     new CameraClamp { MaxVerticalValue = -55.0f, MinVerticalValue = -3.0f });
@@ -1641,6 +1652,7 @@ namespace BennysMotorworksRevamped
                 : 2.85f;
             Vector3 position = focus + _target.ForwardVector * 1.35f
                 - _target.RightVector * sideDistance + _target.UpVector * 0.4f;
+            Logger.Debug("Roll cage generic anchor: model=" + _target.Model + " focus=" + focus + " camera=" + position);
             SetAroundCamera(focus, focus.DistanceTo(position), position,
                 GetStableLookRotation(focus - position, _mainCamera.Rotation.Z),
                 new CameraClamp { MaxVerticalValue = -55.0f, MinVerticalValue = -3.0f });
@@ -1681,7 +1693,14 @@ namespace BennysMotorworksRevamped
                     SetHeadlightCamera();
                     break;
                 case CameraPosition.RollCage:
-                    SetRollCageCamera();
+                    if (_target.Model == "slamvan3")
+                    {
+                        SetSpoilerCamera();
+                    }
+                    else
+                    {
+                        SetRollCageCamera();
+                    }
                     break;
                 case CameraPosition.EngineBaySide:
                     SetEngineBaySideCamera();

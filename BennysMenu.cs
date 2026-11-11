@@ -127,6 +127,15 @@ namespace BennysMotorworksRevamped
             _lastSpecializedCameraMenu = visibleMenu;
             _lastSpecializedCameraVehicleHandle = vehicleHandle;
 
+            if (menuChanged && visibleMenu == MenuHelper.mFrame)
+            {
+                Logger.Debug("Roll cage submenu opened: vehicle=" + (veh != null && veh.Exists() ? veh.Model.ToString() : "none")
+                    + " handle=" + vehicleHandle
+                    + " arena=" + (veh != null && veh.Exists() && Helper.arenavehicle.Contains(veh.Model))
+                    + " requested=" + (MenuHelper.TryGetSpecializedCameraForVisibleMenu(visibleMenu, out CameraPosition requested) ? requested.ToString() : "none")
+                    + " current=" + (camera != null ? camera.MainCameraPosition.ToString() : "no camera"));
+            }
+
             if (camera == null || !MenuHelper.TryGetSpecializedCameraForVisibleMenu(visibleMenu, out CameraPosition position))
             {
                 return;

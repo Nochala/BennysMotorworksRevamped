@@ -1085,7 +1085,7 @@ namespace BennysMotorworksRevamped
 
             if (menu == mFrame && !arenavehicle.Contains(veh.Model))
             {
-                position = CameraPosition.RollCage;
+                position = veh.Model == "slamvan3" ? CameraPosition.Spoiler : CameraPosition.RollCage;
                 return true;
             }
 
@@ -7904,7 +7904,10 @@ namespace BennysMotorworksRevamped
                     }
                     else if (selectedItem == iFrame)
                     {
-                        camera.MainCameraPosition = CameraPosition.RollCage;
+                        Logger.Debug("Roll cage selected: vehicle=" + (veh != null && veh.Exists() ? veh.Model.ToString() : "none")
+                            + " handle=" + (veh != null && veh.Exists() ? veh.Handle : 0)
+                            + " menu=" + (sender == MainMenu ? "main" : "other"));
+                        camera.MainCameraPosition = veh.Model == "slamvan3" ? CameraPosition.Spoiler : CameraPosition.RollCage;
                     }
                     else if (selectedItem == giEngine)
                     {
