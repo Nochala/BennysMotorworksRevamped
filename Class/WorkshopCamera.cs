@@ -69,6 +69,8 @@ namespace BennysMotorworksRevamped
         private Entity _target;
         private Vector3 _targetPos;
         private CameraPosition _internalCameraPosition;
+        private CameraPosition? _pendingCameraPosition;
+        private int _pendingCameraVehicleHandle;
         private CameraRotationMode _rotationMode;
         private CameraClamp _cameraClamp;
         private float _cameraZoom;
@@ -115,9 +117,21 @@ namespace BennysMotorworksRevamped
             get => _internalCameraPosition;
             set
             {
+                if (Helper.isCutscene || Helper.isExiting)
+                {
+                    return;
+                }
+
                 if (EnsureCameraReady())
                 {
                     OnCameraChange(value);
+                    _pendingCameraPosition = null;
+                    _pendingCameraVehicleHandle = 0;
+                }
+                else
+                {
+                    _pendingCameraPosition = value;
+                    _pendingCameraVehicleHandle = Helper.veh != null && Helper.veh.Exists() ? Helper.veh.Handle : 0;
                 }
                 _internalCameraPosition = value;
             }
@@ -417,6 +431,8 @@ namespace BennysMotorworksRevamped
 
         private void ResetTransientState()
         {
+            _pendingCameraPosition = null;
+            _pendingCameraVehicleHandle = 0;
             IsLerping = false;
             _lerpAroundFocus = false;
             _curvedTransition = false;
@@ -457,6 +473,11 @@ namespace BennysMotorworksRevamped
 
         private bool EnsureCameraReady()
         {
+            if (Helper.isCutscene || Helper.isExiting)
+            {
+                return false;
+            }
+
             Vehicle currentVehicle = Helper.veh;
             bool targetMatchesCurrentVehicle = currentVehicle == null
                 || !currentVehicle.Exists()
@@ -621,6 +642,34 @@ namespace BennysMotorworksRevamped
 
         public void Update()
         {
+            if (Helper.isCutscene || Helper.isExiting)
+            {
+                _pendingCameraPosition = null;
+                _pendingCameraVehicleHandle = 0;
+                return;
+            }
+
+            if (_pendingCameraPosition.HasValue)
+            {
+                if (Helper._menuPool == null || !Helper._menuPool.AreAnyVisible
+                    || Helper.veh == null || !Helper.veh.Exists() || Helper.veh.Handle != _pendingCameraVehicleHandle)
+                {
+                    _pendingCameraPosition = null;
+                    _pendingCameraVehicleHandle = 0;
+                }
+                else
+                {
+                    CameraPosition requestedPosition = _pendingCameraPosition.Value;
+                    if (EnsureCameraReady())
+                    {
+                        OnCameraChange(requestedPosition);
+                        _internalCameraPosition = requestedPosition;
+                        _pendingCameraPosition = null;
+                        _pendingCameraVehicleHandle = 0;
+                    }
+                }
+            }
+
             if (_isDragging && (!Helper.optEnableMouse
                 || IsControlJustReleasedIncludingDisabled(Control.Attack)
                 || !IsControlPressedIncludingDisabled(Control.Attack)))
@@ -1560,6 +1609,17 @@ namespace BennysMotorworksRevamped
             _target.Model.GetDimensions(out minimum, out maximum);
             bool hasDimensions = IsFiniteVector(minimum) && IsFiniteVector(maximum)
                 && maximum.X > minimum.X && maximum.Y > minimum.Y && maximum.Z > minimum.Z;
+
+            if (_target.Model == "slamvan3")
+            {
+                Vector3 cabinFocus = _target.Position + _target.ForwardVector * 0.95f + _target.UpVector * 1.55f;
+                Vector3 cabinCamera = cabinFocus - _target.RightVector * 2.85f
+                    + _target.ForwardVector * 0.2f + _target.UpVector * 0.6f;
+                SetAroundCamera(cabinFocus, cabinFocus.DistanceTo(cabinCamera), cabinCamera,
+                    GetStableLookRotation(cabinFocus - cabinCamera, _mainCamera.Rotation.Z),
+                    new CameraClamp { MaxVerticalValue = -55.0f, MinVerticalValue = -3.0f });
+                return;
+            }
 
             Vector3 focus;
             if (TryGetAverageBonePosition(_target, "seat_dside_f", "seat_pside_f", out focus))

@@ -61,6 +61,8 @@ namespace BennysMotorworksRevamped
         private bool _menuCreationFailureLogged;
         private bool _workshopFilterMenuVisible;
         private bool _headlightCameraMenuVisible;
+        private BennysMotorworksRevamped.Compat.UIMenu _lastSpecializedCameraMenu;
+        private int _lastSpecializedCameraVehicleHandle;
         private bool _workshopFilterUnavailable;
         private bool _workshopFilterPushed;
         private bool _workshopFilterLightPreview;
@@ -103,6 +105,40 @@ namespace BennysMotorworksRevamped
             else if (menuVisible && camera.MainCameraPosition == CameraPosition.Headlights)
             {
                 camera.MainCameraPosition = CameraPosition.Car;
+            }
+        }
+
+        private void UpdateSpecializedCategoryCamera(bool menuVisible)
+        {
+            if (!menuVisible || isCutscene || isExiting)
+            {
+                _lastSpecializedCameraMenu = null;
+                _lastSpecializedCameraVehicleHandle = 0;
+                return;
+            }
+
+            BennysMotorworksRevamped.Compat.UIMenu visibleMenu = menuVisible
+                ? BennysMotorworksRevamped.Compat.UIMenu.GetVisibleMenu()
+                : null;
+            int vehicleHandle = veh != null && veh.Exists() ? veh.Handle : 0;
+            bool menuChanged = visibleMenu != _lastSpecializedCameraMenu
+                || vehicleHandle != _lastSpecializedCameraVehicleHandle;
+
+            _lastSpecializedCameraMenu = visibleMenu;
+            _lastSpecializedCameraVehicleHandle = vehicleHandle;
+
+            if (camera == null || !MenuHelper.TryGetSpecializedCameraForVisibleMenu(visibleMenu, out CameraPosition position))
+            {
+                return;
+            }
+
+            if (camera.MainCameraPosition != position)
+            {
+                if (menuChanged)
+                {
+                    Logger.Debug("Workshop camera: " + position + " requested for " + veh.Model);
+                }
+                MenuHelper.ApplySpecializedCameraForVisibleMenu(visibleMenu);
             }
         }
 
@@ -828,6 +864,7 @@ namespace BennysMotorworksRevamped
 
                 bool isMenuVisible = MenuHelper._menuPool != null && MenuHelper._menuPool.AreAnyVisible;
                 UpdateHeadlightCamera(isMenuVisible);
+                UpdateSpecializedCategoryCamera(isMenuVisible);
                 UpdateWorkshopVisualFilter(isMenuVisible);
                 camera?.UpdateShopDepthOfField(isMenuVisible);
                 SetWorkshopPlayerControlSuppressed(isMenuVisible);

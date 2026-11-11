@@ -1069,25 +1069,52 @@ namespace BennysMotorworksRevamped
                 || menu == mStruts || menu == mBEngineBlock || menu == mBAirFilter;
         }
 
-        internal static void ApplySpecializedCameraForVisibleMenu(UIMenu menu)
+        private static bool IsSpecialEngineBayVehicle(Model model)
         {
-            if (menu == null || camera == null || veh == null || !veh.Exists())
+            return model == "banshee" || model == "banshee2" || model == "banshee3" || model == "mamba"
+                || model.ToString().StartsWith("banshee", StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal static bool TryGetSpecializedCameraForVisibleMenu(UIMenu menu, out CameraPosition position)
+        {
+            position = CameraPosition.Car;
+            if (menu == null || veh == null || !veh.Exists())
             {
-                return;
+                return false;
             }
 
             if (menu == mFrame && !arenavehicle.Contains(veh.Model))
             {
-                camera.MainCameraPosition = CameraPosition.RollCage;
+                position = CameraPosition.RollCage;
+                return true;
+            }
+
+            if (IsSpecialEngineBayVehicle(veh.Model)
+                && veh.GetVehEnginePos() != EngineLoc.rear
+                && (menu == gmEngine || IsEnginePreviewMenu(menu)))
+            {
+                position = CameraPosition.EngineBaySide;
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static void ApplySpecializedCameraForVisibleMenu(UIMenu menu)
+        {
+            if (camera == null || !TryGetSpecializedCameraForVisibleMenu(menu, out CameraPosition position))
+            {
                 return;
             }
 
-            string modelName = veh.Model.ToString();
-            if ((modelName.StartsWith("banshee", StringComparison.OrdinalIgnoreCase)
-                || modelName.Equals("mamba", StringComparison.OrdinalIgnoreCase))
-                && (menu == gmEngine || IsEnginePreviewMenu(menu)))
+            if (position == CameraPosition.EngineBaySide && veh.HasBone("bonnet"))
             {
-                ApplyEnginePreviewCamera(true);
+                veh.OpenDoor(VehicleDoorIndex.Hood, false, false);
+            }
+
+            if (camera.MainCameraPosition != position)
+            {
+                camera.MainCameraPosition = position;
             }
         }
 
@@ -1100,9 +1127,7 @@ namespace BennysMotorworksRevamped
 
             if (veh.GetVehEnginePos() != EngineLoc.rear)
             {
-                string modelName = veh.Model.ToString();
-                if (modelName.StartsWith("banshee", StringComparison.OrdinalIgnoreCase)
-                    || modelName.Equals("mamba", StringComparison.OrdinalIgnoreCase))
+                if (IsSpecialEngineBayVehicle(veh.Model))
                 {
                     if (openCover && veh.HasBone("bonnet"))
                     {
